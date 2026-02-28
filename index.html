@@ -703,49 +703,90 @@
     .celebration-comment { font-size: 14px; }
   }
 
-  /* ═══ TV MODE – Samsung Smart TVs (weak GPU) ═══ */
-  body.tv-mode #mim-celebration-overlay {
+  /* ═══ TV MODE – Samsung Smart TVs (ULTRA LIGHTWEIGHT) ═══
+     Kill ALL animations, filters, box-shadows, backdrop-filters.
+     Samsung Tizen browser has ~50MB GPU memory. Every animation eats it. */
+
+  /* Nuclear kill: disable ALL animations and transitions globally in TV mode */
+  body.tv-mode *,
+  body.tv-mode *::before,
+  body.tv-mode *::after {
+    animation-duration: 0.001s !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001s !important;
     backdrop-filter: none !important;
-    background: radial-gradient(ellipse at 50% 30%, #1a0a2e 0%, #0a0e27 40%, #050510 100%) !important;
+    -webkit-backdrop-filter: none !important;
+    filter: none !important;
   }
-  body.tv-mode #mim-celebration-overlay::before {
-    animation: none !important;
-    background: radial-gradient(circle at 50% 40%, rgba(255,215,0,0.15) 0%, transparent 60%) !important;
-    opacity: 1 !important;
+
+  /* Overlay: solid dark background, no gradients, no pseudo-elements */
+  body.tv-mode #mim-celebration-overlay {
+    background: #0a0e1a !important;
   }
-  body.tv-mode #mim-celebration-overlay::after { display: none !important; }
+  body.tv-mode #mim-celebration-overlay::before,
+  body.tv-mode #mim-celebration-overlay::after {
+    display: none !important;
+  }
+
+  /* Cards: flat solid colors, no blur, no shadow */
   body.tv-mode .celebration-data-card,
   body.tv-mode .celebration-comments-card,
   body.tv-mode .celebration-leaderboard {
-    backdrop-filter: none !important;
-    background: rgba(255, 255, 255, 0.06) !important;
-    border: 1px solid rgba(255, 215, 0, 0.3) !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 215, 0, 0.25) !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+    transform: none !important;
   }
+
+  /* Kill particles, shockwaves, flash */
+  body.tv-mode #mim-particles,
   body.tv-mode .celebration-shockwave,
-  body.tv-mode .celebration-shockwave-2 { display: none !important; }
-  body.tv-mode #mim-particles { display: none !important; }
-  body.tv-mode .celebration-avatar-wrapper { filter: drop-shadow(0 0 40px rgba(255,215,0,0.5)); }
-  body.tv-mode .celebration-title { filter: drop-shadow(0 0 20px rgba(255,215,0,0.4)); }
-  @keyframes tvGoldPulse {
-    0%, 100% { box-shadow: 0 0 60px 20px rgba(255,215,0,0.2), 0 0 120px 40px rgba(255,215,0,0.1); }
-    50% { box-shadow: 0 0 80px 30px rgba(255,215,0,0.35), 0 0 150px 60px rgba(255,215,0,0.15); }
+  body.tv-mode .celebration-shockwave-2,
+  body.tv-mode .celebration-screen-flash {
+    display: none !important;
   }
+
+  /* Avatar: static gold border, no shadow animation */
   body.tv-mode .celebration-avatar {
-    animation: tvGoldPulse 2.5s ease-in-out infinite !important;
-    animation-delay: 1.1s !important;
+    box-shadow: 0 0 40px rgba(255, 215, 0, 0.3) !important;
   }
-  @keyframes tvCardGlow {
-    0% { opacity: 0; transform: translateY(20px); }
-    100% { opacity: 1; transform: translateY(0); box-shadow: 0 0 15px rgba(255,215,0,0.1); }
+  body.tv-mode .celebration-avatar-wrapper {
+    opacity: 1 !important;
+    transform: none !important;
   }
-  body.tv-mode .celebration-data-card {
-    animation: tvCardGlow 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards !important; opacity: 0;
+
+  /* Title: simple gold color, no filter/shadow */
+  body.tv-mode .celebration-title {
+    opacity: 1 !important;
+    transform: none !important;
   }
-  body.tv-mode .celebration-data-card.card-1 { animation-delay: 0.8s !important; }
-  body.tv-mode .celebration-data-card.card-2 { animation-delay: 0.9s !important; }
-  body.tv-mode .celebration-data-card.card-3 { animation-delay: 1.0s !important; }
-  body.tv-mode .celebration-data-card.card-4 { animation-delay: 1.1s !important; }
-  body.tv-mode .celebration-data-card.card-5 { animation-delay: 1.2s !important; }
+
+  /* Combo text: static, no rotation/scale */
+  body.tv-mode .celebration-combo {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* Seller name: instant visible */
+  body.tv-mode .celebration-seller-name {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* Data values: make sure everything is visible */
+  body.tv-mode .celebration-data-value,
+  body.tv-mode .celebration-data-label {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* Main dashboard cards also simplified for TV */
+  body.tv-mode .card {
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+  }
 </style>
 </head>
 <body>
@@ -1597,21 +1638,20 @@ function showCelebration(seller, mimData, dayMimCount, weekMimCount) {
   html += `</div>`;
   content.innerHTML = html;
 
-  // === TIMELINE (30 seconds of madness) ===
-
-  // 0.3s: WHITE FLASH
-  cTimeout(() => {
-    const flash = document.createElement('div');
-    flash.className = 'celebration-screen-flash';
-    document.body.appendChild(flash);
-    cTimeout(() => flash.remove(), 300);
-  }, 300);
+  // === TIMELINE ===
 
   // 1.0s: ROCK MUSIC STARTS
   cTimeout(() => playCelebrationSound(comboLevel), 1000);
 
-  // === PARTICLE EFFECTS (skip on TV mode) ===
+  // === EFFECTS (all skipped on TV mode) ===
   if (!TV_MODE) {
+    // 0.3s: WHITE FLASH
+    cTimeout(() => {
+      const flash = document.createElement('div');
+      flash.className = 'celebration-screen-flash';
+      document.body.appendChild(flash);
+      cTimeout(() => flash.remove(), 300);
+    }, 300);
     // 0.5s: Screen Flash particles burst from center
     cTimeout(() => particles.addScreenFlashParticles(), 500);
 
