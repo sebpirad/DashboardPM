@@ -703,44 +703,43 @@
     .celebration-comment { font-size: 14px; }
   }
 
-  /* ═══ TV MODE – Samsung Smart TVs (ULTRA LIGHTWEIGHT) ═══
-     Kill ALL animations, filters, box-shadows, backdrop-filters.
-     Samsung Tizen browser has ~50MB GPU memory. Every animation eats it. */
+  /* ═══════════════════════════════════════════════════════════════
+     TV MODE – Hardware-accelerated ONLY (transform + opacity)
 
-  /* Nuclear kill: disable ALL animations and transitions globally in TV mode */
+     Rules:
+     - ZERO box-shadow animations
+     - ZERO filter / drop-shadow
+     - ZERO backdrop-filter
+     - ZERO background animations
+     - ZERO width/height animations (layout reflow)
+     - ZERO text-shadow animations
+     - ONLY transform (translate, scale, rotate) and opacity
+     ═══════════════════════════════════════════════════════════════ */
+
+  /* Global nuclear kill: remove ALL non-GPU properties */
   body.tv-mode *,
   body.tv-mode *::before,
   body.tv-mode *::after {
-    animation-duration: 0.001s !important;
-    animation-delay: 0s !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001s !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     filter: none !important;
+    text-shadow: none !important;
+    will-change: transform, opacity !important;
   }
 
-  /* Overlay: solid dark background, no gradients, no pseudo-elements */
+  /* Overlay: solid flat background, no pseudo-element animations */
   body.tv-mode #mim-celebration-overlay {
-    background: #0a0e1a !important;
+    background: #0a0e27 !important;
+    animation: none !important;
   }
-  body.tv-mode #mim-celebration-overlay::before,
+  body.tv-mode #mim-celebration-overlay::before {
+    display: none !important;
+  }
   body.tv-mode #mim-celebration-overlay::after {
     display: none !important;
   }
 
-  /* Cards: flat solid colors, no blur, no shadow */
-  body.tv-mode .celebration-data-card,
-  body.tv-mode .celebration-comments-card,
-  body.tv-mode .celebration-leaderboard {
-    background: rgba(255, 255, 255, 0.05) !important;
-    border: 1px solid rgba(255, 215, 0, 0.25) !important;
-    box-shadow: none !important;
-    opacity: 1 !important;
-    transform: none !important;
-  }
-
-  /* Kill particles, shockwaves, flash */
+  /* Kill particles, shockwaves, flashes entirely */
   body.tv-mode #mim-particles,
   body.tv-mode .celebration-shockwave,
   body.tv-mode .celebration-shockwave-2,
@@ -748,41 +747,113 @@
     display: none !important;
   }
 
-  /* Avatar: static gold border, no shadow animation */
-  body.tv-mode .celebration-avatar {
-    box-shadow: 0 0 40px rgba(255, 215, 0, 0.3) !important;
+  /* ── TITLE: fade-in + scale using ONLY transform+opacity ── */
+  @keyframes tvTitleIn {
+    0% { opacity: 0; transform: scale(0.7); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+  body.tv-mode .celebration-title {
+    animation: tvTitleIn 0.5s ease-out forwards !important;
+    opacity: 0;
+    /* Keep the gold gradient text — it's static, not animated */
+  }
+
+  /* ── COMBO: fade-in + slight scale ── */
+  @keyframes tvComboIn {
+    0% { opacity: 0; transform: scale(0.5) rotate(-10deg); }
+    100% { opacity: 1; transform: scale(1) rotate(0deg); }
+  }
+  body.tv-mode .celebration-combo {
+    animation: tvComboIn 0.6s ease-out 0.2s forwards !important;
+    opacity: 0;
+  }
+
+  /* ── AVATAR: bounce in with transform only, static after ── */
+  @keyframes tvAvatarIn {
+    0% { opacity: 0; transform: scale(0); }
+    70% { transform: scale(1.05); }
+    100% { opacity: 1; transform: scale(1); }
   }
   body.tv-mode .celebration-avatar-wrapper {
-    opacity: 1 !important;
-    transform: none !important;
+    animation: tvAvatarIn 0.6s ease-out 0.3s forwards !important;
+    opacity: 0;
+  }
+  body.tv-mode .celebration-avatar {
+    animation: none !important;
+    box-shadow: 0 0 0 3px #fff, 0 0 40px rgba(255, 215, 0, 0.4) !important;
+  }
+  /* Kill the shine pseudo-element on avatar */
+  body.tv-mode .celebration-avatar::before {
+    display: none !important;
   }
 
-  /* Title: simple gold color, no filter/shadow */
-  body.tv-mode .celebration-title {
-    opacity: 1 !important;
-    transform: none !important;
+  /* Subtle breathing with ONLY opacity (no box-shadow) */
+  @keyframes tvAvatarBreathe {
+    0%, 100% { opacity: 0.85; }
+    50% { opacity: 1; }
+  }
+  body.tv-mode .celebration-avatar img {
+    animation: tvAvatarBreathe 3s ease-in-out 1.5s infinite !important;
   }
 
-  /* Combo text: static, no rotation/scale */
-  body.tv-mode .celebration-combo {
-    opacity: 1 !important;
-    transform: none !important;
+  /* ── SELLER NAME: simple fade-up ── */
+  @keyframes tvFadeUp {
+    0% { opacity: 0; transform: translateY(15px); }
+    100% { opacity: 1; transform: translateY(0); }
   }
-
-  /* Seller name: instant visible */
   body.tv-mode .celebration-seller-name {
-    opacity: 1 !important;
-    transform: none !important;
+    animation: tvFadeUp 0.4s ease-out 0.5s forwards !important;
+    opacity: 0;
   }
 
-  /* Data values: make sure everything is visible */
-  body.tv-mode .celebration-data-value,
-  body.tv-mode .celebration-data-label {
-    opacity: 1 !important;
-    transform: none !important;
+  /* ── DATA CARDS: staggered fade-up (transform+opacity only) ── */
+  @keyframes tvCardIn {
+    0% { opacity: 0; transform: translateY(25px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  body.tv-mode .celebration-data-card {
+    backdrop-filter: none !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+    border: 1px solid rgba(255, 215, 0, 0.25) !important;
+    box-shadow: none !important;
+    animation: tvCardIn 0.5s ease-out forwards !important;
+    opacity: 0;
+  }
+  body.tv-mode .celebration-data-card.card-1 { animation-delay: 0.7s !important; }
+  body.tv-mode .celebration-data-card.card-2 { animation-delay: 0.85s !important; }
+  body.tv-mode .celebration-data-card.card-3 { animation-delay: 1.0s !important; }
+  body.tv-mode .celebration-data-card.card-4 { animation-delay: 1.15s !important; }
+  body.tv-mode .celebration-data-card.card-5 { animation-delay: 1.3s !important; }
+
+  /* ── COMMENTS CARD ── */
+  body.tv-mode .celebration-comments-card {
+    backdrop-filter: none !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+    border: 1px solid rgba(255, 215, 0, 0.25) !important;
+    box-shadow: none !important;
+    animation: tvCardIn 0.5s ease-out 1.5s forwards !important;
+    opacity: 0;
+  }
+  body.tv-mode .celebration-comment {
+    animation: tvFadeUp 0.4s ease-out forwards !important;
+    opacity: 0;
   }
 
-  /* Main dashboard cards also simplified for TV */
+  /* ── LEADERBOARD ── */
+  body.tv-mode .celebration-leaderboard {
+    backdrop-filter: none !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+    border: 1px solid rgba(255, 215, 0, 0.25) !important;
+    box-shadow: none !important;
+    animation: tvCardIn 0.5s ease-out 1.8s forwards !important;
+    opacity: 0;
+  }
+  body.tv-mode .leaderboard-entry {
+    animation: tvFadeUp 0.4s ease-out forwards !important;
+    opacity: 0;
+  }
+
+  /* ── Dashboard cards (non-celebration) also simplified ── */
   body.tv-mode .card {
     backdrop-filter: none !important;
     box-shadow: none !important;
@@ -1643,7 +1714,7 @@ function showCelebration(seller, mimData, dayMimCount, weekMimCount) {
   // 1.0s: ROCK MUSIC STARTS
   cTimeout(() => playCelebrationSound(comboLevel), 1000);
 
-  // === EFFECTS (all skipped on TV mode) ===
+  // === ALL HEAVY EFFECTS (skip entirely on TV mode) ===
   if (!TV_MODE) {
     // 0.3s: WHITE FLASH
     cTimeout(() => {
