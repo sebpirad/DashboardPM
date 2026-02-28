@@ -704,18 +704,11 @@
   }
 
   /* ═══════════════════════════════════════════════════════════════
-     TV MODE – Samsung Tizen Browser Optimized
-
-     RULES (based on Tizen WebKit research):
-     1. ZERO animations on individual elements
-     2. SINGLE animation: whole overlay fades in once
-     3. NO box-shadow, filter, backdrop-filter, text-shadow
-     4. clip-path: circle() replaces border-radius: 50% on avatar
-     5. Solid gold text replaces background-clip: text gradient
-     6. All content renders instantly (no opacity:0 pre-loads)
+     TV MODE – Samsung Tizen: VIDEO replaces all CSS animations
+     Video is hardware-decoded = 60fps, zero CPU/GPU load
      ═══════════════════════════════════════════════════════════════ */
 
-  /* Global kill: all heavy properties */
+  /* Global kill: all CSS animations/effects */
   body.tv-mode *,
   body.tv-mode *::before,
   body.tv-mode *::after {
@@ -727,9 +720,9 @@
     transition: none !important;
   }
 
-  /* Overlay: flat solid dark, no pseudo-elements */
+  /* Overlay: transparent so video shows through */
   body.tv-mode #mim-celebration-overlay {
-    background: #0a0e27 !important;
+    background: transparent !important;
   }
   body.tv-mode #mim-celebration-overlay::before,
   body.tv-mode #mim-celebration-overlay::after {
@@ -745,7 +738,7 @@
     to { opacity: 1; }
   }
 
-  /* Kill particles, shockwaves, flashes */
+  /* Kill CSS particles, shockwaves, flashes */
   body.tv-mode #mim-particles,
   body.tv-mode .celebration-shockwave,
   body.tv-mode .celebration-shockwave-2,
@@ -753,7 +746,7 @@
     display: none !important;
   }
 
-  /* AVATAR: clip-path replaces border-radius (critical perf fix) */
+  /* AVATAR: clip-path replaces border-radius */
   body.tv-mode .celebration-avatar-wrapper {
     opacity: 1 !important;
   }
@@ -767,7 +760,7 @@
     display: none !important;
   }
 
-  /* TITLE: solid gold, no gradient-clip rendering */
+  /* TITLE: solid gold, no gradient-clip */
   body.tv-mode .celebration-title {
     background: none !important;
     -webkit-background-clip: unset !important;
@@ -777,33 +770,26 @@
     opacity: 1 !important;
   }
 
-  /* COMBO: instant */
-  body.tv-mode .celebration-combo {
-    opacity: 1 !important;
-  }
-
-  /* SELLER NAME: instant */
-  body.tv-mode .celebration-seller-name {
-    opacity: 1 !important;
-  }
-
-  /* ALL CARDS: flat, instant, zero GPU layers */
-  body.tv-mode .celebration-data-card,
-  body.tv-mode .celebration-comments-card,
-  body.tv-mode .celebration-leaderboard {
-    backdrop-filter: none !important;
-    background: rgba(255, 255, 255, 0.06) !important;
-    border: 1px solid rgba(255, 215, 0, 0.2) !important;
-    box-shadow: none !important;
-    opacity: 1 !important;
-  }
-
+  /* All text + cards: instant visible */
+  body.tv-mode .celebration-combo,
+  body.tv-mode .celebration-seller-name,
   body.tv-mode .celebration-comment,
   body.tv-mode .leaderboard-entry {
     opacity: 1 !important;
   }
 
-  /* Dashboard cards also cleaned */
+  /* Cards: semi-transparent so video shows behind */
+  body.tv-mode .celebration-data-card,
+  body.tv-mode .celebration-comments-card,
+  body.tv-mode .celebration-leaderboard {
+    backdrop-filter: none !important;
+    background: rgba(0, 0, 0, 0.6) !important;
+    border: 1px solid rgba(255, 215, 0, 0.3) !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+  }
+
+  /* Dashboard cards */
   body.tv-mode .card {
     backdrop-filter: none !important;
     box-shadow: none !important;
@@ -939,6 +925,10 @@
 
 <!-- Celebration overlay -->
 <div id="mim-celebration-overlay">
+  <video id="mim-celebration-video" muted playsinline preload="auto"
+    style="position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:9998;display:none;pointer-events:none;">
+    <source src="celebration.mp4" type="video/mp4">
+  </video>
   <canvas id="mim-particles"></canvas>
   <div class="celebration-content" id="celebration-content"></div>
 </div>
@@ -1552,6 +1542,9 @@ function clearCelebration() {
   _celebrationIntervals = [];
   if (_currentParticles) { _currentParticles.stop(); _currentParticles = null; }
   stopCelebrationSound();
+  // Stop celebration video
+  const celebVideo = document.getElementById('mim-celebration-video');
+  if (celebVideo) { celebVideo.pause(); celebVideo.currentTime = 0; celebVideo.style.display = 'none'; }
   const overlay = document.getElementById('mim-celebration-overlay');
   overlay.classList.remove('active');
   overlay.removeAttribute('style');
@@ -1584,6 +1577,14 @@ function showCelebration(seller, mimData, dayMimCount, weekMimCount) {
   void overlay.offsetHeight; // force reflow
   overlay.classList.add('active');
   if (!TV_MODE) document.getElementById('mim-particles').style.display = 'block';
+
+  // Start celebration video (hardware-decoded on Samsung TV)
+  const celebVideo = document.getElementById('mim-celebration-video');
+  if (celebVideo) {
+    celebVideo.currentTime = 0;
+    celebVideo.style.display = 'block';
+    celebVideo.play().catch(e => console.log('Video play failed:', e));
+  }
 
   const comments = getComments(seller, mimData.kandidat, mimData.virk, mimData.gf, dayMimCount, weekMimCount, new Date().getHours());
   const avatar = generateSellerAvatar(seller);
@@ -1664,7 +1665,7 @@ function showCelebration(seller, mimData, dayMimCount, weekMimCount) {
   // Music plays in ALL modes
   cTimeout(() => playCelebrationSound(comboLevel), 1000);
 
-  // === ALL VISUAL EFFECTS (skip entirely on TV — zero DOM manipulation) ===
+  // === CSS EFFECTS (skip on TV — video handles visuals) ===
   if (!TV_MODE) {
     // 0.3s: WHITE FLASH
     cTimeout(() => {
