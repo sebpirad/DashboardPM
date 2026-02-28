@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="da">
 <head>
@@ -9,10 +8,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
   :root {
-    --bg: #0F0F0F; --card: #1A1A1A; --card-border: #2A2A2A;
-    --text: #F5F5F5; --dim: #8A8A8A; --dimmer: #555555;
-    --red: #FF4D4D; --yellow: #FFB800; --green: #00D26A; --gold: #FFB800;
-    --blue: #4A9EFF; --pink: #FF6B8A; --mint: #00E6A0;
+    --bg: #0a0e1a; --card: #111827; --card-border: #1e293b;
+    --text: #F5F5F5; --dim: #94a3b8; --dimmer: #64748b;
+    --red: #f87171; --yellow: #fbbf24; --green: #34d399; --gold: #fbbf24;
+    --blue: #60a5fa; --pink: #f472b6; --mint: #6ee7b7;
+    --accent: #818cf8; --card-hover: #1e293b;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); padding: 28px 32px; }
@@ -57,7 +57,7 @@
   #error-msg { color: var(--red); font-size: 13px; display: none; }
 
   /* ── Section titles ── */
-  .section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--dim); margin: 28px 0 12px; }
+  .section-title { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: #94a3b8; margin: 28px 0 14px; }
 
   /* ── Cards ── */
   .card { background: var(--card); border: 1px solid var(--card-border); border-radius: 12px; padding: 20px; }
@@ -113,9 +113,9 @@
 
   .daily-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; margin-bottom: 28px; }
   .daily-card {
-    background: var(--card); border: 1px solid var(--card-border); border-radius: 18px;
+    background: linear-gradient(160deg, #111827 0%, #0f172a 100%); border: 1px solid #1e293b; border-radius: 18px;
     padding: 32px 28px 28px; text-align: center; position: relative; overflow: hidden;
-    transition: border-color 0.3s;
+    transition: border-color 0.3s; box-shadow: 0 4px 24px rgba(0,0,0,0.3);
   }
   .daily-card.state-gold {
     border-color: rgba(52,211,153,0.4);
@@ -134,7 +134,7 @@
   /* Big ring – 200px */
   .ring-wrap { position: relative; width: 280px; height: 280px; margin: 0 auto 20px; }
   .ring-wrap svg { width: 280px; height: 280px; transform: rotate(-90deg); }
-  .ring-bg { fill: none; stroke: #1e2236; stroke-width: 12; }
+  .ring-bg { fill: none; stroke: #1e293b; stroke-width: 12; }
   .ring-fg { fill: none; stroke-width: 12; stroke-linecap: round; transition: stroke-dashoffset 1s ease, stroke 0.5s; }
   .ring-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; }
   .ring-pct { font-size: 56px; font-weight: 900; color: #fff; line-height: 1; font-variant-numeric: tabular-nums; }
@@ -143,17 +143,17 @@
   /* Small ring for team donuts – 120px */
   .ring-sm { position: relative; width: 200px; height: 200px; margin: 0 auto 10px; }
   .ring-sm svg { width: 200px; height: 200px; transform: rotate(-90deg); }
-  .ring-sm .ring-pct { font-size: 42px; }
-  .ring-sm .ring-label { font-size: 11px; }
+  .ring-sm .ring-pct { font-size: 48px; font-weight: 900; font-variant-numeric: tabular-nums; }
+  .ring-sm .ring-label { font-size: 15px; font-weight: 700; letter-spacing: 1px; }
 
   /* Progress bars */
   .daily-bars { text-align: left; margin-top: 4px; }
   .bar-row { margin-bottom: 12px; }
   .bar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
-  .bar-label { font-size: 13px; font-weight: 700; color: #B0B0B0; }
+  .bar-label { font-size: 13px; font-weight: 700; color: #cbd5e1; }
   .bar-val { font-size: 14px; font-weight: 800; color: #fff; font-variant-numeric: tabular-nums; }
   .bar-pct { font-size: 13px; font-weight: 900; margin-left: 6px; }
-  .bar-track { height: 12px; background: #2A2A2A; border-radius: 5px; overflow: hidden; position: relative; }
+  .bar-track { height: 12px; background: #1e293b; border-radius: 5px; overflow: hidden; position: relative; }
   .bar-fill { height: 100%; border-radius: 5px; transition: width 0.8s ease; min-width: 2px; }
   .bar-fill.c-red    { background: linear-gradient(90deg, #dc2626, #ef4444); }
   .bar-fill.c-yellow { background: linear-gradient(90deg, #ca8a04, #eab308); }
@@ -168,10 +168,10 @@
   /* Team donuts row */
   .daily-team-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; margin-bottom: 28px; }
   .daily-team-card {
-    background: var(--card); border: 1px solid var(--card-border); border-radius: 14px;
-    padding: 20px; text-align: center;
+    background: linear-gradient(160deg, #111827 0%, #0f172a 100%); border: 1px solid #1e293b; border-radius: 14px;
+    padding: 24px; text-align: center; box-shadow: 0 4px 24px rgba(0,0,0,0.3);
   }
-  .daily-team-card-title { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: var(--dim); margin-bottom: 16px; }
+  .daily-team-card-title { font-size: 16px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color: #e2e8f0; margin-bottom: 16px; }
 
   /* Comparison table */
   .compare-table { width: 100%; border-collapse: collapse; font-size: 12px; }
@@ -1989,22 +1989,21 @@ function renderDaglig(){
   const tSam=NAMES.reduce((s,n)=>s+dayData[n].Samtaler,0), tMiM=NAMES.reduce((s,n)=>s+dayData[n].MiM,0);
   const tBud={KT:dBud.KT*3,SS:dBud.SS*3,Sam:dBud.Sam*3,MiM:dBud.MiM*3};
   const teamMetrics=[
-    {l:'KT',v:tKT,m:tBud.KT,sub:`${tSS} SS (${tKT?Math.round(tSS/tKT*100):0}%)`},
-    {l:'Samtaler',v:tSam,m:tBud.Sam,sub:''},
-    {l:'MiM',v:tMiM,m:tBud.MiM,sub:''}
+    {l:'KT',v:tKT,m:tBud.KT},
+    {l:'Samtaler',v:tSam,m:tBud.Sam},
+    {l:'MiM',v:tMiM,m:tBud.MiM}
   ];
   document.getElementById('daily-team-donuts').innerHTML=teamMetrics.map(k=>{
     const i=idx(k.v,k.m);
     return `<div class="daily-team-card">
-      <div class="daily-team-card-title">${k.l} ${idxBadge(i)}</div>
+      <div class="daily-team-card-title">${k.l}</div>
       <div class="ring-sm">
         ${ringSVG(i, ringColor(i), 200, 12)}
         <div class="ring-center">
           <div class="ring-pct" style="color:${ringColor(i)}">${k.v}</div>
-          <div class="ring-label">af ${k.m}</div>
+          <div class="ring-label">AF ${k.m}</div>
         </div>
       </div>
-      ${k.sub?`<div style="font-size:11px;color:var(--dim);margin-top:4px">${k.sub}</div>`:''}
     </div>`;
   }).join('');
 
