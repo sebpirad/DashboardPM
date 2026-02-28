@@ -734,19 +734,23 @@
   }
 
   /* ═══ TV-OPTIMERET – Samsung Smart TV (altid aktiv) ═══ */
-  body.tv-mode *,
-  body.tv-mode *::before,
-  body.tv-mode *::after {
+  /* ── TV-MODE: Kill heavy effects on DASHBOARD, but KEEP MiM celebration FULLY alive ── */
+  /* Dashboard elements only: no animations/transitions (Tizen performance) */
+  body.tv-mode .card *, body.tv-mode .daily-card *, body.tv-mode .daily-team-card *,
+  body.tv-mode .kpi-card *, body.tv-mode .seller-card *,
+  body.tv-mode .tab-nav *, body.tv-mode .section-title,
+  body.tv-mode .bar-track, body.tv-mode .bar-fill,
+  body.tv-mode .ring-center, body.tv-mode .ring-pct, body.tv-mode .ring-label {
     text-shadow: none !important;
     animation: none !important;
     transition: none !important;
   }
-  /* Keep ambient orbs alive on TV - they use filter:blur which is GPU composited */
+  /* Keep ambient orbs alive - filter:blur IS GPU composited */
   body.tv-mode > ::before, body.tv-mode > ::after,
   body.tv-mode #app::before { filter: blur(120px) !important; opacity: 0.3 !important; }
   /* Keep ring glow */
   body.tv-mode .ring-fg { filter: drop-shadow(0 0 8px currentColor) !important; }
-  /* Kill backdrop-filter (not GPU composited on Tizen) */
+  /* Kill backdrop-filter on dashboard cards (not GPU composited on Tizen) */
   body.tv-mode .card, body.tv-mode .daily-card, body.tv-mode .daily-team-card,
   body.tv-mode .kpi-card, body.tv-mode .seller-card, body.tv-mode .tab-nav,
   body.tv-mode .refresh-btn {
@@ -754,38 +758,20 @@
     background: rgba(17,25,40,0.85) !important;
   }
   body.tv-mode .spinner { animation: spin 0.7s linear infinite !important; }
-  body.tv-mode #mim-celebration-overlay { background: transparent !important; }
-  body.tv-mode #mim-celebration-overlay::before,
-  body.tv-mode #mim-celebration-overlay::after { display: none !important; }
-  body.tv-mode #mim-celebration-overlay.active {
-    animation: tvFadeIn 0.5s ease-out forwards !important; opacity: 0;
-  }
-  @keyframes tvFadeIn { to { opacity: 1; } }
-  body.tv-mode #mim-particles,
-  body.tv-mode .celebration-shockwave,
-  body.tv-mode .celebration-shockwave-2,
-  body.tv-mode .celebration-screen-flash { display: none !important; }
-  body.tv-mode .celebration-avatar-wrapper { opacity: 1 !important; }
-  body.tv-mode .celebration-avatar {
-    border-radius: 0 !important; clip-path: circle(48%) !important;
-    box-shadow: none !important; border: none !important;
-  }
-  body.tv-mode .celebration-avatar::before { display: none !important; }
-  body.tv-mode .celebration-title {
-    background: none !important; -webkit-background-clip: unset !important;
-    -webkit-text-fill-color: #FFD700 !important; background-clip: unset !important;
-    color: #FFD700 !important; opacity: 1 !important;
-  }
-  body.tv-mode .celebration-combo,
-  body.tv-mode .celebration-seller-name,
-  body.tv-mode .celebration-comment,
-  body.tv-mode .leaderboard-entry { opacity: 1 !important; }
+  /* ── MiM CELEBRATION: Keep ALL animations, glow, particles, shockwaves ALIVE ── */
+  /* Only kill backdrop-filter on celebration cards (Tizen compat) */
   body.tv-mode .celebration-data-card,
   body.tv-mode .celebration-comments-card,
   body.tv-mode .celebration-leaderboard {
-    backdrop-filter: none !important; background: rgba(0,0,0,0.6) !important;
-    border: 1px solid rgba(255,215,0,0.3) !important; box-shadow: none !important; opacity: 1 !important;
+    backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+    background: rgba(0,0,0,0.6) !important;
+    border: 1px solid rgba(255,215,0,0.3) !important;
   }
+  /* Avatar: clip-path for TV perf but KEEP glow ring + animations */
+  body.tv-mode .celebration-avatar {
+    border-radius: 0 !important; clip-path: circle(48%) !important;
+  }
+  /* Dashboard-only: no box-shadow on regular cards */
   body.tv-mode .card { backdrop-filter: none !important; box-shadow: none !important; }
   body.tv-mode .daily-card.state-gold::before { display: none !important; }
   body.tv-mode .bar-fill.c-gold { animation: none !important; box-shadow: none !important; }</style>
@@ -796,7 +782,7 @@
 <div class="header">
   <div>
     <h1>POWERMATCH — SALES DASHBOARD</h1>
-    <div class="subtitle" id="period-label">Henter data...</div>
+    <div class="subtitle" id="period-label"></div>
   </div>
   <div style="text-align:right;display:flex;align-items:center;gap:4px">
     <button class="photo-settings-btn" onclick="togglePhotoMgr()">📷 Fotos</button>
@@ -824,7 +810,7 @@
   <button class="tab-btn"        id="tab-person" onclick="switchTab('person')">Person</button>
 </div>
 
-<div id="loading"><div class="spinner"></div><div style="color:var(--dim);font-size:12px">Henter Google Sheets data...</div></div>
+<div id="loading" style="display:none"></div>
 <div id="error-msg"></div>
 
 <!-- ══ DAGLIG VIEW ═══════════════════════════════════════════════ -->
