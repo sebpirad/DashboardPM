@@ -2,18 +2,19 @@
 <html lang="da">
 <head>
 <meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PowerMatch – Live Sales Dashboard</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
   :root {
-    --bg: #0a0c10; --card: #12141c; --card-border: #1e2236;
-    --text: #e2e8f0; --dim: #64748b; --dimmer: #3a4158;
-    --red: #ef4444; --yellow: #eab308; --green: #22c55e; --gold: #f59e0b;
-    --blue: #60a5fa; --pink: #f87171; --mint: #34d399;
+    --bg: #0F0F0F; --card: #1A1A1A; --card-border: #2A2A2A;
+    --text: #F5F5F5; --dim: #8A8A8A; --dimmer: #555555;
+    --red: #FF4D4D; --yellow: #FFB800; --green: #00D26A; --gold: #FFB800;
+    --blue: #4A9EFF; --pink: #FF6B8A; --mint: #00E6A0;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); padding: 28px 32px; }
+  body { font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); padding: 28px 32px; }
 
   /* ── Header ── */
   .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
@@ -112,8 +113,8 @@
   .daily-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; margin-bottom: 28px; }
   .daily-card {
     background: var(--card); border: 1px solid var(--card-border); border-radius: 18px;
-    padding: 28px 24px 24px; text-align: center; position: relative; overflow: hidden;
-    transition: border-color 0.3s, box-shadow 0.3s;
+    padding: 32px 28px 28px; text-align: center; position: relative; overflow: hidden;
+    transition: border-color 0.3s;
   }
   .daily-card.state-gold {
     border-color: rgba(52,211,153,0.4);
@@ -127,31 +128,31 @@
   @keyframes goldShimmer { 0%,100%{opacity:.5} 50%{opacity:1} }
   .daily-card > * { position: relative; z-index: 1; }
 
-  .daily-name { font-size: 15px; font-weight: 900; color: #fff; margin-bottom: 20px; letter-spacing: 0.5px; }
+  .daily-name { font-size: 18px; font-weight: 900; color: #fff; margin-bottom: 24px; letter-spacing: 0.5px; }
 
   /* Big ring – 200px */
-  .ring-wrap { position: relative; width: 200px; height: 200px; margin: 0 auto 20px; }
-  .ring-wrap svg { width: 200px; height: 200px; transform: rotate(-90deg); }
+  .ring-wrap { position: relative; width: 280px; height: 280px; margin: 0 auto 20px; }
+  .ring-wrap svg { width: 280px; height: 280px; transform: rotate(-90deg); }
   .ring-bg { fill: none; stroke: #1e2236; stroke-width: 12; }
   .ring-fg { fill: none; stroke-width: 12; stroke-linecap: round; transition: stroke-dashoffset 1s ease, stroke 0.5s; }
   .ring-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; }
-  .ring-pct { font-size: 42px; font-weight: 900; color: #fff; line-height: 1; }
-  .ring-label { font-size: 11px; color: var(--dim); margin-top: 3px; text-transform: uppercase; letter-spacing: 1.2px; }
+  .ring-pct { font-size: 56px; font-weight: 900; color: #fff; line-height: 1; font-variant-numeric: tabular-nums; }
+  .ring-label { font-size: 13px; color: var(--dim); margin-top: 5px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; }
 
-  /* Small ring for team donuts – 120px */
-  .ring-sm { position: relative; width: 120px; height: 120px; margin: 0 auto 10px; }
-  .ring-sm svg { width: 120px; height: 120px; transform: rotate(-90deg); }
-  .ring-sm .ring-pct { font-size: 26px; }
-  .ring-sm .ring-label { font-size: 9px; }
+  /* Small ring for team donuts – 200px */
+  .ring-sm { position: relative; width: 200px; height: 200px; margin: 0 auto 10px; }
+  .ring-sm svg { width: 200px; height: 200px; transform: rotate(-90deg); }
+  .ring-sm .ring-pct { font-size: 42px; }
+  .ring-sm .ring-label { font-size: 11px; }
 
   /* Progress bars */
   .daily-bars { text-align: left; margin-top: 4px; }
   .bar-row { margin-bottom: 12px; }
   .bar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
-  .bar-label { font-size: 11px; font-weight: 700; color: #94a3b8; }
-  .bar-val { font-size: 11px; font-weight: 700; color: #fff; }
-  .bar-pct { font-size: 10px; font-weight: 800; margin-left: 6px; }
-  .bar-track { height: 10px; background: #1e2236; border-radius: 5px; overflow: hidden; position: relative; }
+  .bar-label { font-size: 13px; font-weight: 700; color: #B0B0B0; }
+  .bar-val { font-size: 14px; font-weight: 800; color: #fff; font-variant-numeric: tabular-nums; }
+  .bar-pct { font-size: 13px; font-weight: 900; margin-left: 6px; }
+  .bar-track { height: 12px; background: #2A2A2A; border-radius: 6px; overflow: hidden; position: relative; }
   .bar-fill { height: 100%; border-radius: 5px; transition: width 0.8s ease; min-width: 2px; }
   .bar-fill.c-red    { background: linear-gradient(90deg, #dc2626, #ef4444); }
   .bar-fill.c-yellow { background: linear-gradient(90deg, #ca8a04, #eab308); }
@@ -167,9 +168,9 @@
   .daily-team-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; margin-bottom: 28px; }
   .daily-team-card {
     background: var(--card); border: 1px solid var(--card-border); border-radius: 14px;
-    padding: 20px; text-align: center;
+    padding: 24px; text-align: center;
   }
-  .daily-team-card-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--dim); margin-bottom: 12px; }
+  .daily-team-card-title { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: var(--dim); margin-bottom: 16px; }
 
   /* Comparison table */
   .compare-table { width: 100%; border-collapse: collapse; font-size: 12px; }
@@ -571,7 +572,7 @@
   /* Hall of Fame */
   .mim-log-section {
     background: var(--card); border: 1px solid var(--card-border); border-radius: 12px;
-    padding: 20px; margin-bottom: 20px;
+    padding: 16px; margin-bottom: 16px; max-height: 200px; overflow-y: auto;
   }
 
   .mim-log-title {
@@ -579,12 +580,12 @@
   }
 
   .mim-log-grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px;
   }
 
   .mim-log-card {
-    background: #1a1e2e; border: 1px solid var(--card-border); border-radius: 8px;
-    padding: 12px; display: flex; flex-direction: column; gap: 8px;
+    background: #222; border: 1px solid var(--card-border); border-radius: 8px;
+    padding: 8px 10px; display: flex; flex-direction: column; gap: 4px;
   }
 
   .mim-log-time {
@@ -703,12 +704,7 @@
     .celebration-comment { font-size: 14px; }
   }
 
-  /* ═══════════════════════════════════════════════════════════════
-     TV MODE – Samsung Tizen: VIDEO replaces all CSS animations
-     Video is hardware-decoded = 60fps, zero CPU/GPU load
-     ═══════════════════════════════════════════════════════════════ */
-
-  /* Global kill: all CSS animations/effects */
+  /* ═══ TV MODE – Samsung Smart TVs (hardware video) ═══ */
   body.tv-mode *,
   body.tv-mode *::before,
   body.tv-mode *::after {
@@ -719,8 +715,8 @@
     animation: none !important;
     transition: none !important;
   }
+  body.tv-mode .spinner { animation: spin 0.7s linear infinite !important; }
 
-  /* Overlay: transparent so video shows through */
   body.tv-mode #mim-celebration-overlay {
     background: transparent !important;
   }
@@ -728,17 +724,12 @@
   body.tv-mode #mim-celebration-overlay::after {
     display: none !important;
   }
-
-  /* THE ONLY ANIMATION: overlay fade-in */
   body.tv-mode #mim-celebration-overlay.active {
     animation: tvFadeIn 0.5s ease-out forwards !important;
     opacity: 0;
   }
-  @keyframes tvFadeIn {
-    to { opacity: 1; }
-  }
+  @keyframes tvFadeIn { to { opacity: 1; } }
 
-  /* Kill CSS particles, shockwaves, flashes */
   body.tv-mode #mim-particles,
   body.tv-mode .celebration-shockwave,
   body.tv-mode .celebration-shockwave-2,
@@ -746,21 +737,15 @@
     display: none !important;
   }
 
-  /* AVATAR: clip-path replaces border-radius */
-  body.tv-mode .celebration-avatar-wrapper {
-    opacity: 1 !important;
-  }
+  body.tv-mode .celebration-avatar-wrapper { opacity: 1 !important; }
   body.tv-mode .celebration-avatar {
     border-radius: 0 !important;
     clip-path: circle(48%) !important;
     box-shadow: none !important;
     border: none !important;
   }
-  body.tv-mode .celebration-avatar::before {
-    display: none !important;
-  }
+  body.tv-mode .celebration-avatar::before { display: none !important; }
 
-  /* TITLE: solid gold, no gradient-clip */
   body.tv-mode .celebration-title {
     background: none !important;
     -webkit-background-clip: unset !important;
@@ -770,15 +755,11 @@
     opacity: 1 !important;
   }
 
-  /* All text + cards: instant visible */
   body.tv-mode .celebration-combo,
   body.tv-mode .celebration-seller-name,
   body.tv-mode .celebration-comment,
-  body.tv-mode .leaderboard-entry {
-    opacity: 1 !important;
-  }
+  body.tv-mode .leaderboard-entry { opacity: 1 !important; }
 
-  /* Cards: semi-transparent so video shows behind */
   body.tv-mode .celebration-data-card,
   body.tv-mode .celebration-comments-card,
   body.tv-mode .celebration-leaderboard {
@@ -789,11 +770,13 @@
     opacity: 1 !important;
   }
 
-  /* Dashboard cards */
   body.tv-mode .card {
     backdrop-filter: none !important;
     box-shadow: none !important;
   }
+
+  body.tv-mode .daily-card.state-gold::before { display: none !important; }
+  body.tv-mode .bar-fill.c-gold { animation: none !important; box-shadow: none !important; }
 </style>
 </head>
 <body>
@@ -925,13 +908,15 @@
 
 <!-- Celebration overlay -->
 <div id="mim-celebration-overlay">
-  <video id="mim-celebration-video" muted playsinline preload="auto"
-    style="position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:9998;display:none;pointer-events:none;">
-    <source src="celebration.mp4" type="video/mp4">
-  </video>
   <canvas id="mim-particles"></canvas>
   <div class="celebration-content" id="celebration-content"></div>
 </div>
+
+<!-- Celebration video (hardware-decoded on Samsung TV) -->
+<video id="mim-celebration-video" muted playsinline preload="auto"
+  style="position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:9998;display:none;pointer-events:none;">
+  <source src="celebration.mp4" type="video/mp4">
+</video>
 
 <!-- Sound toggle -->
 <button class="sound-toggle" id="sound-toggle" title="Toggle celebration sound" onclick="toggleSoundMuted()">🔊</button>
@@ -951,8 +936,21 @@ const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxTb_Qpuo-mTBTx
 const NAMES = ['William','Jonas','Andreas'];
 const COLORS = { William:'#60a5fa', Jonas:'#f87171', Andreas:'#34d399', floor:'#f87171', maal:'#475569' };
 
-// Seller photo configuration – auto-loads from localStorage
+// Seller photo configuration – GitHub-hosted + localStorage fallback
+const PHOTO_BASE_URL = 'https://raw.githubusercontent.com/sebpirad/DashboardPM/main/photos/';
+const GITHUB_PHOTOS = {
+  William: PHOTO_BASE_URL + 'william.jpg',
+  Jonas: PHOTO_BASE_URL + 'jonas.jpg',
+  Andreas: PHOTO_BASE_URL + 'andreas.jpg'
+};
+const _githubPhotoVerified = {};
+
 function getSellerPhoto(name) {
+  // First try GitHub-hosted photo (works across all devices)
+  if (GITHUB_PHOTOS[name] && _githubPhotoVerified[name] !== false) {
+    return GITHUB_PHOTOS[name];
+  }
+  // Fallback to localStorage
   try { return localStorage.getItem('pm_photo_'+name) || ''; } catch(e) { return ''; }
 }
 function setSellerPhoto(name, dataUrl) {
@@ -960,6 +958,18 @@ function setSellerPhoto(name, dataUrl) {
 }
 function removeSellerPhoto(name) {
   try { localStorage.removeItem('pm_photo_'+name); } catch(e) {}
+}
+
+// Verify GitHub photos exist on load
+function verifyGitHubPhotos() {
+  for (const name of NAMES) {
+    if (GITHUB_PHOTOS[name]) {
+      const img = new Image();
+      img.onload = () => { _githubPhotoVerified[name] = true; };
+      img.onerror = () => { _githubPhotoVerified[name] = false; };
+      img.src = GITHUB_PHOTOS[name];
+    }
+  }
 }
 let _photoUploadTarget = null; // which seller we're uploading for
 
@@ -1542,14 +1552,14 @@ function clearCelebration() {
   _celebrationIntervals = [];
   if (_currentParticles) { _currentParticles.stop(); _currentParticles = null; }
   stopCelebrationSound();
-  // Stop celebration video
-  const celebVideo = document.getElementById('mim-celebration-video');
-  if (celebVideo) { celebVideo.pause(); celebVideo.currentTime = 0; celebVideo.style.display = 'none'; }
   const overlay = document.getElementById('mim-celebration-overlay');
   overlay.classList.remove('active');
   overlay.removeAttribute('style');
   document.getElementById('mim-particles').style.display = 'none';
   document.querySelectorAll('.celebration-screen-flash, .celebration-shockwave').forEach(e => e.remove());
+  // Stop celebration video
+  const celebVideo = document.getElementById('mim-celebration-video');
+  if (celebVideo) { celebVideo.pause(); celebVideo.currentTime = 0; celebVideo.style.display = 'none'; }
 }
 
 // WILD & EXPLOSIVE Main celebration (30 seconds)
@@ -1660,9 +1670,9 @@ function showCelebration(seller, mimData, dayMimCount, weekMimCount) {
   html += `</div>`;
   content.innerHTML = html;
 
-  // === TIMELINE ===
+  // === TIMELINE (30 seconds of madness) ===
 
-  // Music plays in ALL modes
+  // 1.0s: ROCK MUSIC STARTS (plays in ALL modes)
   cTimeout(() => playCelebrationSound(comboLevel), 1000);
 
   // === CSS EFFECTS (skip on TV — video handles visuals) ===
@@ -1674,6 +1684,7 @@ function showCelebration(seller, mimData, dayMimCount, weekMimCount) {
       document.body.appendChild(flash);
       cTimeout(() => flash.remove(), 300);
     }, 300);
+
     // 0.5s: Screen Flash particles burst from center
     cTimeout(() => particles.addScreenFlashParticles(), 500);
 
@@ -1755,7 +1766,15 @@ function checkForNewMiM() {
 
       if (!_seenMiM.has(key)) {
         _seenMiM.add(key);
-        newMiMs.push({ seller, mimData: mimRow, dayCount: _sellerMimToday[seller] });
+        // Only trigger celebration if ALL key fields are present
+        const hasKandidat = mimRow.kandidat && mimRow.kandidat.trim();
+        const hasVirk = mimRow.virk && mimRow.virk.trim();
+        const hasGF = !isNaN(mimRow.gf);
+        const hasTimelon = !isNaN(mimRow.timelon);
+        const hasKostpris = !isNaN(mimRow.ks);
+        if (hasKandidat && hasVirk && hasGF && hasTimelon && hasKostpris) {
+          newMiMs.push({ seller, mimData: mimRow, dayCount: _sellerMimToday[seller] });
+        }
 
         _mimLog.push({
           time: new Date(),
@@ -1982,7 +2001,7 @@ function renderDaglig(){
     return `<div class="${isGold?'daily-card state-gold':'daily-card'}">
       <div class="daily-name" style="color:${color}">${name}</div>
       <div class="ring-wrap">
-        ${ringSVG(avgPct, ringColor(avgPct), 200, 12)}
+        ${ringSVG(avgPct, ringColor(avgPct), 280, 14)}
         <div class="ring-center">
           <div class="ring-pct" style="color:${ringColor(avgPct)}">${avgPct}%</div>
           <div class="ring-label">Samlet index</div>
@@ -2012,7 +2031,7 @@ function renderDaglig(){
     return `<div class="daily-team-card">
       <div class="daily-team-card-title">${k.l} ${idxBadge(i)}</div>
       <div class="ring-sm">
-        ${ringSVG(i, ringColor(i), 120, 10)}
+        ${ringSVG(i, ringColor(i), 200, 12)}
         <div class="ring-center">
           <div class="ring-pct" style="color:${ringColor(i)}">${k.v}</div>
           <div class="ring-label">af ${k.m}</div>
@@ -2298,10 +2317,13 @@ let _firstLoad = true;
 // Load data and start auto-refresh
 loadAll();
 
-// Auto-refresh every 60 seconds
+// Auto-refresh every 5 minutes
 _autoRefreshInterval = setInterval(() => {
   loadAll();
-}, 60000);
+}, 300000);
+
+// Verify GitHub-hosted photos
+verifyGitHubPhotos();
 </script>
 </body>
 </html>
