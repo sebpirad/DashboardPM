@@ -1,0 +1,2194 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PowerMatch – Live Sales Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0a0c10; --card: #12141c; --card-border: #1e2236;
+    --text: #e2e8f0; --dim: #64748b; --dimmer: #3a4158;
+    --red: #ef4444; --yellow: #eab308; --green: #22c55e; --gold: #f59e0b;
+    --blue: #60a5fa; --pink: #f87171; --mint: #34d399;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); padding: 28px 32px; }
+
+  /* ── Header ── */
+  .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+  h1 { font-size: 20px; font-weight: 800; color: #fff; letter-spacing: 1px; }
+  .subtitle { font-size: 12px; color: var(--dim); margin-top: 3px; }
+  .refresh-btn {
+    background: var(--card); border: 1px solid var(--card-border); border-radius: 8px;
+    color: #94a3b8; font-size: 11px; padding: 7px 14px; cursor: pointer; transition: all 0.15s;
+  }
+  .refresh-btn:hover { background: #1e2236; color: #fff; }
+  .last-updated { font-size: 10px; color: #475569; margin-top: 4px; text-align: right; }
+
+  /* ── Tabs ── */
+  .tab-nav {
+    display: flex; gap: 3px; margin-bottom: 24px;
+    background: var(--card); border: 1px solid var(--card-border); border-radius: 10px; padding: 4px;
+    width: fit-content;
+  }
+  .tab-btn {
+    background: transparent; border: none; border-radius: 7px;
+    color: var(--dim); font-size: 12px; font-weight: 700; padding: 7px 20px; cursor: pointer;
+    transition: all 0.15s; letter-spacing: 0.5px; text-transform: uppercase;
+  }
+  .tab-btn:hover { color: var(--text); background: #1a1d2e; }
+  .tab-btn.active { background: linear-gradient(135deg, #3b5bdb, #5b7cf7); color: #fff; }
+
+  /* ── Pickers ── */
+  .picker-row { display: flex; gap: 8px; margin-bottom: 20px; align-items: center; flex-wrap: wrap; }
+  .picker-row label { font-size: 12px; color: #94a3b8; font-weight: 600; }
+  .picker-row select {
+    background: var(--card); border: 1px solid var(--card-border); border-radius: 8px;
+    color: var(--text); font-size: 12px; padding: 6px 12px; cursor: pointer;
+  }
+
+  /* ── Loading / Error ── */
+  #loading { display: flex; align-items: center; justify-content: center; height: 200px; flex-direction: column; gap: 12px; }
+  .spinner { width: 28px; height: 28px; border: 3px solid var(--card-border); border-top-color: var(--blue); border-radius: 50%; animation: spin 0.7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #error-msg { color: var(--red); font-size: 13px; display: none; }
+
+  /* ── Section titles ── */
+  .section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--dim); margin: 28px 0 12px; }
+
+  /* ── Cards ── */
+  .card { background: var(--card); border: 1px solid var(--card-border); border-radius: 12px; padding: 20px; }
+  .card-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--dim); margin-bottom: 14px; }
+
+  /* ── Grids ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+
+  /* ── KPI badges ── */
+  .kpi-row { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+  .kpi-card {
+    flex: 1; min-width: 100px; background: var(--card); border: 1px solid var(--card-border);
+    border-radius: 12px; padding: 16px; text-align: center;
+  }
+  .kpi-label { font-size: 10px; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+  .kpi-val { font-size: 26px; font-weight: 800; line-height: 1; margin-bottom: 3px; color: #fff; }
+  .kpi-sub { font-size: 11px; color: var(--dim); }
+  .kpi-idx { font-size: 12px; font-weight: 700; margin-top: 5px; }
+
+  /* ── Badges (updated thresholds) ── */
+  .badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
+  .badge-red    { background: rgba(239,68,68,0.15); color: var(--red); }
+  .badge-yellow { background: rgba(234,179,8,0.15);  color: var(--yellow); }
+  .badge-green  { background: rgba(34,197,94,0.15);  color: var(--green); }
+  .badge-gold   { background: linear-gradient(135deg, rgba(52,211,153,0.25), rgba(96,230,176,0.15)); color: #60e6b0; border: 1px solid rgba(52,211,153,0.4); }
+
+  .delta-pos { color: var(--green); font-size: 11px; }
+  .delta-neg { color: var(--red); font-size: 11px; }
+  .delta-neu { color: var(--dim); font-size: 11px; }
+  .divider { border: none; border-top: 1px solid var(--card-border); margin: 10px 0; }
+
+  /* ── Seller cards ── */
+  .seller-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+  .seller-card { background: var(--card); border: 1px solid var(--card-border); border-radius: 12px; padding: 18px; }
+  .seller-name { font-size: 14px; font-weight: 800; color: #fff; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--card-border); }
+  .seller-kpi { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .seller-kpi-label { font-size: 11px; color: #94a3b8; }
+  .seller-kpi-right { display: flex; align-items: center; gap: 6px; }
+  .seller-kpi-val { font-size: 12px; font-weight: 700; color: #fff; }
+
+  /* ── MiM table ── */
+  .mim-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
+  .mim-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .mim-table th { text-align: left; color: var(--dim); font-weight: 600; padding: 5px 6px; border-bottom: 1px solid var(--card-border); }
+  .mim-table td { padding: 6px 6px; border-bottom: 1px solid #151825; color: var(--text); }
+  .mim-table tr:hover td { background: #1a1e2e; }
+  .tag-low { color: var(--yellow); font-size: 10px; }
+
+  /* ════════════════════════════════════════════════════════
+     DAGLIG DASHBOARD
+     ════════════════════════════════════════════════════════ */
+
+  .daily-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; margin-bottom: 28px; }
+  .daily-card {
+    background: var(--card); border: 1px solid var(--card-border); border-radius: 18px;
+    padding: 28px 24px 24px; text-align: center; position: relative; overflow: hidden;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  .daily-card.state-gold {
+    border-color: rgba(52,211,153,0.4);
+    box-shadow: 0 0 40px rgba(52,211,153,0.1), inset 0 0 40px rgba(52,211,153,0.04);
+  }
+  .daily-card.state-gold::before {
+    content: ''; position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px;
+    border-radius: 20px; background: linear-gradient(135deg, rgba(52,211,153,0.18), transparent 40%, rgba(96,230,176,0.12));
+    z-index: 0; animation: goldShimmer 3s ease-in-out infinite;
+  }
+  @keyframes goldShimmer { 0%,100%{opacity:.5} 50%{opacity:1} }
+  .daily-card > * { position: relative; z-index: 1; }
+
+  .daily-name { font-size: 15px; font-weight: 900; color: #fff; margin-bottom: 20px; letter-spacing: 0.5px; }
+
+  /* Big ring – 200px */
+  .ring-wrap { position: relative; width: 200px; height: 200px; margin: 0 auto 20px; }
+  .ring-wrap svg { width: 200px; height: 200px; transform: rotate(-90deg); }
+  .ring-bg { fill: none; stroke: #1e2236; stroke-width: 12; }
+  .ring-fg { fill: none; stroke-width: 12; stroke-linecap: round; transition: stroke-dashoffset 1s ease, stroke 0.5s; }
+  .ring-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; }
+  .ring-pct { font-size: 42px; font-weight: 900; color: #fff; line-height: 1; }
+  .ring-label { font-size: 11px; color: var(--dim); margin-top: 3px; text-transform: uppercase; letter-spacing: 1.2px; }
+
+  /* Small ring for team donuts – 120px */
+  .ring-sm { position: relative; width: 120px; height: 120px; margin: 0 auto 10px; }
+  .ring-sm svg { width: 120px; height: 120px; transform: rotate(-90deg); }
+  .ring-sm .ring-pct { font-size: 26px; }
+  .ring-sm .ring-label { font-size: 9px; }
+
+  /* Progress bars */
+  .daily-bars { text-align: left; margin-top: 4px; }
+  .bar-row { margin-bottom: 12px; }
+  .bar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+  .bar-label { font-size: 11px; font-weight: 700; color: #94a3b8; }
+  .bar-val { font-size: 11px; font-weight: 700; color: #fff; }
+  .bar-pct { font-size: 10px; font-weight: 800; margin-left: 6px; }
+  .bar-track { height: 10px; background: #1e2236; border-radius: 5px; overflow: hidden; position: relative; }
+  .bar-fill { height: 100%; border-radius: 5px; transition: width 0.8s ease; min-width: 2px; }
+  .bar-fill.c-red    { background: linear-gradient(90deg, #dc2626, #ef4444); }
+  .bar-fill.c-yellow { background: linear-gradient(90deg, #ca8a04, #eab308); }
+  .bar-fill.c-green  { background: linear-gradient(90deg, #16a34a, #22c55e); }
+  .bar-fill.c-gold   {
+    background: linear-gradient(90deg, #22c55e, #34d399, #60e6b0);
+    box-shadow: 0 0 14px rgba(52,211,153,0.5);
+    animation: barGoldPulse 2s ease-in-out infinite;
+  }
+  @keyframes barGoldPulse { 0%,100%{box-shadow:0 0 10px rgba(52,211,153,0.4)} 50%{box-shadow:0 0 20px rgba(52,211,153,0.7)} }
+
+  /* Team donuts row */
+  .daily-team-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; margin-bottom: 28px; }
+  .daily-team-card {
+    background: var(--card); border: 1px solid var(--card-border); border-radius: 14px;
+    padding: 20px; text-align: center;
+  }
+  .daily-team-card-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--dim); margin-bottom: 12px; }
+
+  /* Comparison table */
+  .compare-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .compare-table th {
+    text-align: center; color: var(--dim); font-weight: 700; padding: 10px 8px;
+    border-bottom: 2px solid var(--card-border); font-size: 10px; text-transform: uppercase; letter-spacing: 1px;
+  }
+  .compare-table th:first-child { text-align: left; }
+  .compare-table td { padding: 12px 8px; border-bottom: 1px solid #151825; text-align: center; }
+  .compare-table td:first-child { text-align: left; font-weight: 700; color: #94a3b8; font-size: 11px; }
+  .compare-table tr:hover td { background: #151825; }
+  .compare-val { font-size: 18px; font-weight: 900; color: #fff; }
+  .compare-target { font-size: 10px; color: var(--dimmer); margin-top: 1px; }
+  .compare-bar-wrap { width: 100%; margin-top: 4px; }
+  .compare-bar-track { height: 4px; background: #1e2236; border-radius: 2px; overflow: hidden; }
+  .compare-bar-fill { height: 100%; border-radius: 2px; transition: width 0.6s ease; }
+  .compare-bar-fill.c-red    { background: linear-gradient(90deg, #dc2626, #ef4444); }
+  .compare-bar-fill.c-yellow { background: linear-gradient(90deg, #ca8a04, #eab308); }
+  .compare-bar-fill.c-green  { background: linear-gradient(90deg, #16a34a, #22c55e); }
+  .compare-bar-fill.c-gold   { background: linear-gradient(90deg, #22c55e, #60e6b0); }
+
+  /* ── Person dashboard ── */
+  .person-hero {
+    background: linear-gradient(135deg, var(--card) 0%, #1a1e2e 100%);
+    border: 1px solid var(--card-border); border-radius: 14px; padding: 24px;
+    margin-bottom: 20px; display: flex; align-items: center; gap: 20px;
+  }
+  .person-avatar {
+    width: 54px; height: 54px; border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; font-size: 20px; font-weight: 900; flex-shrink: 0;
+  }
+  .person-hero-name { font-size: 22px; font-weight: 900; }
+  .person-hero-sub { font-size: 12px; color: var(--dim); margin-top: 3px; }
+
+  .week-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .week-table th { text-align: center; color: var(--dim); font-weight: 700; padding: 7px 8px; border-bottom: 1px solid var(--card-border); font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; }
+  .week-table td { padding: 8px 8px; border-bottom: 1px solid #151825; text-align: center; }
+  .week-table td:first-child { text-align: left; font-weight: 700; color: #94a3b8; }
+  .week-table tr:hover td { background: #1a1e2e; }
+
+  .red { color: var(--red); } .yellow { color: var(--yellow); } .green { color: var(--green); } .gold { color: var(--gold); }
+
+  /* ── No-data message ── */
+  .no-data { color: var(--dim); font-size: 13px; text-align: center; padding: 40px; }
+
+  /* ════════════════════════════════════════════════════════
+     MIM CELEBRATION SYSTEM - WORLD CLASS REDESIGN
+     ════════════════════════════════════════════════════════ */
+
+  /* Background gradients and animations */
+  @keyframes gradientShift {
+    0% { background: linear-gradient(135deg, #FFD700 0%, #FFD700 25%, rgba(255,215,0,0.5) 50%, #1a0a2e 75%, #FFD700 100%); }
+    25% { background: linear-gradient(135deg, #FFD700 0%, #2a0845 25%, #16213e 50%, #1a0a2e 75%, #FFD700 100%); }
+    50% { background: linear-gradient(135deg, #2a0845 0%, #16213e 25%, #1a0a2e 50%, #FFD700 75%, #2a0845 100%); }
+    75% { background: linear-gradient(135deg, #16213e 0%, #1a0a2e 25%, #FFD700 50%, #2a0845 75%, #16213e 100%); }
+    100% { background: linear-gradient(135deg, #FFD700 0%, #FFD700 25%, rgba(255,215,0,0.5) 50%, #1a0a2e 75%, #FFD700 100%); }
+  }
+
+  @keyframes diagonalStreak {
+    0% { transform: translateX(-100%) translateY(-100%); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateX(100%) translateY(100%); opacity: 0; }
+  }
+
+  @keyframes shockwaveRing1 {
+    0% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+    100% { transform: translate(-50%, -50%) scale(3); opacity: 0; }
+  }
+
+  @keyframes shockwaveRing2 {
+    0% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+    100% { transform: translate(-50%, -50%) scale(4); opacity: 0; }
+  }
+
+  @keyframes avatarBounce {
+    0% { opacity: 0; transform: scale(0); }
+    70% { transform: scale(1.1); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes avatarShine {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  @keyframes cardSlideUp {
+    0% { opacity: 0; transform: translateY(30px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes titleScaleIn {
+    0% { opacity: 0; transform: scale(0.5); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+
+  /* Celebration overlay */
+  #mim-celebration-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999;
+    background: rgba(10, 14, 39, 0.92);
+    display: none; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 0.3s;
+    backdrop-filter: blur(12px);
+  }
+
+  #mim-celebration-overlay::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    animation: gradientShift 4s ease-in-out infinite;
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  #mim-celebration-overlay::after {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%; width: 200%; height: 200%;
+    background: linear-gradient(45deg, transparent 20%, rgba(255, 215, 0, 0.1) 50%, transparent 80%);
+    animation: diagonalStreak 8s linear infinite;
+    pointer-events: none;
+  }
+
+  #mim-celebration-overlay.active {
+    display: flex; opacity: 1;
+    animation: screenShake 0.6s ease-in-out;
+  }
+
+  .celebration-content {
+    position: relative; z-index: 10000;
+    display: flex; flex-direction: column; align-items: center;
+    width: 95%; max-width: 1400px; height: auto;
+  }
+
+  /* Title: MAND I MARKEN */
+  .celebration-title {
+    font-size: 80px; font-weight: 900; text-transform: uppercase;
+    letter-spacing: 6px; margin-bottom: 10px;
+    background: linear-gradient(90deg, #FFD700, #FFA500, #FFD700);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: titleScaleIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    opacity: 0;
+  }
+
+  /* Combo text */
+  .celebration-combo {
+    font-size: 48px; font-weight: 900; color: #fff; margin: 5px 0 30px 0;
+    animation: comboExplode 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    opacity: 0; animation-delay: 0.2s;
+    text-shadow: 0 0 20px rgba(248, 113, 113, 0.8), 0 0 40px rgba(245, 158, 11, 0.6);
+  }
+
+  .celebration-combo.level-1 { color: #94a3b8; text-shadow: 0 0 10px rgba(148, 163, 184, 0.4); }
+  .celebration-combo.level-2 { color: #f59e0b; text-shadow: 0 0 20px rgba(245, 158, 11, 0.8); }
+  .celebration-combo.level-3 { color: #ef4444; text-shadow: 0 0 20px rgba(239, 68, 68, 0.8), 0 0 40px rgba(245, 158, 11, 0.6); }
+  .celebration-combo.level-4 { color: #a855f7; text-shadow: 0 0 20px rgba(168, 85, 247, 0.8), 0 0 40px rgba(124, 58, 255, 0.6); }
+  .celebration-combo.level-5 { color: #ec4899; text-shadow: 0 0 20px rgba(236, 72, 153, 0.8), 0 0 40px rgba(168, 85, 247, 0.6); }
+  .celebration-combo.level-6 {
+    background: linear-gradient(90deg, #f59e0b, #ef4444, #ec4899, #a855f7, #60a5fa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: none;
+    filter: drop-shadow(0 0 20px rgba(245, 158, 11, 0.6)) drop-shadow(0 0 20px rgba(168, 85, 247, 0.6));
+    animation: comboExplode 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards, rainbowPulse 2s ease-in-out infinite;
+    animation-delay: 0.2s, 1.0s;
+  }
+
+  @keyframes comboExplode {
+    0% { opacity: 0; transform: scale(0) rotate(-180deg); }
+    70% { transform: scale(1.25) rotate(10deg); }
+    100% { opacity: 1; transform: scale(1) rotate(0deg); }
+  }
+
+  @keyframes rainbowPulse {
+    0%, 100% { filter: drop-shadow(0 0 20px rgba(245, 158, 11, 0.6)) drop-shadow(0 0 20px rgba(168, 85, 247, 0.6)); }
+    50% { filter: drop-shadow(0 0 40px rgba(245, 158, 11, 0.8)) drop-shadow(0 0 40px rgba(168, 85, 247, 0.8)); }
+  }
+
+  /* Main two-column layout */
+  .celebration-main-layout {
+    display: flex; width: 100%; gap: 40px; margin-bottom: 30px;
+    justify-content: center; align-items: flex-start;
+  }
+
+  /* Left column: Avatar + Name */
+  .celebration-left-column {
+    width: 40%; flex-shrink: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-start;
+  }
+
+  .celebration-avatar-wrapper {
+    position: relative; width: 360px; height: 360px;
+    animation: avatarBounce 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    opacity: 0; animation-delay: 0.3s;
+    margin-bottom: 20px;
+  }
+
+  .celebration-avatar {
+    width: 360px; height: 360px; border-radius: 50%;
+    border: 5px solid #FFD700;
+    box-shadow: 0 0 0 3px #fff, 0 0 60px rgba(255, 215, 0, 0.6);
+    position: relative; display: flex; align-items: center; justify-content: center;
+    font-size: 180px; font-weight: 900; overflow: hidden;
+    animation: avatarPulse 2s ease-in-out infinite;
+    animation-delay: 1.1s;
+  }
+
+  .celebration-avatar img {
+    object-fit: cover; width: 100%; height: 100%; border-radius: 50%;
+  }
+
+  .celebration-avatar::before {
+    content: '';
+    position: absolute; top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: avatarShine 3s ease-in-out 3.1s infinite;
+    border-radius: 50%;
+  }
+
+  @keyframes avatarPulse {
+    0%, 100% { box-shadow: 0 0 0 3px #fff, 0 0 60px rgba(255, 215, 0, 0.6); }
+    50% { box-shadow: 0 0 0 3px #fff, 0 0 80px rgba(255, 215, 0, 0.8); }
+  }
+
+  .celebration-seller-name {
+    font-size: 28px; font-weight: 900; text-align: center;
+    animation: fadeInUpSmall 0.6s ease forwards;
+    opacity: 0; animation-delay: 0.5s;
+  }
+
+  @keyframes fadeInUpSmall {
+    0% { opacity: 0; transform: translateY(15px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Right column: Data cards grid */
+  .celebration-right-column {
+    width: 60%; flex-shrink: 0;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 16px; align-content: flex-start;
+  }
+
+  .celebration-data-card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 215, 0, 0.25);
+    border-radius: 16px;
+    padding: 16px 24px;
+    animation: cardSlideUp 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    opacity: 0;
+  }
+
+  .celebration-data-card.card-1 { animation-delay: 0.8s; }
+  .celebration-data-card.card-2 { animation-delay: 0.9s; }
+  .celebration-data-card.card-3 { animation-delay: 1.0s; }
+  .celebration-data-card.card-4 { animation-delay: 1.1s; }
+
+  .celebration-data-card.card-5 {
+    grid-column: 1 / -1;
+    animation-delay: 1.2s;
+  }
+
+  .celebration-card-label {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 2px;
+    color: #60e6b0; font-weight: 700; margin-bottom: 8px;
+  }
+
+  .celebration-card-value {
+    font-size: 28px; font-weight: 800; color: #fff;
+  }
+
+  .celebration-data-card.card-5 .celebration-card-value {
+    color: #FFD700; font-size: 36px;
+  }
+
+  /* Comments card */
+  .celebration-comments-card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 215, 0, 0.25);
+    border-radius: 16px;
+    padding: 16px 24px;
+    margin-top: 20px;
+    animation: cardSlideUp 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    opacity: 0; animation-delay: 1.6s;
+  }
+
+  .celebration-comment {
+    font-size: 16px; color: #fbbf24; font-weight: 700; margin: 8px 0;
+    animation: slideInComment 0.6s ease forwards;
+    opacity: 0;
+  }
+
+  @keyframes slideInComment {
+    0% { opacity: 0; transform: translateX(-30px); }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+
+  /* Leaderboard card */
+  .celebration-leaderboard {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 215, 0, 0.25);
+    border-radius: 16px;
+    padding: 16px 24px;
+    margin-top: 20px;
+    animation: cardSlideUp 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    opacity: 0; animation-delay: 2.0s;
+  }
+
+  .celebration-leaderboard-title {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 2px;
+    color: #60e6b0; font-weight: 700; margin-bottom: 12px;
+  }
+
+  .leaderboard-entry {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 0; margin: 8px 0; border-bottom: 1px solid rgba(255, 215, 0, 0.1);
+    animation: slideInLeaderboard 0.5s ease forwards;
+    opacity: 0;
+  }
+
+  .leaderboard-entry:last-child { border-bottom: none; }
+
+  @keyframes slideInLeaderboard {
+    0% { opacity: 0; transform: translateX(-20px); }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+
+  .leaderboard-entry.highlight {
+    background: rgba(255, 215, 0, 0.1);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    border-radius: 8px;
+    padding: 12px 12px;
+    margin: 6px 0;
+  }
+
+  .leaderboard-name { font-size: 14px; font-weight: 800; flex: 1; }
+  .leaderboard-count { font-size: 20px; font-weight: 900; color: #fbbf24; }
+
+  /* Shockwave rings */
+  .celebration-shockwave {
+    position: fixed; top: 50%; left: 50%; width: 100px; height: 100px;
+    border: 2px solid rgba(255, 215, 0, 0.5); border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: shockwaveExpand 1.2s ease-out forwards;
+    pointer-events: none;
+  }
+
+  .celebration-shockwave-2 {
+    position: fixed; top: 50%; left: 50%; width: 100px; height: 100px;
+    border: 2px solid rgba(255, 215, 0, 0.3); border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: shockwaveExpand 1.4s ease-out forwards;
+    pointer-events: none;
+    animation-delay: 0.2s;
+  }
+
+  @keyframes shockwaveExpand {
+    0% { width: 100px; height: 100px; opacity: 1; }
+    100% { width: 800px; height: 800px; opacity: 0; }
+  }
+
+  .celebration-screen-flash {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(255, 255, 255, 0.95); z-index: 9997;
+    animation: flashFade 0.3s ease-out forwards;
+    pointer-events: none;
+  }
+
+  @keyframes flashFade {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  /* Canvas for particles */
+  #mim-particles {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    display: none; z-index: 9998;
+  }
+
+  /* Sound toggle button */
+  .sound-toggle {
+    position: fixed; bottom: 20px; right: 20px; z-index: 10001;
+    background: var(--card); border: 1px solid var(--card-border);
+    border-radius: 50%; width: 44px; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.2s; font-size: 20px;
+  }
+  .sound-toggle:hover {
+    background: #1e2236; border-color: var(--blue);
+  }
+  .sound-toggle.muted { opacity: 0.5; }
+
+  /* Hall of Fame */
+  .mim-log-section {
+    background: var(--card); border: 1px solid var(--card-border); border-radius: 12px;
+    padding: 20px; margin-bottom: 20px;
+  }
+
+  .mim-log-title {
+    font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 16px;
+  }
+
+  .mim-log-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px;
+  }
+
+  .mim-log-card {
+    background: #1a1e2e; border: 1px solid var(--card-border); border-radius: 8px;
+    padding: 12px; display: flex; flex-direction: column; gap: 8px;
+  }
+
+  .mim-log-time {
+    font-size: 10px; color: var(--dim); text-transform: uppercase; letter-spacing: 0.5px;
+  }
+
+  .mim-log-seller {
+    font-size: 12px; font-weight: 700;
+  }
+
+  .mim-log-candidate {
+    font-size: 11px; color: #94a3b8;
+  }
+
+  .mim-log-company {
+    font-size: 11px; color: #94a3b8;
+  }
+
+  .mim-log-meta {
+    display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+    font-size: 10px; color: var(--dim);
+  }
+
+  .mim-log-tag {
+    background: #151825; border: 1px solid var(--card-border); border-radius: 4px;
+    padding: 2px 6px; font-size: 9px; font-weight: 600;
+  }
+
+  .mim-log-empty {
+    color: var(--dim); font-size: 13px; text-align: center; padding: 40px 20px;
+  }
+
+  .pulse-dot {
+    display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--green); animation: pulse 2s ease-in-out infinite;
+    margin-right: 4px;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* Screen shake */
+  @keyframes screenShake {
+    0%, 100% { transform: translate(0, 0); }
+    10% { transform: translate(-5px, -5px); }
+    20% { transform: translate(5px, 5px); }
+    30% { transform: translate(-5px, 5px); }
+    40% { transform: translate(5px, -5px); }
+    50% { transform: translate(-3px, -3px); }
+    60% { transform: translate(3px, 3px); }
+    70% { transform: translate(-3px, 3px); }
+    80% { transform: translate(3px, -3px); }
+    90% { transform: translate(-2px, -2px); }
+  }
+
+  body.mim-shake { animation: screenShake 0.8s ease-in-out; }
+
+  /* Photo upload */
+  .photo-upload-hint {
+    position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.7);
+    color: #fff; font-size: 9px; text-align: center; padding: 4px 0;
+    opacity: 0; transition: opacity 0.2s; cursor: pointer; border-radius: 0 0 8px 8px;
+  }
+  .photo-upload-wrap:hover .photo-upload-hint { opacity: 1; }
+  .photo-upload-wrap { position: relative; cursor: pointer; }
+  .photo-settings-btn {
+    background: var(--card); border: 1px solid var(--card-border); border-radius: 8px;
+    color: #94a3b8; font-size: 11px; padding: 7px 14px; cursor: pointer; transition: all 0.15s;
+    margin-left: 8px;
+  }
+  .photo-settings-btn:hover { background: #1e2236; color: #fff; }
+  .photo-mgr { display: none; background: var(--card); border: 1px solid var(--card-border); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+  .photo-mgr.open { display: block; }
+  .photo-mgr-grid { display: flex; gap: 24px; align-items: center; flex-wrap: wrap; }
+  .photo-mgr-item { text-align: center; }
+  .photo-mgr-avatar {
+    width: 80px; height: 80px; border-radius: 50%; overflow: hidden; margin: 0 auto 8px;
+    border: 3px solid var(--card-border); cursor: pointer; transition: border-color 0.2s;
+    display: flex; align-items: center; justify-content: center; background: #1a1e2e;
+  }
+  .photo-mgr-avatar:hover { border-color: var(--blue); }
+  .photo-mgr-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .photo-mgr-name { font-size: 11px; font-weight: 700; color: #94a3b8; }
+  .photo-mgr-action { font-size: 10px; color: var(--blue); cursor: pointer; margin-top: 2px; }
+  .photo-mgr-action:hover { text-decoration: underline; }
+
+  /* Test button */
+  .test-celebration-btn {
+    position: fixed; bottom: 70px; right: 20px; z-index: 10001;
+    background: var(--blue); border: none;
+    border-radius: 50%; width: 44px; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.2s; font-size: 18px;
+    color: #fff; font-weight: 700;
+  }
+  .test-celebration-btn:hover {
+    background: #3b82f6; transform: scale(1.1);
+  }
+
+  @media (max-width: 900px) {
+    .grid-2, .grid-3, .seller-grid, .mim-grid, .daily-grid { grid-template-columns: 1fr; }
+    .kpi-row { flex-wrap: wrap; }
+    body { padding: 16px; }
+    .daily-team { flex-wrap: wrap; }
+    .mim-log-grid { grid-template-columns: 1fr; }
+    .celebration-title { font-size: 60px; letter-spacing: 4px; }
+    .celebration-main-layout { flex-direction: column; gap: 20px; }
+    .celebration-left-column { width: 100%; }
+    .celebration-right-column { width: 100%; grid-template-columns: 1fr; }
+    .celebration-avatar { width: 240px; height: 240px; font-size: 120px; }
+    .celebration-avatar-wrapper { width: 240px; height: 240px; }
+    .celebration-combo { font-size: 40px; }
+    .celebration-card-value { font-size: 20px; }
+    .celebration-comment { font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>POWERMATCH — SALES DASHBOARD</h1>
+    <div class="subtitle" id="period-label">Henter data...</div>
+  </div>
+  <div style="text-align:right;display:flex;align-items:center;gap:4px">
+    <button class="photo-settings-btn" onclick="togglePhotoMgr()">📷 Fotos</button>
+    <button class="refresh-btn" onclick="loadAll()">↻ Opdater</button>
+    <div class="last-updated" id="last-updated"></div>
+  </div>
+</div>
+
+<!-- Hidden file input for photo upload -->
+<input type="file" id="photo-upload-input" accept="image/*" style="display:none" onchange="handlePhotoUpload(event)">
+
+<!-- Photo Manager Panel -->
+<div class="photo-mgr" id="photo-mgr">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+    <div style="font-size:13px;font-weight:700;color:#fff">Sælger-fotos</div>
+    <div style="font-size:10px;color:var(--dim)">Klik på avatar for at uploade · Gemmes i browseren</div>
+  </div>
+  <div class="photo-mgr-grid" id="photo-mgr-grid"></div>
+</div>
+
+<div class="tab-nav">
+  <button class="tab-btn active" id="tab-daglig" onclick="switchTab('daglig')">Daglig</button>
+  <button class="tab-btn"        id="tab-uge"    onclick="switchTab('uge')">Uge</button>
+  <button class="tab-btn"        id="tab-maaned" onclick="switchTab('maaned')">Måned</button>
+  <button class="tab-btn"        id="tab-person" onclick="switchTab('person')">Person</button>
+</div>
+
+<div id="loading"><div class="spinner"></div><div style="color:var(--dim);font-size:12px">Henter Google Sheets data...</div></div>
+<div id="error-msg"></div>
+
+<!-- ══ DAGLIG VIEW ═══════════════════════════════════════════════ -->
+<div id="view-daglig" style="display:none">
+  <div class="picker-row">
+    <label>Dato:</label>
+    <select id="day-select" onchange="renderDaglig()"></select>
+  </div>
+
+  <!-- Hall of Fame / MiM Log -->
+  <div class="mim-log-section" id="mim-log-section"></div>
+
+  <!-- Individual seller cards with big rings -->
+  <div class="daily-grid" id="daily-cards"></div>
+
+  <!-- Team donuts: KT, Samtaler, MiM -->
+  <div class="section-title">Team – Dagens totaler</div>
+  <div class="daily-team-row" id="daily-team-donuts"></div>
+
+  <!-- Clean comparison -->
+  <div class="section-title">Sammenligning – Alle sælgere</div>
+  <div class="card" style="margin-bottom:20px">
+    <table class="compare-table" id="daily-compare"></table>
+  </div>
+</div>
+
+<!-- ══ UGE VIEW ══════════════════════════════════════════════════ -->
+<div id="view-uge" style="display:none">
+  <div class="picker-row">
+    <label>Uge:</label>
+    <select id="week-select" onchange="renderUge()"></select>
+  </div>
+  <div class="section-title">Team KPI'er</div>
+  <div class="kpi-row" id="team-kpis"></div>
+  <div class="section-title">Individuelle Scoreboards</div>
+  <div class="seller-grid" id="seller-cards"></div>
+  <div class="section-title">Trend – Alle uger</div>
+  <div class="grid-2" style="margin-bottom:14px">
+    <div class="card"><div class="card-title">MiM pr. sælger</div><canvas id="mimChart" height="200"></canvas></div>
+    <div class="card"><div class="card-title">KT + SS pr. sælger</div><canvas id="ktChart" height="200"></canvas></div>
+  </div>
+  <div class="grid-2">
+    <div class="card"><div class="card-title">Samtaler pr. sælger</div><canvas id="samChart" height="200"></canvas></div>
+    <div class="card"><div class="card-title">GF pr. sælger (floor 1,90)</div><canvas id="gfChart" height="200"></canvas></div>
+  </div>
+  <div class="section-title" id="mim-details-title">MiM-detaljer</div>
+  <div class="mim-grid" id="mim-details"></div>
+</div>
+
+<!-- ══ MÅNED VIEW ════════════════════════════════════════════════ -->
+<div id="view-maaned" style="display:none">
+  <div class="picker-row">
+    <label>Måned:</label>
+    <select id="month-select" onchange="renderMaaned()"></select>
+  </div>
+  <div class="section-title">Team KPI'er – Månedsoverblik</div>
+  <div class="kpi-row" id="month-team-kpis"></div>
+  <div class="section-title">Individuelle Scoreboards – Månedstotaler</div>
+  <div class="seller-grid" id="month-seller-cards"></div>
+  <div class="section-title">Ugentlig progression</div>
+  <div class="grid-2">
+    <div class="card"><div class="card-title">MiM pr. uge</div><canvas id="monthMimChart" height="200"></canvas></div>
+    <div class="card"><div class="card-title">KT + SS pr. uge</div><canvas id="monthKtChart" height="200"></canvas></div>
+  </div>
+  <div class="section-title" id="month-mim-title">MiM-detaljer</div>
+  <div class="mim-grid" id="month-mim-details"></div>
+</div>
+
+<!-- ══ PERSON VIEW ═══════════════════════════════════════════════ -->
+<div id="view-person" style="display:none">
+  <div class="picker-row">
+    <label>Sælger:</label>
+    <select id="person-select" onchange="renderPerson()">
+      <option value="William">William</option>
+      <option value="Jonas">Jonas</option>
+      <option value="Andreas">Andreas</option>
+    </select>
+    <label style="margin-left:14px">Uge:</label>
+    <select id="person-week-select" onchange="renderPerson()"></select>
+  </div>
+  <div id="person-hero"></div>
+  <div class="section-title">Ugentlig performance</div>
+  <div class="card" style="margin-bottom:16px"><table class="week-table" id="person-week-table"></table></div>
+  <div class="section-title">Trend</div>
+  <div class="grid-3" style="margin-bottom:16px">
+    <div class="card"><div class="card-title">MiM</div><canvas id="personMimChart" height="200"></canvas></div>
+    <div class="card"><div class="card-title">KT + SS</div><canvas id="personKtChart" height="200"></canvas></div>
+    <div class="card"><div class="card-title">GF gennemsnit</div><canvas id="personGfChart" height="200"></canvas></div>
+  </div>
+  <div class="section-title" id="person-mim-title">MiM-detaljer</div>
+  <div id="person-mim-details"></div>
+</div>
+
+<!-- Celebration overlay -->
+<div id="mim-celebration-overlay">
+  <canvas id="mim-particles"></canvas>
+  <div class="celebration-content" id="celebration-content"></div>
+</div>
+
+<!-- Sound toggle -->
+<button class="sound-toggle" id="sound-toggle" title="Toggle celebration sound" onclick="toggleSoundMuted()">🔊</button>
+
+<!-- Test celebration button -->
+<button class="test-celebration-btn" title="Test celebration" onclick="testCelebration()">=</button>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════════════════
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxTb_Qpuo-mTBTxXdKydQqDUGmJ_VBq7f0r_QHmvJ7B1cXmDiXHG_Kp1jFHHzcs0SSK/exec';
+const NAMES = ['William','Jonas','Andreas'];
+const COLORS = { William:'#60a5fa', Jonas:'#f87171', Andreas:'#34d399', floor:'#f87171', maal:'#475569' };
+
+// Seller photo configuration – auto-loads from localStorage
+function getSellerPhoto(name) {
+  try { return localStorage.getItem('pm_photo_'+name) || ''; } catch(e) { return ''; }
+}
+function setSellerPhoto(name, dataUrl) {
+  try { localStorage.setItem('pm_photo_'+name, dataUrl); } catch(e) { console.warn('localStorage full'); }
+}
+function removeSellerPhoto(name) {
+  try { localStorage.removeItem('pm_photo_'+name); } catch(e) {}
+}
+let _photoUploadTarget = null; // which seller we're uploading for
+
+// Dynamic – computed from data at load time
+let WEEK_RANGES = {};   // wn → [start, end]
+let MONTH_RANGES = {};  // 'YYYY-MM' → [start, end]
+let WEEK_LABELS = {};   // wn → 'U5 (26/1)'
+let WEEKS_IN_MONTH = {}; // 'YYYY-MM' → [wn, ...]
+let ALL_WEEKS = [];     // sorted week numbers
+
+let _rawData={}, _trendData={}, _budgets={}, _charts={}, _currentTab='daglig';
+
+// MiM tracking
+let _seenMiM = new Set();
+let _mimLog = [];
+let _sellerMimCount = { William: 0, Jonas: 0, Andreas: 0 };
+let _sellerMimToday = { William: 0, Jonas: 0, Andreas: 0 };
+let _sellerStreak = { William: 0, Jonas: 0, Andreas: 0 };
+let _soundMuted = false;
+let _autoRefreshInterval = null;
+let _userHasInteracted = false;
+let _audioCtx = null;
+
+// Unlock audio on FIRST user interaction (Chrome autoplay policy)
+document.addEventListener('click', function _unlockAudio() {
+  _userHasInteracted = true;
+  try {
+    if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (_audioCtx.state === 'suspended') _audioCtx.resume();
+  } catch(e) {}
+}, { once: false });
+
+// ═══════════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════════
+function fmtDate(d) {
+  if (!(d instanceof Date)) return String(d||'');
+  return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+}
+function parseDate(str) {
+  if (!str) return null;
+  if (str instanceof Date) return str;
+  const s = str.trim();
+  const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (m) return new Date(+m[3],+m[2]-1,+m[1]);
+  const iso = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (iso) return new Date(+iso[1],+iso[2]-1,+iso[3]);
+  return null;
+}
+function inRange(ds,s,e){ const d=parseDate(ds); return d&&d>=s&&d<=e; }
+function dk(s){ if(s===null||s===undefined||s==='') return NaN; if(typeof s==='number') return s; return parseFloat(String(s).trim().replace(',','.')); }
+function fmt(v,dec=0){ return v===null?'—':typeof v==='number'?v.toFixed(dec):v; }
+
+// ── Updated thresholds: 0-69 red, 70-99 yellow, 100-125 green, 126+ gold ──
+function idx(a,t){ return t>0?Math.round(a/t*100):0; }
+function idxBadge(i){
+  if(i>=126) return `<span class="badge badge-gold">${i} ⭐</span>`;
+  if(i>=100) return `<span class="badge badge-green">${i} 🟢</span>`;
+  if(i>=70)  return `<span class="badge badge-yellow">${i} 🟡</span>`;
+  return `<span class="badge badge-red">${i} 🔴</span>`;
+}
+function idxColor(i){ return i>=126?'gold':i>=100?'green':i>=70?'yellow':'red'; }
+function barColorClass(i){ return i>=126?'c-gold':i>=100?'c-green':i>=70?'c-yellow':'c-red'; }
+function ringColor(i){ return i>=126?'#60e6b0':i>=100?'var(--green)':i>=70?'var(--yellow)':'var(--red)'; }
+
+function delta(a,b){ const d=a-b; return d>0?`<span class="delta-pos">+${d}</span>`:d<0?`<span class="delta-neg">${d}</span>`:`<span class="delta-neu">0</span>`; }
+function deltaF(a,b){ if(a===null||b===null) return ''; const d=(a-b).toFixed(3); return parseFloat(d)>0?`<span class="delta-pos">+${d}</span>`:parseFloat(d)<0?`<span class="delta-neg">${d}</span>`:`<span class="delta-neu">0</span>`; }
+
+// ═══════════════════════════════════════════════════════════
+// CORE CALC
+// ═══════════════════════════════════════════════════════════
+function calcSellerArr(rows,ws,we){
+  if(!rows||rows.length<2) return {KT:0,SS:0,Samtaler:0,MiM:0,mimRows:[],gnsGF:null,gnsKS:null,lowGF:0};
+  let KT=0,SS=0,Samtaler=0,mimRows=[];
+  for(let i=1;i<rows.length;i++){
+    const r=rows[i];
+    const g=v=>v instanceof Date?fmtDate(v):String(v||'');
+    const r0=g(r[0]),r1=g(r[1]),r3=g(r[3]),r6=g(r[6]),r7=g(r[7]);
+    const r13=g(r[13]),r14=g(r[14]),r15=g(r[15]),r16=g(r[16]),r17=g(r[17]),r18=g(r[18]),r21=g(r[21]);
+    if(inRange(r0,ws,we)&&r1.trim()){ KT++; if(/\bJa\b/i.test(r3)) SS++; }
+    if(inRange(r6,ws,we)&&r7.trim()) Samtaler++;
+    if(inRange(r13,ws,we)&&r15.trim()){
+      if(/startede aldrig/i.test(r21)||/opsagt samme uge/i.test(r21)) continue;
+      mimRows.push({dato:r13,kandidat:r14,virk:r15,timelon:dk(r16),gf:dk(r17),ks:dk(r18),status:r21});
+    }
+  }
+  const vGF=mimRows.filter(r=>!isNaN(r.gf)), vKS=mimRows.filter(r=>!isNaN(r.ks));
+  return { KT,SS,Samtaler,MiM:mimRows.length,mimRows,
+    gnsGF:vGF.length?vGF.reduce((s,r)=>s+r.gf,0)/vGF.length:null,
+    gnsKS:vKS.length?vKS.reduce((s,r)=>s+r.ks,0)/vKS.length:null,
+    lowGF:vGF.filter(r=>r.gf<1.90).length };
+}
+
+// ISO week number for a date
+function isoWeek(d){
+  const t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));
+  t.setUTCDate(t.getUTCDate()+4-(t.getUTCDay()||7));
+  const y=new Date(Date.UTC(t.getUTCFullYear(),0,1));
+  return Math.ceil(((t-y)/86400000+1)/7);
+}
+
+// Get Monday of ISO week
+function mondayOfWeek(wn, year){
+  const jan4=new Date(year,0,4);
+  const dow=jan4.getDay()||7;
+  const mon=new Date(jan4);
+  mon.setDate(jan4.getDate()-(dow-1)+(wn-1)*7);
+  return mon;
+}
+
+// Build dynamic week ranges from all dates found in data + ALWAYS include today's week
+function buildWeekRanges(){
+  const sheets=['Data Input - William','Data Input - Jonas','Data Input - Andreas'];
+  const weekSet=new Set();
+  // Always include today
+  const today=new Date(); today.setHours(0,0,0,0);
+  weekSet.add(isoWeek(today)+'|'+today.getFullYear());
+  for(const sheet of sheets){
+    const rows=_rawData[sheet]||[];
+    for(let i=1;i<rows.length;i++){
+      const r=rows[i];
+      const g=v=>v instanceof Date?fmtDate(v):String(v||'');
+      [g(r[0]),g(r[6]),g(r[13])].forEach(ds=>{
+        const d=parseDate(ds);
+        if(d) weekSet.add(isoWeek(d)+'|'+d.getFullYear());
+      });
+    }
+  }
+  WEEK_RANGES={}; WEEK_LABELS={}; WEEKS_IN_MONTH={}; MONTH_RANGES={};
+  const monthSet=new Set();
+  for(const key of weekSet){
+    const [wn,yr]= key.split('|').map(Number);
+    const mon=mondayOfWeek(wn,yr);
+    const sun=new Date(mon); sun.setDate(mon.getDate()+6);
+    WEEK_RANGES[wn]=[mon,sun];
+    WEEK_LABELS[wn]=`U${wn} (${mon.getDate()}/${mon.getMonth()+1})`;
+    const mKey=`${yr}-${String(mon.getMonth()+1).padStart(2,'0')}`;
+    monthSet.add(mKey);
+    if(!WEEKS_IN_MONTH[mKey]) WEEKS_IN_MONTH[mKey]=[];
+    if(!WEEKS_IN_MONTH[mKey].includes(wn)) WEEKS_IN_MONTH[mKey].push(wn);
+    const mKey2=`${sun.getFullYear()}-${String(sun.getMonth()+1).padStart(2,'0')}`;
+    if(mKey2!==mKey){ monthSet.add(mKey2); if(!WEEKS_IN_MONTH[mKey2]) WEEKS_IN_MONTH[mKey2]=[]; if(!WEEKS_IN_MONTH[mKey2].includes(wn)) WEEKS_IN_MONTH[mKey2].push(wn); }
+  }
+  // Always include today's month
+  const todayMk=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`;
+  if(!monthSet.has(todayMk)) monthSet.add(todayMk);
+  for(const mk of Object.keys(WEEKS_IN_MONTH)) WEEKS_IN_MONTH[mk].sort((a,b)=>a-b);
+  for(const mk of monthSet){
+    const [yr,mo]=mk.split('-').map(Number);
+    MONTH_RANGES[mk]=[new Date(yr,mo-1,1), new Date(yr,mo,0)];
+  }
+  ALL_WEEKS=Object.keys(WEEK_RANGES).map(Number).sort((a,b)=>a-b);
+}
+
+// Find which week a date belongs to
+function weekForDate(d){
+  for(const [wn,[ws,we]] of Object.entries(WEEK_RANGES)){
+    if(d>=ws&&d<=we) return parseInt(wn);
+  }
+  return null;
+}
+
+// Get all unique dates in the dataset + always include today (if weekday)
+function getAllDates(){
+  const dates = new Set();
+  // Always include today if it's a weekday
+  const today=new Date(); today.setHours(0,0,0,0);
+  if(today.getDay()!==0 && today.getDay()!==6) dates.add(fmtDate(today));
+  const sheets = ['Data Input - William','Data Input - Jonas','Data Input - Andreas'];
+  for(const sheet of sheets){
+    const rows = _rawData[sheet]||[];
+    for(let i=1;i<rows.length;i++){
+      const r=rows[i];
+      const g=v=>v instanceof Date?fmtDate(v):String(v||'');
+      [g(r[0]),g(r[6]),g(r[13])].forEach(ds=>{
+        const d=parseDate(ds);
+        if(d && d.getDay()!==0 && d.getDay()!==6) dates.add(fmtDate(d));
+      });
+    }
+  }
+  const sorted=[...dates].sort((a,b)=>parseDate(b)-parseDate(a));
+  return sorted;
+}
+
+// ═══════════════════════════════════════════════════════════
+// MIM CELEBRATION SYSTEM
+// ═══════════════════════════════════════════════════════════
+
+// Generate avatar from initials or stored photo
+function generateSellerAvatar(name, size=180) {
+  const photo = getSellerPhoto(name);
+  if (photo) {
+    return `<img src="${photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="${name}">`;
+  }
+  const initial = name[0];
+  const color = COLORS[name];
+  const fs = size > 120 ? 80 : size > 60 ? 36 : 24;
+  return `<div style="background:${color}22; color:${color}; width:100%; height:100%; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:${fs}px; font-weight:900;">${initial}</div>`;
+}
+
+// Photo Manager
+function togglePhotoMgr() {
+  const el = document.getElementById('photo-mgr');
+  el.classList.toggle('open');
+  if (el.classList.contains('open')) renderPhotoMgr();
+}
+function renderPhotoMgr() {
+  document.getElementById('photo-mgr-grid').innerHTML = NAMES.map(name => {
+    const photo = getSellerPhoto(name);
+    const inner = photo
+      ? `<img src="${photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`
+      : `<div style="background:${COLORS[name]}22;color:${COLORS[name]};width:100%;height:100%;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:900">${name[0]}</div>`;
+    const action = photo
+      ? `<div class="photo-mgr-action" onclick="event.stopPropagation();removeSellerPhoto('${name}');renderPhotoMgr()">Fjern foto</div>`
+      : `<div class="photo-mgr-action" onclick="startPhotoUpload('${name}')">Upload foto</div>`;
+    return `<div class="photo-mgr-item">
+      <div class="photo-mgr-avatar" onclick="startPhotoUpload('${name}')">${inner}</div>
+      <div class="photo-mgr-name" style="color:${COLORS[name]}">${name}</div>
+      ${action}
+    </div>`;
+  }).join('');
+}
+function startPhotoUpload(name) {
+  _photoUploadTarget = name;
+  document.getElementById('photo-upload-input').click();
+}
+function handlePhotoUpload(e) {
+  const file = e.target.files[0];
+  if (!file || !_photoUploadTarget) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    // Resize to max 300x300 to keep localStorage manageable
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      const max = 300;
+      let w = img.width, h = img.height;
+      if (w > h) { h = Math.round(h * max / w); w = max; }
+      else { w = Math.round(w * max / h); h = max; }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      setSellerPhoto(_photoUploadTarget, dataUrl);
+      renderPhotoMgr();
+      _photoUploadTarget = null;
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+  e.target.value = ''; // reset for re-upload
+}
+
+// Dynamic comment selection
+function getComments(seller, candidate, company, gf, dayMimCount, weekMimCount, dayOfWeek, hour) {
+  const comments = [];
+
+  // First MiM of the day
+  if (dayMimCount === 1) {
+    comments.push(`${seller} åbner ballet!`);
+  }
+
+  // 2nd MiM same day
+  if (dayMimCount === 2) {
+    comments.push(`${seller} er VARM i dag!`);
+  }
+
+  // 3rd+ MiM same day
+  if (dayMimCount >= 3) {
+    comments.push(`HAT-TRICK! ${seller} er USTOPPELIG!`);
+  }
+
+  // GF checks
+  if (!isNaN(gf)) {
+    if (gf >= 2.20) {
+      comments.push(`Premium placement – GF på ${gf.toFixed(2)}!`);
+    } else if (gf < 1.90) {
+      comments.push(`Obs: GF under floor (${gf.toFixed(2)})`);
+    }
+  }
+
+  // Time-based
+  if (hour < 10) {
+    comments.push(`Tidlig fugl fanger ormen!`);
+  } else if (hour >= 15) {
+    comments.push(`Endnu én inden lukketid!`);
+  }
+
+  // Weekly leader (would need comparison logic)
+
+  return comments.length > 0 ? comments : ['MiM confirmed!'];
+}
+
+// Get combo level (expanded to 6 levels)
+function getComboLevel(dayMimCount) {
+  if (dayMimCount >= 6) return 6;
+  if (dayMimCount === 5) return 5;
+  if (dayMimCount === 4) return 4;
+  if (dayMimCount === 3) return 3;
+  if (dayMimCount === 2) return 2;
+  return 1;
+}
+
+// Advanced Particle System with multiple effects
+class ParticleSystem {
+  constructor() {
+    this.particles = [];
+    this.canvas = document.getElementById('mim-particles');
+    this.ctx = this.canvas.getContext('2d');
+    this.canvas.width = window.innerWidth;
+    this.canvas.height = window.innerHeight;
+    this.animationId = null;
+  }
+
+  addRocketFireworks(x, y, count) {
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const apexHeight = 200 + Math.random() * 300;
+      const duration = 0.6 + Math.random() * 0.4;
+      this.particles.push({
+        x, y, startX: x, startY: y, apexHeight, duration, elapsed: 0,
+        angle, life: 1, type: 'rocket',
+        trail: [], trailLength: 15
+      });
+    }
+  }
+
+  addFireworksExplosion(x, y, count) {
+    const colors = ['#f59e0b', '#ec4899', '#a855f7', '#60a5fa', '#34d399', '#fbbf24', '#fff'];
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const velocity = 6 + Math.random() * 10;
+      this.particles.push({
+        x, y,
+        vx: Math.cos(angle) * velocity,
+        vy: Math.sin(angle) * velocity,
+        life: 1,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        size: 2 + Math.random() * 4,
+        type: 'explosion',
+        trail: []
+      });
+    }
+  }
+
+  addConfettiRain(count) {
+    const colors = ['#f59e0b', '#ec4899', '#a855f7', '#60a5fa', '#34d399', '#fbbf24'];
+    for (let i = 0; i < count; i++) {
+      this.particles.push({
+        x: Math.random() * this.canvas.width,
+        y: -20,
+        vx: (Math.random() - 0.5) * 4,
+        vy: 3 + Math.random() * 4,
+        life: 1,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        size: 5 + Math.random() * 6,
+        rotation: Math.random() * Math.PI * 2,
+        rotationVel: (Math.random() - 0.5) * 0.3,
+        type: 'confetti'
+      });
+    }
+  }
+
+  addGoldenShower(count) {
+    for (let i = 0; i < count; i++) {
+      this.particles.push({
+        x: Math.random() * this.canvas.width,
+        y: -20,
+        vx: (Math.random() - 0.5) * 2,
+        vy: 4 + Math.random() * 6,
+        life: 1,
+        color: '#fbbf24',
+        size: 3 + Math.random() * 5,
+        type: 'golden',
+        tail: true
+      });
+    }
+  }
+
+  addScreenFlashParticles() {
+    for (let i = 0; i < 80; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const velocity = 10 + Math.random() * 15;
+      this.particles.push({
+        x: this.canvas.width / 2,
+        y: this.canvas.height / 2,
+        vx: Math.cos(angle) * velocity,
+        vy: Math.sin(angle) * velocity,
+        life: 0.6,
+        color: '#fff',
+        size: 1 + Math.random() * 2,
+        type: 'flash'
+      });
+    }
+  }
+
+  addFireParticles(x, y, count) {
+    const fireColors = ['#ff6b35', '#ff4500', '#ff8c00', '#fbbf24'];
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const velocity = 3 + Math.random() * 8;
+      this.particles.push({
+        x, y,
+        vx: Math.cos(angle) * velocity,
+        vy: Math.sin(angle) * velocity - 3,
+        life: 1,
+        color: fireColors[Math.floor(Math.random() * fireColors.length)],
+        size: 2 + Math.random() * 5,
+        type: 'fire',
+        flicker: Math.random()
+      });
+    }
+  }
+
+  update() {
+    this.particles = this.particles.filter(p => p.life > 0);
+    for (let p of this.particles) {
+      if (p.type === 'rocket') {
+        p.elapsed += 0.016;
+        const progress = p.elapsed / p.duration;
+        if (progress <= 1) {
+          const t = progress;
+          p.x = p.startX + Math.cos(p.angle) * t * 50;
+          p.y = p.startY - (p.apexHeight * 4 * t * (1 - t));
+          p.trail.push({x: p.x, y: p.y});
+          if (p.trail.length > p.trailLength) p.trail.shift();
+          p.life -= 0.02;
+        } else {
+          p.life = 0;
+        }
+      } else {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.type === 'explosion' || p.type === 'fire' || p.type === 'golden' || p.type === 'flash') {
+          p.trail = p.trail || [];
+          p.trail.push({x: p.x, y: p.y});
+          if (p.trail.length > 8) p.trail.shift();
+          p.vy += 0.12;
+          p.vx *= 0.96;
+          p.life -= 0.018;
+        } else {
+          p.vy += 0.15;
+          p.vx *= 0.98;
+          p.life -= 0.015;
+        }
+        if (p.rotation !== undefined) {
+          p.rotation += p.rotationVel || 0.15;
+        }
+      }
+    }
+  }
+
+  draw() {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    for (let p of this.particles) {
+      this.ctx.globalAlpha = p.life;
+      if (p.type === 'rocket' && p.trail && p.trail.length > 1) {
+        this.ctx.strokeStyle = p.color || '#fbbf24';
+        this.ctx.lineWidth = 2;
+        this.ctx.lineCap = 'round';
+        this.ctx.lineJoin = 'round';
+        this.ctx.beginPath();
+        this.ctx.moveTo(p.trail[0].x, p.trail[0].y);
+        for (let i = 1; i < p.trail.length; i++) {
+          this.ctx.lineTo(p.trail[i].x, p.trail[i].y);
+        }
+        this.ctx.stroke();
+      } else if (p.trail && p.trail.length > 1) {
+        for (let i = 0; i < p.trail.length - 1; i++) {
+          const alpha = (i / p.trail.length) * p.life * 0.6;
+          this.ctx.globalAlpha = alpha;
+          this.ctx.fillStyle = p.color;
+          this.ctx.save();
+          this.ctx.translate(p.trail[i].x, p.trail[i].y);
+          this.ctx.beginPath();
+          this.ctx.arc(0, 0, p.size * 0.5, 0, Math.PI * 2);
+          this.ctx.fill();
+          this.ctx.restore();
+        }
+      }
+      this.ctx.globalAlpha = p.life;
+      this.ctx.fillStyle = p.color || '#fff';
+      this.ctx.save();
+      this.ctx.translate(p.x, p.y);
+      if (p.rotation !== undefined) {
+        this.ctx.rotate(p.rotation);
+        this.ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+      } else {
+        this.ctx.beginPath();
+        this.ctx.arc(0, 0, p.size, 0, Math.PI * 2);
+        this.ctx.fill();
+      }
+      this.ctx.restore();
+    }
+    this.ctx.globalAlpha = 1;
+  }
+
+  animate() {
+    this.update();
+    this.draw();
+    if (this.particles.length > 0) {
+      this.animationId = requestAnimationFrame(() => this.animate());
+    } else {
+      this.canvas.style.display = 'none';
+    }
+  }
+
+  stop() {
+    if (this.animationId) {
+      cancelAnimationFrame(this.animationId);
+    }
+  }
+}
+
+// ═══ AC/DC – THUNDERSTRUCK (iTunes 30s Preview) ═══
+const THUNDERSTRUCK_URL = 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview125/v4/f3/45/64/f3456422-afe5-5218-0144-6a2dd6754a2b/mzaf_8906497323614731144.plus.aac.p.m4a';
+let _thunderAudio = null;
+
+// Pre-load audio on page load for instant playback
+(function preloadThunderstruck() {
+  try {
+    _thunderAudio = new Audio(THUNDERSTRUCK_URL);
+    _thunderAudio.preload = 'auto';
+    _thunderAudio.volume = 0.85;
+    _thunderAudio.load();
+  } catch(e) { console.log('Audio preload failed:', e); }
+})();
+
+function playCelebrationSound(comboLevel = 1) {
+  if (_soundMuted) return;
+  stopCelebrationSound();
+  try {
+    // Resume AudioContext if needed (unlocks audio on Chrome)
+    if (_audioCtx && _audioCtx.state === 'suspended') _audioCtx.resume();
+
+    // Re-create audio element for clean playback every time
+    _thunderAudio = new Audio(THUNDERSTRUCK_URL);
+    _thunderAudio.volume = Math.min(0.7 + comboLevel * 0.05, 1.0);
+    _thunderAudio.currentTime = 0;
+    _thunderAudio.play().catch(e => console.log('Audio play blocked:', e));
+  } catch(e) {
+    console.log('Thunderstruck failed:', e);
+  }
+}
+
+function stopCelebrationSound() {
+  try {
+    if (_thunderAudio) {
+      _thunderAudio.pause();
+      _thunderAudio.currentTime = 0;
+    }
+  } catch(e) {}
+}
+
+// Track all celebration timers so we can clean up
+let _celebrationTimers = [];
+let _celebrationIntervals = [];
+let _currentParticles = null;
+let _celebrationQueue = [];
+let _celebrationRunning = false;
+
+// Process celebration queue – one at a time, 15s pause between
+function processCelebrationQueue() {
+  if (_celebrationRunning || _celebrationQueue.length === 0) return;
+  _celebrationRunning = true;
+  const { seller, mimData, dayCount, weekMiMs } = _celebrationQueue.shift();
+  showCelebration(seller, mimData, dayCount, weekMiMs);
+  // After 30s celebration ends, wait 15s, then play next
+  setTimeout(() => {
+    _celebrationRunning = false;
+    if (_celebrationQueue.length > 0) {
+      setTimeout(() => processCelebrationQueue(), 15000);
+    }
+  }, 30000);
+}
+
+function clearCelebration() {
+  _celebrationTimers.forEach(t => clearTimeout(t));
+  _celebrationIntervals.forEach(t => clearInterval(t));
+  _celebrationTimers = [];
+  _celebrationIntervals = [];
+  if (_currentParticles) { _currentParticles.stop(); _currentParticles = null; }
+  stopCelebrationSound();
+  const overlay = document.getElementById('mim-celebration-overlay');
+  overlay.classList.remove('active');
+  overlay.removeAttribute('style');
+  document.getElementById('mim-particles').style.display = 'none';
+  document.querySelectorAll('.celebration-screen-flash, .celebration-shockwave').forEach(e => e.remove());
+}
+
+// WILD & EXPLOSIVE Main celebration (30 seconds)
+function showCelebration(seller, mimData, dayMimCount, weekMimCount) {
+  // Kill any running celebration first
+  clearCelebration();
+
+  const overlay = document.getElementById('mim-celebration-overlay');
+  const content = document.getElementById('celebration-content');
+  const particles = new ParticleSystem();
+  _currentParticles = particles;
+  const comboLevel = getComboLevel(dayMimCount);
+
+  // Helper to track timers
+  const cTimeout = (fn, ms) => { const t = setTimeout(fn, ms); _celebrationTimers.push(t); return t; };
+  const cInterval = (fn, ms) => { const t = setInterval(fn, ms); _celebrationIntervals.push(t); return t; };
+
+  // 0.0s: Screen SHAKE (violent)
+  document.body.classList.add('mim-shake');
+  cTimeout(() => document.body.classList.remove('mim-shake'), 1000);
+
+  // Blackout overlay – force clean state, reflow, then activate
+  overlay.removeAttribute('style');
+  overlay.classList.remove('active');
+  void overlay.offsetHeight; // force reflow
+  overlay.classList.add('active');
+  document.getElementById('mim-particles').style.display = 'block';
+
+  const comments = getComments(seller, mimData.kandidat, mimData.virk, mimData.gf, dayMimCount, weekMimCount, new Date().getHours());
+  const avatar = generateSellerAvatar(seller);
+
+  // Build HTML
+  let comboText = '';
+  let comboClass = `level-${comboLevel}`;
+  if (comboLevel === 1) comboText = '';
+  else if (comboLevel === 2) comboText = 'DOUBLE! 🎯';
+  else if (comboLevel === 3) comboText = 'HAT-TRICK! 🔥';
+  else if (comboLevel === 4) comboText = 'RAMPAGE! ⚡';
+  else if (comboLevel === 5) comboText = 'GODLIKE! 💥';
+  else if (comboLevel === 6) comboText = 'LEGENDARY! ✨✨✨';
+
+  let html = `
+    <div class="celebration-title">MAND I MARKEN</div>
+    <div class="celebration-combo ${comboClass}">${comboText}</div>
+    <div class="celebration-main-layout">
+      <div class="celebration-left-column">
+        <div class="celebration-avatar-wrapper">
+          <div class="celebration-avatar" style="color:${COLORS[seller]}">${avatar}</div>
+        </div>
+        <div class="celebration-seller-name" style="color:${COLORS[seller]}">${seller}</div>
+      </div>
+      <div class="celebration-right-column">
+        <div class="celebration-data-card card-1">
+          <div class="celebration-card-label">Kandidat</div>
+          <div class="celebration-card-value">${mimData.kandidat}</div>
+        </div>
+        <div class="celebration-data-card card-2">
+          <div class="celebration-card-label">Virksomhed</div>
+          <div class="celebration-card-value">${mimData.virk}</div>
+        </div>
+        <div class="celebration-data-card card-3">
+          <div class="celebration-card-label">Timeløn</div>
+          <div class="celebration-card-value">${isNaN(mimData.timelon) ? '—' : mimData.timelon.toFixed(0)} kr/t</div>
+        </div>
+        <div class="celebration-data-card card-4">
+          <div class="celebration-card-label">Kostpris</div>
+          <div class="celebration-card-value">${isNaN(mimData.ks) ? '—' : mimData.ks.toFixed(0)} kr</div>
+        </div>
+        <div class="celebration-data-card card-5">
+          <div class="celebration-card-label">Gangefaktor</div>
+          <div class="celebration-card-value">${isNaN(mimData.gf) ? '—' : mimData.gf.toFixed(2)}${mimData.gf >= 2.20 ? ' ✨' : ''}</div>
+        </div>
+      </div>
+    </div>
+    <div class="celebration-comments-card">`;
+
+  comments.forEach((comment, idx) => {
+    html += `<div class="celebration-comment" style="animation-delay:${1.6 + idx * 0.2}s">${comment}</div>`;
+  });
+
+  html += `</div>
+    <div class="celebration-leaderboard">
+      <div class="celebration-leaderboard-title">Dagens MiM – Top 3</div>`;
+
+  const entries = [
+    { name: 'William', count: _sellerMimToday.William },
+    { name: 'Jonas', count: _sellerMimToday.Jonas },
+    { name: 'Andreas', count: _sellerMimToday.Andreas }
+  ].sort((a, b) => b.count - a.count);
+
+  entries.forEach((entry, idx) => {
+    const isHighlight = entry.name === seller;
+    html += `
+      <div class="leaderboard-entry ${isHighlight ? 'highlight' : ''}" style="animation-delay:${2.0 + idx * 0.15}s">
+        <div class="leaderboard-name" style="color:${COLORS[entry.name]}">${entry.name}</div>
+        <div class="leaderboard-count">${entry.count}</div>
+      </div>`;
+  });
+
+  html += `</div>`;
+  content.innerHTML = html;
+
+  // === TIMELINE (30 seconds of madness) ===
+
+  // 0.3s: WHITE FLASH
+  cTimeout(() => {
+    const flash = document.createElement('div');
+    flash.className = 'celebration-screen-flash';
+    document.body.appendChild(flash);
+    cTimeout(() => flash.remove(), 300);
+  }, 300);
+
+  // 0.5s: Screen Flash particles burst from center
+  cTimeout(() => particles.addScreenFlashParticles(), 500);
+
+  // 0.8s: SHOCKWAVE animation with dual rings
+  cTimeout(() => {
+    const shockwave = document.createElement('div');
+    shockwave.className = 'celebration-shockwave';
+    document.body.appendChild(shockwave);
+
+    const shockwave2 = document.createElement('div');
+    shockwave2.className = 'celebration-shockwave-2';
+    document.body.appendChild(shockwave2);
+
+    cTimeout(() => { shockwave.remove(); shockwave2.remove(); }, 1400);
+  }, 1500);
+
+  // 1.0s: ROCK MUSIC STARTS
+  cTimeout(() => playCelebrationSound(comboLevel), 1000);
+
+  // 1.2s: First firework wave
+  cTimeout(() => {
+    const count = 150 + comboLevel * 40;
+    particles.addFireworksExplosion(window.innerWidth / 2, window.innerHeight / 2, count);
+    particles.addConfettiRain(80 + comboLevel * 20);
+  }, 1200);
+
+  // 1.5s: Rocket trails launch
+  cTimeout(() => {
+    particles.addRocketFireworks(window.innerWidth / 4, window.innerHeight * 0.6, 5 + comboLevel);
+    particles.addRocketFireworks(window.innerWidth * 0.75, window.innerHeight * 0.6, 5 + comboLevel);
+  }, 1500);
+
+  // Start particle animation
+  cTimeout(() => particles.animate(), 1200);
+
+  // Continuous firework waves based on combo level
+  const startWaves = () => {
+    let waveCount = 0;
+    cInterval(() => {
+      if (waveCount > 12 - comboLevel) return;
+      const x = window.innerWidth * (0.3 + Math.random() * 0.4);
+      const y = window.innerHeight * (0.2 + Math.random() * 0.5);
+      particles.addFireworksExplosion(x, y, 100 + comboLevel * 30);
+      if (comboLevel >= 3) particles.addFireParticles(x, y, 50 + comboLevel * 15);
+      if (comboLevel >= 5) particles.addGoldenShower(100);
+      waveCount++;
+    }, comboLevel >= 4 ? 1200 : 1500);
+  };
+
+  // 3.5s: Start continuous waves
+  cTimeout(startWaves, 3500);
+
+  // Level-specific effects
+  if (comboLevel >= 5) {
+    cTimeout(() => {
+      cInterval(() => particles.addGoldenShower(150), 2000);
+    }, 4000);
+  }
+
+  // Auto-close at 30 seconds
+  cTimeout(() => clearCelebration(), 30000);
+}
+
+// Check for new MiM – only "Dato" (col 13) = today triggers celebration
+function checkForNewMiM() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const sheets = ['Data Input - William', 'Data Input - Jonas', 'Data Input - Andreas'];
+
+  const newMiMs = [];
+
+  for (let i = 0; i < NAMES.length; i++) {
+    const seller = NAMES[i];
+    const rows = _rawData[sheets[i]] || [];
+    const data = calcSellerArr(rows, today, today);
+
+    _sellerMimToday[seller] = data.MiM;
+
+    for (const mimRow of data.mimRows) {
+      const key = `${seller}|${mimRow.kandidat}|${mimRow.virk}|${mimRow.dato}`;
+
+      if (!_seenMiM.has(key)) {
+        _seenMiM.add(key);
+        newMiMs.push({ seller, mimData: mimRow, dayCount: _sellerMimToday[seller] });
+
+        _mimLog.push({
+          time: new Date(),
+          seller,
+          candidate: mimRow.kandidat,
+          company: mimRow.virk,
+          gf: mimRow.gf,
+          combo: getComboLevel(_sellerMimToday[seller])
+        });
+      }
+    }
+  }
+
+  return newMiMs;
+}
+
+// Mark all current MiM as seen (on first load)
+function initializeMiMTracking() {
+  _seenMiM.clear();
+  _mimLog = [];
+  const sheets = ['Data Input - William', 'Data Input - Jonas', 'Data Input - Andreas'];
+
+  for (let i = 0; i < NAMES.length; i++) {
+    const seller = NAMES[i];
+    const rows = _rawData[sheets[i]] || [];
+    for (let j = 1; j < rows.length; j++) {
+      const r = rows[j];
+      const g = v => v instanceof Date ? fmtDate(v) : String(v || '');
+      const r13 = g(r[13]), r14 = g(r[14]), r15 = g(r[15]), r21 = g(r[21]);
+
+      if (r15.trim() && r13.trim()) {
+        if (!/startede aldrig/i.test(r21) && !/opsagt samme uge/i.test(r21)) {
+          const key = `${seller}|${r14}|${r15}|${r13}`;
+          _seenMiM.add(key);
+        }
+      }
+    }
+  }
+}
+
+function toggleSoundMuted() {
+  _soundMuted = !_soundMuted;
+  const btn = document.getElementById('sound-toggle');
+  btn.textContent = _soundMuted ? '🔇' : '🔊';
+  btn.classList.toggle('muted', _soundMuted);
+}
+
+// Cycle through combo levels on each test click
+let _testComboLevel = 0;
+function testCelebration() {
+  _testComboLevel = (_testComboLevel % 6) + 1;
+  showCelebration('William', {
+    kandidat: 'Test Kandidat',
+    virk: 'Test Virksomhed',
+    gf: 2.15
+  }, _testComboLevel, 5);
+}
+
+// ═══════════════════════════════════════════════════════════
+// FETCH
+// ═══════════════════════════════════════════════════════════
+async function loadAll(){
+  document.getElementById('loading').style.display='flex';
+  ['daglig','uge','maaned','person'].forEach(t=>document.getElementById('view-'+t).style.display='none');
+  document.getElementById('error-msg').style.display='none';
+  try{
+    const r=await fetch(APPS_SCRIPT_URL+'?cb='+Date.now());
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const json=await r.json();
+    ['Data Input - William','Data Input - Jonas','Data Input - Andreas','Budgetter'].forEach(n=>_rawData[n]=json[n]||[]);
+
+    // 1) Build dynamic week ranges from data
+    buildWeekRanges();
+
+    // 2) Compute trend for every discovered week
+    const sheets=['Data Input - William','Data Input - Jonas','Data Input - Andreas'];
+    for(const wn of ALL_WEEKS){
+      const [ws,we]=WEEK_RANGES[wn];
+      _trendData[wn]={};
+      for(let i=0;i<NAMES.length;i++) _trendData[wn][NAMES[i]]=calcSellerArr(_rawData[sheets[i]],ws,we);
+    }
+
+    // 3) Parse ALL budget rows (not limited to specific weeks)
+    _budgets={};
+    const budRows=_rawData['Budgetter']||[];
+    for(const r of budRows){
+      const wn=parseInt(r[0]);
+      if(!isNaN(wn)){
+        _budgets[wn]={ indiv:{KT:parseInt(r[1])||0,SS:parseInt(r[2])||0,Sam:parseInt(r[3])||0,MiM:parseInt(r[4])||0} };
+        _budgets[wn].team=Object.fromEntries(Object.entries(_budgets[wn].indiv).map(([k,v])=>[k,v*3]));
+      }
+    }
+
+    // 4) MiM tracking: on first load mark all as seen, on subsequent loads detect & celebrate
+    if (_firstLoad) {
+      initializeMiMTracking(); // marks all existing MiM as "seen" – no false celebrations
+      _firstLoad = false;
+    } else {
+      const newMiMs = checkForNewMiM();
+      // Add to celebration queue – played sequentially with 15s pause between
+      for (const { seller, mimData, dayCount } of newMiMs) {
+        const weekMiMs = _trendData[isoWeek(new Date())]?.[seller]?.MiM || 0;
+        _celebrationQueue.push({ seller, mimData, dayCount, weekMiMs });
+      }
+      processCelebrationQueue();
+    }
+
+    // 5) Populate day-select – default to today
+    const today=new Date(); today.setHours(0,0,0,0);
+    const todayStr=fmtDate(today);
+    const allDates=getAllDates();
+    const daySelEl=document.getElementById('day-select');
+    const dNames=['Søn','Man','Tir','Ons','Tor','Fre','Lør'];
+    daySelEl.innerHTML=allDates.map(ds=>{
+      const d=parseDate(ds);
+      const isSel=ds===todayStr;
+      return `<option value="${ds}"${isSel?' selected':''}>${dNames[d.getDay()]} ${ds}</option>`;
+    }).join('');
+
+    // 6) Populate week-select – default to current week
+    const curWeek=isoWeek(today);
+    const weeksDesc=[...ALL_WEEKS].reverse();
+    const fmtW=wn=>{
+      const [ws,we]=WEEK_RANGES[wn];
+      return `Uge ${wn} (${String(ws.getDate()).padStart(2,'0')}/${String(ws.getMonth()+1).padStart(2,'0')}–${String(we.getDate()).padStart(2,'0')}/${String(we.getMonth()+1).padStart(2,'0')})`;
+    };
+    document.getElementById('week-select').innerHTML=weeksDesc.map(wn=>`<option value="${wn}"${wn===curWeek?' selected':''}>${fmtW(wn)}</option>`).join('');
+    document.getElementById('person-week-select').innerHTML=weeksDesc.map(wn=>`<option value="${wn}"${wn===curWeek?' selected':''}>Uge ${wn}</option>`).join('');
+
+    // 7) Populate month-select – default to current month
+    const curMonth=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`;
+    const months=Object.keys(MONTH_RANGES).sort().reverse();
+    const mNames=['','Januar','Februar','Marts','April','Maj','Juni','Juli','August','September','Oktober','November','December'];
+    document.getElementById('month-select').innerHTML=months.map(mk=>{
+      const [yr,mo]=mk.split('-').map(Number);
+      return `<option value="${mk}"${mk===curMonth?' selected':''}>${mNames[mo]} ${yr}</option>`;
+    }).join('');
+
+    document.getElementById('last-updated').textContent='Opdateret: '+new Date().toLocaleTimeString('da-DK');
+    document.getElementById('loading').style.display='none';
+    switchTab(_currentTab);
+  }catch(e){
+    document.getElementById('loading').style.display='none';
+    document.getElementById('error-msg').style.display='block';
+    document.getElementById('error-msg').textContent='⚠️ Fejl: '+e.message;
+    console.error(e);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// TAB SWITCH
+// ═══════════════════════════════════════════════════════════
+function switchTab(tab){
+  _currentTab=tab;
+  ['daglig','uge','maaned','person'].forEach(t=>{
+    document.getElementById('tab-'+t).classList.toggle('active',t===tab);
+    document.getElementById('view-'+t).style.display=t===tab?'block':'none';
+  });
+  if(tab==='daglig') renderDaglig();
+  if(tab==='uge') renderUge();
+  if(tab==='maaned') renderMaaned();
+  if(tab==='person') renderPerson();
+}
+
+// ═══════════════════════════════════════════════════════════
+// CHART HELPERS
+// ═══════════════════════════════════════════════════════════
+function mkChart(id,cfg){ if(_charts[id]) _charts[id].destroy(); _charts[id]=new Chart(document.getElementById(id),cfg); }
+const COP={plugins:{legend:{labels:{color:'#94a3b8',font:{size:10}}}},scales:{x:{ticks:{color:'#64748b'},grid:{color:'#151825'}},y:{ticks:{color:'#64748b'},grid:{color:'#151825'}}}};
+
+// SVG progress ring helper
+function ringSVG(pct, color, size=200, stroke=12){
+  const r=(size-stroke)/2, circ=2*Math.PI*r;
+  const offset=circ*(1-Math.min(pct/100,1));
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+    <circle class="ring-bg" cx="${size/2}" cy="${size/2}" r="${r}" stroke-width="${stroke}"/>
+    <circle class="ring-fg" cx="${size/2}" cy="${size/2}" r="${r}" stroke="${color}"
+      stroke-dasharray="${circ}" stroke-dashoffset="${offset}" stroke-width="${stroke}"/>
+  </svg>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// DAGLIG RENDERER
+// ═══════════════════════════════════════════════════════════
+function renderDaglig(){
+  const ds=document.getElementById('day-select').value;
+  if(!ds) return;
+  const d=parseDate(ds);
+  const wn=weekForDate(d);
+  const bud=_budgets[wn]?.indiv||{KT:15,SS:3,Sam:13,MiM:7};
+  const dBud={KT:Math.ceil(bud.KT/5),SS:Math.ceil(bud.SS/5),Sam:Math.ceil(bud.Sam/5),MiM:Math.ceil(bud.MiM/5)};
+
+  const dayNames=['Søndag','Mandag','Tirsdag','Onsdag','Torsdag','Fredag','Lørdag'];
+  document.getElementById('period-label').textContent=`${dayNames[d.getDay()]} ${ds} · Dagligt mål · Live`;
+
+  const sheets=['Data Input - William','Data Input - Jonas','Data Input - Andreas'];
+  const dayData={};
+  for(let i=0;i<NAMES.length;i++) dayData[NAMES[i]]=calcSellerArr(_rawData[sheets[i]],d,d);
+
+  // Hall of Fame / MiM Log
+  const logHTML = renderMimLog(d);
+  document.getElementById('mim-log-section').innerHTML = logHTML;
+
+  // ── Individual cards: big ring + 4 bars (KT, SS, Samtaler, MiM) with % ──
+  document.getElementById('daily-cards').innerHTML=NAMES.map(name=>{
+    const s=dayData[name];
+    const pctKT=idx(s.KT,dBud.KT), pctSS=idx(s.SS,dBud.SS), pctSam=idx(s.Samtaler,dBud.Sam), pctMiM=idx(s.MiM,dBud.MiM);
+    const avgPct=Math.round((pctKT+pctSS+pctSam+pctMiM)/4);
+    const color=COLORS[name];
+    const isGold=avgPct>=126;
+
+    function bar(label,actual,target,pct){
+      const cc=barColorClass(pct);
+      const rc=ringColor(pct);
+      return `<div class="bar-row">
+        <div class="bar-header">
+          <span class="bar-label">${label}</span>
+          <span class="bar-val">${actual} / ${target} <span class="bar-pct" style="color:${rc}">${pct}%</span></span>
+        </div>
+        <div class="bar-track"><div class="bar-fill ${cc}" style="width:${Math.min(pct,100)}%"></div></div>
+      </div>`;
+    }
+
+    return `<div class="${isGold?'daily-card state-gold':'daily-card'}">
+      <div class="daily-name" style="color:${color}">${name}</div>
+      <div class="ring-wrap">
+        ${ringSVG(avgPct, ringColor(avgPct), 200, 12)}
+        <div class="ring-center">
+          <div class="ring-pct" style="color:${ringColor(avgPct)}">${avgPct}%</div>
+          <div class="ring-label">Samlet index</div>
+        </div>
+      </div>
+      <div class="daily-bars">
+        ${bar('KT', s.KT, dBud.KT, pctKT)}
+        ${bar('SS', s.SS, dBud.SS, pctSS)}
+        ${bar('Samtaler', s.Samtaler, dBud.Sam, pctSam)}
+        ${bar('MiM', s.MiM, dBud.MiM, pctMiM)}
+        ${s.gnsGF!==null?`<div style="margin-top:8px;font-size:11px;color:#94a3b8">GF: ${s.gnsGF.toFixed(3)}${s.gnsGF<1.90?' <span class="tag-low">↓ lav</span>':' <span style="color:var(--green)">✓</span>'}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+
+  // ── Team donuts: KT, Samtaler, MiM ──
+  const tKT=NAMES.reduce((s,n)=>s+dayData[n].KT,0), tSS=NAMES.reduce((s,n)=>s+dayData[n].SS,0);
+  const tSam=NAMES.reduce((s,n)=>s+dayData[n].Samtaler,0), tMiM=NAMES.reduce((s,n)=>s+dayData[n].MiM,0);
+  const tBud={KT:dBud.KT*3,SS:dBud.SS*3,Sam:dBud.Sam*3,MiM:dBud.MiM*3};
+  const teamMetrics=[
+    {l:'KT',v:tKT,m:tBud.KT,sub:`${tSS} SS (${tKT?Math.round(tSS/tKT*100):0}%)`},
+    {l:'Samtaler',v:tSam,m:tBud.Sam,sub:''},
+    {l:'MiM',v:tMiM,m:tBud.MiM,sub:''}
+  ];
+  document.getElementById('daily-team-donuts').innerHTML=teamMetrics.map(k=>{
+    const i=idx(k.v,k.m);
+    return `<div class="daily-team-card">
+      <div class="daily-team-card-title">${k.l} ${idxBadge(i)}</div>
+      <div class="ring-sm">
+        ${ringSVG(i, ringColor(i), 120, 10)}
+        <div class="ring-center">
+          <div class="ring-pct" style="color:${ringColor(i)}">${k.v}</div>
+          <div class="ring-label">af ${k.m}</div>
+        </div>
+      </div>
+      ${k.sub?`<div style="font-size:11px;color:var(--dim);margin-top:4px">${k.sub}</div>`:''}
+    </div>`;
+  }).join('');
+
+  // ── Comparison table: scannable, clean ──
+  const headers=['<th>Metric</th>',...NAMES.map(n=>`<th style="color:${COLORS[n]}">${n}</th>`),'<th>Team</th>','<th>Mål</th>'].join('');
+  const metrics=[
+    {l:'KT',k:'KT',bk:'KT',tV:tKT,tM:tBud.KT},
+    {l:'SS',k:'SS',bk:'SS',tV:tSS,tM:tBud.SS},
+    {l:'Samtaler',k:'Samtaler',bk:'Sam',tV:tSam,tM:tBud.Sam},
+    {l:'MiM',k:'MiM',bk:'MiM',tV:tMiM,tM:tBud.MiM},
+  ];
+  const trows=metrics.map(m=>{
+    const tPct=idx(m.tV,m.tM);
+    const cells=NAMES.map(n=>{
+      const v=dayData[n][m.k];
+      const t=dBud[m.bk];
+      const p=idx(v,t);
+      const c=ringColor(p);
+      const bc=barColorClass(p);
+      return `<td>
+        <div class="compare-val" style="color:${c}">${v}</div>
+        <div class="compare-target">mål ${t} · ${p}%</div>
+        <div class="compare-bar-wrap"><div class="compare-bar-track"><div class="compare-bar-fill ${bc}" style="width:${Math.min(p,100)}%"></div></div></div>
+      </td>`;
+    }).join('');
+    const tc=ringColor(tPct);
+    const tbc=barColorClass(tPct);
+    return `<tr><td>${m.l}</td>${cells}
+      <td><div class="compare-val" style="color:${tc}">${m.tV}</div><div class="compare-target">mål ${m.tM} · ${tPct}%</div>
+      <div class="compare-bar-wrap"><div class="compare-bar-track"><div class="compare-bar-fill ${tbc}" style="width:${Math.min(tPct,100)}%"></div></div></div></td>
+      <td style="color:var(--dimmer);font-size:13px;font-weight:700">${m.tM}</td></tr>`;
+  });
+  // GF row
+  const allGF=NAMES.flatMap(n=>dayData[n].mimRows.filter(r=>!isNaN(r.gf)).map(r=>r.gf));
+  const teamGF=allGF.length?allGF.reduce((a,b)=>a+b,0)/allGF.length:null;
+  const gfCells=NAMES.map(n=>{
+    const g=dayData[n].gnsGF;
+    const low=dayData[n].lowGF;
+    const c=g!==null?(g<1.90?'var(--yellow)':'var(--green)'):'var(--dim)';
+    return `<td><div class="compare-val" style="color:${c};font-size:15px">${g!==null?g.toFixed(3):'—'}</div>${low>0?'<div class="compare-target" style="color:var(--yellow)">'+low+' lav</div>':''}</td>`;
+  }).join('');
+  trows.push(`<tr><td>GF gns</td>${gfCells}<td><div class="compare-val" style="font-size:15px;color:${teamGF!==null?(teamGF<1.90?'var(--yellow)':'var(--green)'):'var(--dim)'}">${teamGF!==null?teamGF.toFixed(3):'—'}</div></td><td style="color:var(--dimmer);font-size:11px">≥ 1,900</td></tr>`);
+
+  document.getElementById('daily-compare').innerHTML=`<thead><tr>${headers}</tr></thead><tbody>${trows.join('')}</tbody>`;
+}
+
+// Hall of Fame renderer
+function renderMimLog(date) {
+  const dateStr = fmtDate(date);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const isToday = fmtDate(today) === dateStr;
+
+  const todaysLogs = _mimLog.filter(entry => {
+    const entryDate = new Date(entry.time);
+    entryDate.setHours(0, 0, 0, 0);
+    return fmtDate(entryDate) === dateStr;
+  });
+
+  if (todaysLogs.length === 0) {
+    return `<div class="mim-log-section">
+      <div class="mim-log-title">Dagens MiM Log 🏆</div>
+      <div class="mim-log-empty"><span class="pulse-dot"></span>Ingen MiM endnu i dag</div>
+    </div>`;
+  }
+
+  const cards = todaysLogs.map(entry => {
+    const timeStr = entry.time.toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
+    let comboTag = '';
+    if (entry.combo === 2) comboTag = '<span class="mim-log-tag" style="background:#f59e0b22; color:#f59e0b; font-weight: 700;">DOUBLE 🎯</span>';
+    else if (entry.combo === 3) comboTag = '<span class="mim-log-tag" style="background:#ef444422; color:#ef4444; font-weight: 700;">HAT-TRICK 🔥</span>';
+    else if (entry.combo === 4) comboTag = '<span class="mim-log-tag" style="background:#a855f722; color:#a855f7; font-weight: 700;">RAMPAGE ⚡</span>';
+    else if (entry.combo === 5) comboTag = '<span class="mim-log-tag" style="background:#ec489922; color:#ec4899; font-weight: 700;">GODLIKE 💥</span>';
+    else if (entry.combo === 6) comboTag = '<span class="mim-log-tag" style="background:linear-gradient(90deg, #f59e0b22, #ec489922, #a855f722); color:#fbbf24; font-weight: 700; border: 1px solid #f59e0b;">LEGENDARY ✨</span>';
+
+    return `<div class="mim-log-card">
+      <div class="mim-log-time">${timeStr}</div>
+      <div class="mim-log-seller" style="color:${COLORS[entry.seller]}">${entry.seller}</div>
+      <div class="mim-log-candidate"><strong>${entry.candidate}</strong></div>
+      <div class="mim-log-company">${entry.company}</div>
+      <div class="mim-log-meta">
+        <span>GF ${isNaN(entry.gf) ? '—' : entry.gf.toFixed(2)}</span>
+        ${comboTag}
+      </div>
+    </div>`;
+  }).join('');
+
+  return `<div class="mim-log-section">
+    <div class="mim-log-title">Dagens MiM Log 🏆</div>
+    <div class="mim-log-grid">${cards}</div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// SHARED RENDERERS
+// ═══════════════════════════════════════════════════════════
+function buildTeamKpis(w,bud,elId){
+  const t={KT:NAMES.reduce((s,n)=>s+w[n].KT,0),SS:NAMES.reduce((s,n)=>s+w[n].SS,0),Sam:NAMES.reduce((s,n)=>s+w[n].Samtaler,0),MiM:NAMES.reduce((s,n)=>s+w[n].MiM,0)};
+  const aGF=NAMES.flatMap(n=>w[n].mimRows.filter(r=>!isNaN(r.gf)).map(r=>r.gf));
+  const aKS=NAMES.flatMap(n=>w[n].mimRows.filter(r=>!isNaN(r.ks)).map(r=>r.ks));
+  t.gnsGF=aGF.length?aGF.reduce((a,b)=>a+b,0)/aGF.length:null;
+  t.lowGF=NAMES.reduce((s,n)=>s+w[n].lowGF,0);
+  const data=[
+    {l:'KT',v:t.KT,m:bud.team.KT,sub:`Mål: ${bud.team.KT}`},
+    {l:'SS',v:t.SS,m:bud.team.SS,sub:`Mål: ${bud.team.SS} · ${t.KT?Math.round(t.SS/t.KT*100):0}% af KT`},
+    {l:'Samtaler',v:t.Sam,m:bud.team.Sam,sub:`Mål: ${bud.team.Sam}`},
+    {l:'MiM',v:t.MiM,m:bud.team.MiM,sub:`Mål: ${bud.team.MiM}`},
+    {l:'Gns GF',v:fmt(t.gnsGF,3),m:null,sub:`Lav: ${t.lowGF}/${aGF.length}`},
+  ];
+  document.getElementById(elId).innerHTML=data.map(k=>{
+    const i=k.m?idx(k.v,k.m):null;
+    const ih=i!==null?`<div class="kpi-idx ${idxColor(i)}">${idxBadge(i)}</div>`:'';
+    return `<div class="kpi-card"><div class="kpi-label">${k.l}</div><div class="kpi-val">${k.v}</div><div class="kpi-sub">${k.sub}</div>${ih}</div>`;
+  }).join('');
+}
+
+function buildSellerCards(w,wp,bud,elId){
+  document.getElementById(elId).innerHTML=NAMES.map(name=>{
+    const s=w[name],sp=wp?wp[name]:null,bi=bud.indiv;
+    const kpis=[{l:'KT',v:s.KT,p:sp?.KT,m:bi.KT},{l:'SS',v:s.SS,p:sp?.SS,m:bi.SS},{l:'Samtaler',v:s.Samtaler,p:sp?.Samtaler,m:bi.Sam},{l:'MiM',v:s.MiM,p:sp?.MiM,m:bi.MiM}];
+    const rows=kpis.map(k=>`<div class="seller-kpi"><span class="seller-kpi-label">${k.l}</span><div class="seller-kpi-right"><span class="seller-kpi-val">${k.v}/${k.m}</span>${idxBadge(idx(k.v,k.m))}${k.p!==undefined?delta(k.v,k.p):''}</div></div>`).join('');
+    const gf=s.gnsGF!==null?s.gnsGF.toFixed(3):'—';
+    const gfD=sp?deltaF(s.gnsGF,sp.gnsGF):'';
+    const low=s.lowGF>0?`<span style="color:var(--yellow)">${s.lowGF}</span>`:`<span style="color:var(--green)">0</span>`;
+    return `<div class="seller-card"><div class="seller-name" style="color:${COLORS[name]}">${name}</div>${rows}<hr class="divider">
+      <div class="seller-kpi"><span class="seller-kpi-label">Gns GF</span><div class="seller-kpi-right"><span class="seller-kpi-val">${gf}</span>${gfD}</div></div>
+      <div class="seller-kpi"><span class="seller-kpi-label">Lav GF</span><div class="seller-kpi-right">${low}</div></div></div>`;
+  }).join('');
+}
+
+function buildMimDetails(w,elId,title,tElId){
+  if(tElId) document.getElementById(tElId).textContent=title;
+  document.getElementById(elId).innerHTML=NAMES.filter(n=>w[n].MiM>0).map(name=>{
+    const rows=w[name].mimRows.map(r=>{
+      const low=!isNaN(r.gf)&&r.gf<1.90;
+      return `<tr><td>${r.dato.substring(0,5)}</td><td>${r.kandidat}</td><td>${r.virk}</td><td>${isNaN(r.gf)?'—':r.gf.toFixed(3)}${low?' <span class="tag-low">↓ lav</span>':''}</td><td>${isNaN(r.ks)?'—':r.ks.toFixed(0)}</td><td style="font-size:10px;color:var(--dim)">${r.status}</td></tr>`;
+    }).join('');
+    return `<div class="card"><div class="card-title" style="color:${COLORS[name]}">${name} · ${w[name].MiM} MiM</div><table class="mim-table"><thead><tr><th>Dato</th><th>Kandidat</th><th>Virksomhed</th><th>GF</th><th>KS</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// UGE RENDERER
+// ═══════════════════════════════════════════════════════════
+function renderUge(){
+  const wn=parseInt(document.getElementById('week-select').value);
+  const w=_trendData[wn], wp=_trendData[wn-1];
+  if(!w) return;
+  const bud=_budgets[wn]||{indiv:{KT:15,SS:3,Sam:13,MiM:7},team:{KT:45,SS:9,Sam:39,MiM:21}};
+  const wLabel=WEEK_LABELS[wn]||`Uge ${wn}`;
+  document.getElementById('period-label').textContent=wLabel+' · Live';
+  buildTeamKpis(w,bud,'team-kpis');
+  buildSellerCards(w,wp,bud,'seller-cards');
+  buildMimDetails(w,'mim-details',`MiM-detaljer – ${wLabel}`,'mim-details-title');
+
+  const wks=ALL_WEEKS.filter(w=>_trendData[w]), labels=wks.map(w=>`U${w}`);
+  // KT + SS combined stacked chart
+  mkChart('ktChart',{type:'bar',data:{labels,datasets:[
+    ...NAMES.map(n=>({label:n+' KT',data:wks.map(w=>_trendData[w][n].KT),backgroundColor:COLORS[n]+'BB',borderRadius:4,stack:'KT-'+n})),
+    ...NAMES.map(n=>({label:n+' SS',data:wks.map(w=>_trendData[w][n].SS),backgroundColor:COLORS[n]+'44',borderRadius:4,stack:'KT-'+n})),
+    {label:'Mål KT',type:'line',data:wks.map(w=>(_budgets[w]?.indiv.KT??15)),borderColor:COLORS.maal,borderDash:[6,3],pointRadius:3}
+  ]},options:{...COP,responsive:true,plugins:{legend:{labels:{color:'#94a3b8',font:{size:9},filter:item=>!item.text.includes('SS')}}},scales:{...COP.scales,x:{stacked:false,...COP.scales.x}}}});
+
+  mkChart('mimChart',{type:'line',data:{labels,datasets:[
+    ...NAMES.map(n=>({label:n,data:wks.map(w=>_trendData[w][n].MiM),borderColor:COLORS[n],backgroundColor:COLORS[n]+'22',tension:0.3,pointRadius:5,fill:true})),
+    {label:'Mål',data:wks.map(w=>(_budgets[w]?.indiv.MiM??5)),borderColor:COLORS.maal,borderDash:[6,3],pointRadius:3,tension:0}
+  ]},options:{...COP,responsive:true}});
+
+  mkChart('samChart',{type:'bar',data:{labels,datasets:[
+    ...NAMES.map(n=>({label:n,data:wks.map(w=>_trendData[w][n].Samtaler),backgroundColor:COLORS[n]+'BB',borderRadius:4})),
+    {label:'Mål',type:'line',data:wks.map(w=>(_budgets[w]?.indiv.Sam??13)),borderColor:COLORS.maal,borderDash:[6,3],pointRadius:3}
+  ]},options:{...COP,responsive:true}});
+
+  mkChart('gfChart',{type:'line',data:{labels,datasets:[
+    ...NAMES.filter(n=>wks.some(w=>_trendData[w][n].gnsGF)).map(n=>({label:n,data:wks.map(w=>_trendData[w][n].gnsGF),borderColor:COLORS[n],tension:0.3,pointRadius:5,spanGaps:true})),
+    {label:'Floor 1,90',data:wks.map(()=>1.90),borderColor:COLORS.floor,borderDash:[6,3],pointRadius:0,borderWidth:1.5}
+  ]},options:{...COP,responsive:true,scales:{x:{ticks:{color:'#64748b'},grid:{color:'#151825'}},y:{min:1.82,max:2.05,ticks:{color:'#64748b',callback:v=>v.toFixed(2)},grid:{color:'#151825'}}}}});
+}
+
+// ═══════════════════════════════════════════════════════════
+// MÅNED RENDERER
+// ═══════════════════════════════════════════════════════════
+function renderMaaned(){
+  const mk=document.getElementById('month-select').value;
+  const [ms,me]=MONTH_RANGES[mk], wim=WEEKS_IN_MONTH[mk]||[];
+  const mNames=['','Januar','Februar','Marts','April','Maj','Juni','Juli','August','September','Oktober','November','December'];
+  const [mYr,mMo]=mk.split('-').map(Number);
+  const ml=`${mNames[mMo]} ${mYr}`;
+  document.getElementById('period-label').textContent=ml+' · Live';
+  const sheets=['Data Input - William','Data Input - Jonas','Data Input - Andreas'];
+  const mw={};
+  for(let i=0;i<NAMES.length;i++) mw[NAMES[i]]=calcSellerArr(_rawData[sheets[i]],ms,me);
+  const bI=wim.reduce((a,wn)=>{const b=_budgets[wn]?.indiv||{};a.KT+=b.KT||0;a.SS+=b.SS||0;a.Sam+=b.Sam||0;a.MiM+=b.MiM||0;return a;},{KT:0,SS:0,Sam:0,MiM:0});
+  const mBud={indiv:bI,team:Object.fromEntries(Object.entries(bI).map(([k,v])=>[k,v*3]))};
+  buildTeamKpis(mw,mBud,'month-team-kpis');
+  buildSellerCards(mw,null,mBud,'month-seller-cards');
+  buildMimDetails(mw,'month-mim-details',`MiM-detaljer – ${ml}`,'month-mim-title');
+
+  const wks=wim.filter(w=>_trendData[w]), labels=wks.map(w=>WEEK_LABELS[w]);
+  mkChart('monthMimChart',{type:'line',data:{labels,datasets:[
+    ...NAMES.map(n=>({label:n,data:wks.map(w=>_trendData[w][n].MiM),borderColor:COLORS[n],backgroundColor:COLORS[n]+'22',tension:0.3,pointRadius:5,fill:true})),
+    {label:'Mål',data:wks.map(w=>(_budgets[w]?.indiv.MiM??5)),borderColor:COLORS.maal,borderDash:[6,3],pointRadius:3}
+  ]},options:{...COP,responsive:true}});
+  mkChart('monthKtChart',{type:'bar',data:{labels,datasets:[
+    ...NAMES.map(n=>({label:n+' KT',data:wks.map(w=>_trendData[w][n].KT),backgroundColor:COLORS[n]+'BB',borderRadius:4})),
+    ...NAMES.map(n=>({label:n+' SS',data:wks.map(w=>_trendData[w][n].SS),backgroundColor:COLORS[n]+'44',borderRadius:4})),
+    {label:'Mål KT',type:'line',data:wks.map(w=>(_budgets[w]?.indiv.KT??15)),borderColor:COLORS.maal,borderDash:[6,3],pointRadius:3}
+  ]},options:{...COP,responsive:true,plugins:{legend:{labels:{color:'#94a3b8',font:{size:9},filter:item=>!item.text.includes('SS')}}}}});
+}
+
+// ═══════════════════════════════════════════════════════════
+// PERSON RENDERER
+// ═══════════════════════════════════════════════════════════
+function renderPerson(){
+  const name=document.getElementById('person-select').value;
+  const sw=parseInt(document.getElementById('person-week-select').value);
+  const color=COLORS[name];
+  document.getElementById('period-label').textContent=`${name} · Personligt dashboard · Live`;
+
+  const wCur=_trendData[sw]?.[name], bud=_budgets[sw]?.indiv||{KT:15,SS:3,Sam:13,MiM:7};
+  const heroIdx=wCur?Math.round((wCur.KT+wCur.MiM)/(bud.KT+bud.MiM)*100):0;
+  document.getElementById('person-hero').innerHTML=`<div class="person-hero">
+    <div class="person-avatar" style="background:${color}22;color:${color}">${name[0]}</div>
+    <div><div class="person-hero-name" style="color:${color}">${name}</div>
+    <div class="person-hero-sub">U${sw} samlet index: ${idxBadge(heroIdx)}</div>
+    <div class="person-hero-sub" style="margin-top:4px">${wCur?`MiM: ${wCur.MiM} · KT: ${wCur.KT} (SS: ${wCur.SS}) · Samtaler: ${wCur.Samtaler} · GF: ${wCur.gnsGF?.toFixed(3)||'—'}`:'Ingen data'}</div></div></div>`;
+
+  const wks=ALL_WEEKS.filter(w=>_trendData[w]?.[name]);
+  const headers=['<th>KPI</th>',...wks.map(w=>`<th style="color:${w===sw?color:'var(--dim)'}">${w===sw?'▸ ':''}U${w}</th>`),'<th>Total</th>'].join('');
+  const metrics=[{k:'KT',l:'KT',b:'KT',f:false},{k:'SS',l:'SS',b:'SS',f:false},{k:'Samtaler',l:'Samtaler',b:'Sam',f:false},{k:'MiM',l:'MiM',b:'MiM',f:false},{k:'gnsGF',l:'Gns GF',b:null,f:true}];
+  const trows=metrics.map(m=>{
+    const vals=wks.map(w=>_trendData[w][name][m.k]);
+    const total=m.f?(vals.filter(v=>v!==null).length?(vals.filter(v=>v!==null).reduce((a,b)=>a+b,0)/vals.filter(v=>v!==null).length).toFixed(3):'—'):vals.reduce((a,b)=>a+(b||0),0);
+    const cells=wks.map((w,i)=>{
+      const v=vals[i],b=_budgets[w]?.indiv[m.b];
+      let disp=v===null?'—':(m.f?v?.toFixed(3):v);
+      let badge=b&&!m.f?' '+idxBadge(idx(v,b)):'';
+      return `<td${w===sw?' style="background:#1a2540"':''}>${disp}${badge}</td>`;
+    }).join('');
+    return `<tr><td>${m.l}</td>${cells}<td style="font-weight:800;color:${color}">${m.f?(total==='—'?'—':total):total}</td></tr>`;
+  });
+  document.getElementById('person-week-table').innerHTML=`<thead><tr>${headers}</tr></thead><tbody>${trows.join('')}</tbody>`;
+
+  const labels=wks.map(w=>`U${w}`);
+  mkChart('personMimChart',{type:'line',data:{labels,datasets:[
+    {label:'MiM',data:wks.map(w=>_trendData[w][name].MiM),borderColor:color,backgroundColor:color+'22',tension:0.3,pointRadius:5,fill:true},
+    {label:'Mål',data:wks.map(w=>_budgets[w]?.indiv.MiM??5),borderColor:COLORS.maal,borderDash:[6,3],pointRadius:3}
+  ]},options:{...COP,responsive:true}});
+  mkChart('personKtChart',{type:'bar',data:{labels,datasets:[
+    {label:'KT',data:wks.map(w=>_trendData[w][name].KT),backgroundColor:color+'BB',borderRadius:4},
+    {label:'SS',data:wks.map(w=>_trendData[w][name].SS),backgroundColor:color+'44',borderRadius:4},
+    {label:'Mål',type:'line',data:wks.map(w=>_budgets[w]?.indiv.KT??15),borderColor:COLORS.maal,borderDash:[6,3],pointRadius:3}
+  ]},options:{...COP,responsive:true}});
+  mkChart('personGfChart',{type:'line',data:{labels,datasets:[
+    {label:'GF',data:wks.map(w=>_trendData[w][name].gnsGF),borderColor:color,tension:0.3,pointRadius:5,spanGaps:true},
+    {label:'Floor 1,90',data:wks.map(()=>1.90),borderColor:COLORS.floor,borderDash:[6,3],pointRadius:0,borderWidth:1.5}
+  ]},options:{...COP,responsive:true,scales:{x:{ticks:{color:'#64748b'},grid:{color:'#151825'}},y:{min:1.82,max:2.05,ticks:{color:'#64748b',callback:v=>v.toFixed(2)},grid:{color:'#151825'}}}}});
+
+  const wSel=_trendData[sw]?.[name];
+  document.getElementById('person-mim-title').textContent=`MiM-detaljer – ${name} · Uge ${sw}`;
+  if(wSel&&wSel.MiM>0){
+    const rows=wSel.mimRows.map(r=>{
+      const low=!isNaN(r.gf)&&r.gf<1.90;
+      return `<tr><td>${r.dato.substring(0,5)}</td><td>${r.kandidat}</td><td>${r.virk}</td><td>${isNaN(r.gf)?'—':r.gf.toFixed(3)}${low?' <span class="tag-low">↓ lav</span>':''}</td><td>${isNaN(r.ks)?'—':r.ks.toFixed(0)}</td><td style="font-size:10px;color:var(--dim)">${r.status}</td></tr>`;
+    }).join('');
+    document.getElementById('person-mim-details').innerHTML=`<div class="card"><div class="card-title" style="color:${color}">${name} · ${wSel.MiM} MiM · Uge ${sw}</div><table class="mim-table"><thead><tr><th>Dato</th><th>Kandidat</th><th>Virksomhed</th><th>GF</th><th>KS</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  } else {
+    document.getElementById('person-mim-details').innerHTML=`<div class="card no-data">Ingen MiM i Uge ${sw}</div>`;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════════════════════════
+let _firstLoad = true;
+
+// Load data and start auto-refresh
+loadAll();
+
+// Auto-refresh every 60 seconds
+_autoRefreshInterval = setInterval(() => {
+  loadAll();
+}, 60000);
+</script>
+</body>
+</html>
