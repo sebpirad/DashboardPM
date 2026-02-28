@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="da">
 <head>
@@ -139,7 +140,7 @@
   .ring-pct { font-size: 56px; font-weight: 900; color: #fff; line-height: 1; font-variant-numeric: tabular-nums; }
   .ring-label { font-size: 13px; color: var(--dim); margin-top: 5px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; }
 
-  /* Small ring for team donuts – 200px */
+  /* Small ring for team donuts – 120px */
   .ring-sm { position: relative; width: 200px; height: 200px; margin: 0 auto 10px; }
   .ring-sm svg { width: 200px; height: 200px; transform: rotate(-90deg); }
   .ring-sm .ring-pct { font-size: 42px; }
@@ -152,7 +153,7 @@
   .bar-label { font-size: 13px; font-weight: 700; color: #B0B0B0; }
   .bar-val { font-size: 14px; font-weight: 800; color: #fff; font-variant-numeric: tabular-nums; }
   .bar-pct { font-size: 13px; font-weight: 900; margin-left: 6px; }
-  .bar-track { height: 12px; background: #2A2A2A; border-radius: 6px; overflow: hidden; position: relative; }
+  .bar-track { height: 12px; background: #2A2A2A; border-radius: 5px; overflow: hidden; position: relative; }
   .bar-fill { height: 100%; border-radius: 5px; transition: width 0.8s ease; min-width: 2px; }
   .bar-fill.c-red    { background: linear-gradient(90deg, #dc2626, #ef4444); }
   .bar-fill.c-yellow { background: linear-gradient(90deg, #ca8a04, #eab308); }
@@ -168,7 +169,7 @@
   .daily-team-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; margin-bottom: 28px; }
   .daily-team-card {
     background: var(--card); border: 1px solid var(--card-border); border-radius: 14px;
-    padding: 24px; text-align: center;
+    padding: 20px; text-align: center;
   }
   .daily-team-card-title { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: var(--dim); margin-bottom: 16px; }
 
@@ -704,7 +705,7 @@
     .celebration-comment { font-size: 14px; }
   }
 
-  /* ═══ TV MODE – Samsung Smart TVs (hardware video) ═══ */
+  /* ═══ TV-OPTIMERET – Samsung Smart TV (altid aktiv) ═══ */
   body.tv-mode *,
   body.tv-mode *::before,
   body.tv-mode *::after {
@@ -716,68 +717,41 @@
     transition: none !important;
   }
   body.tv-mode .spinner { animation: spin 0.7s linear infinite !important; }
-
-  body.tv-mode #mim-celebration-overlay {
-    background: transparent !important;
-  }
+  body.tv-mode #mim-celebration-overlay { background: transparent !important; }
   body.tv-mode #mim-celebration-overlay::before,
-  body.tv-mode #mim-celebration-overlay::after {
-    display: none !important;
-  }
+  body.tv-mode #mim-celebration-overlay::after { display: none !important; }
   body.tv-mode #mim-celebration-overlay.active {
-    animation: tvFadeIn 0.5s ease-out forwards !important;
-    opacity: 0;
+    animation: tvFadeIn 0.5s ease-out forwards !important; opacity: 0;
   }
   @keyframes tvFadeIn { to { opacity: 1; } }
-
   body.tv-mode #mim-particles,
   body.tv-mode .celebration-shockwave,
   body.tv-mode .celebration-shockwave-2,
-  body.tv-mode .celebration-screen-flash {
-    display: none !important;
-  }
-
+  body.tv-mode .celebration-screen-flash { display: none !important; }
   body.tv-mode .celebration-avatar-wrapper { opacity: 1 !important; }
   body.tv-mode .celebration-avatar {
-    border-radius: 0 !important;
-    clip-path: circle(48%) !important;
-    box-shadow: none !important;
-    border: none !important;
+    border-radius: 0 !important; clip-path: circle(48%) !important;
+    box-shadow: none !important; border: none !important;
   }
   body.tv-mode .celebration-avatar::before { display: none !important; }
-
   body.tv-mode .celebration-title {
-    background: none !important;
-    -webkit-background-clip: unset !important;
-    -webkit-text-fill-color: #FFD700 !important;
-    background-clip: unset !important;
-    color: #FFD700 !important;
-    opacity: 1 !important;
+    background: none !important; -webkit-background-clip: unset !important;
+    -webkit-text-fill-color: #FFD700 !important; background-clip: unset !important;
+    color: #FFD700 !important; opacity: 1 !important;
   }
-
   body.tv-mode .celebration-combo,
   body.tv-mode .celebration-seller-name,
   body.tv-mode .celebration-comment,
   body.tv-mode .leaderboard-entry { opacity: 1 !important; }
-
   body.tv-mode .celebration-data-card,
   body.tv-mode .celebration-comments-card,
   body.tv-mode .celebration-leaderboard {
-    backdrop-filter: none !important;
-    background: rgba(0, 0, 0, 0.6) !important;
-    border: 1px solid rgba(255, 215, 0, 0.3) !important;
-    box-shadow: none !important;
-    opacity: 1 !important;
+    backdrop-filter: none !important; background: rgba(0,0,0,0.6) !important;
+    border: 1px solid rgba(255,215,0,0.3) !important; box-shadow: none !important; opacity: 1 !important;
   }
-
-  body.tv-mode .card {
-    backdrop-filter: none !important;
-    box-shadow: none !important;
-  }
-
+  body.tv-mode .card { backdrop-filter: none !important; box-shadow: none !important; }
   body.tv-mode .daily-card.state-gold::before { display: none !important; }
-  body.tv-mode .bar-fill.c-gold { animation: none !important; box-shadow: none !important; }
-</style>
+  body.tv-mode .bar-fill.c-gold { animation: none !important; box-shadow: none !important; }</style>
 </head>
 <body>
 
@@ -925,9 +899,9 @@
 <button class="test-celebration-btn" title="Test celebration" onclick="testCelebration()">=</button>
 
 <script>
-// TV MODE – add ?tv=1 for Samsung Smart TVs
-const TV_MODE = new URLSearchParams(window.location.search).get('tv') === '1';
-if (TV_MODE) document.body.classList.add('tv-mode');
+// TV MODE – always on (optimized for Samsung Smart TV)
+const TV_MODE = true;
+document.body.classList.add('tv-mode');
 
 // ═══════════════════════════════════════════════════════════
 // CONFIG
@@ -944,13 +918,8 @@ const GITHUB_PHOTOS = {
   Andreas: PHOTO_BASE_URL + 'andreas.jpg'
 };
 const _githubPhotoVerified = {};
-
 function getSellerPhoto(name) {
-  // First try GitHub-hosted photo (works across all devices)
-  if (GITHUB_PHOTOS[name] && _githubPhotoVerified[name] !== false) {
-    return GITHUB_PHOTOS[name];
-  }
-  // Fallback to localStorage
+  if (GITHUB_PHOTOS[name] && _githubPhotoVerified[name] !== false) return GITHUB_PHOTOS[name];
   try { return localStorage.getItem('pm_photo_'+name) || ''; } catch(e) { return ''; }
 }
 function setSellerPhoto(name, dataUrl) {
@@ -959,8 +928,6 @@ function setSellerPhoto(name, dataUrl) {
 function removeSellerPhoto(name) {
   try { localStorage.removeItem('pm_photo_'+name); } catch(e) {}
 }
-
-// Verify GitHub photos exist on load
 function verifyGitHubPhotos() {
   for (const name of NAMES) {
     if (GITHUB_PHOTOS[name]) {
