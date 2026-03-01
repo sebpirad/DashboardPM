@@ -39,7 +39,7 @@
     width: 400px; height: 400px; top: 40%; left: 50%;
     background: radial-gradient(circle, #06b6d4 0%, #0891b2 40%, transparent 70%);
   }
-  #app { position: relative; z-index: 1; background: #050510; }
+  #app { position: relative; z-index: 1; }
 
   /* ── Header ── */
   .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
@@ -271,24 +271,22 @@
     100% { opacity: 1; transform: scale(1); }
   }
 
-  /* Celebration video — ALWAYS in DOM, ALWAYS visible, just behind dashboard */
-  #mim-celebration-video {
-    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-    object-fit: cover; z-index: -1; background: #000;
-  }
-
-  /* Celebration overlay — content only, transparent bg, sits on top of video */
+  /* Celebration overlay — animated WebP background */
   #mim-celebration-overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999;
-    background: transparent;
+    background: #0d0008;
     display: none; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 0.3s;
     overflow: hidden;
   }
-
   #mim-celebration-overlay.active {
-    display: flex;
+    display: flex; opacity: 1;
   }
-
+  #celebration-bg {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;
+    background-image: url('celebration_anim.webp');
+    background-size: cover; background-position: center; background-repeat: no-repeat;
+  }
   .celebration-content {
     position: relative; z-index: 2;
     display: flex; flex-direction: column; align-items: center;
@@ -806,12 +804,9 @@
   <div id="person-mim-details"></div>
 </div>
 
-<!-- Celebration video — ALWAYS playing in loop behind dashboard, Samsung TV compatible -->
-<video id="mim-celebration-video" src="celebration.mp4" muted playsinline autoplay loop
-  width="1920" height="1080"></video>
-
-<!-- Celebration overlay — content only, transparent, on top of video -->
+<!-- Celebration overlay — animated WebP background, Samsung TV compatible -->
 <div id="mim-celebration-overlay">
+  <div id="celebration-bg"></div>
   <div class="celebration-content" id="celebration-content"></div>
 </div>
 
@@ -1233,9 +1228,6 @@ function clearCelebration() {
   const overlay = document.getElementById('mim-celebration-overlay');
   overlay.classList.remove('active');
   overlay.removeAttribute('style');
-  // Hide video by moving behind dashboard (keep playing in loop)
-  const v = document.getElementById('mim-celebration-video');
-  if (v) { v.style.zIndex = '-1'; }
 }
 
 // WILD & EXPLOSIVE Main celebration (30 seconds)
@@ -1257,13 +1249,7 @@ function showCelebration(seller, mimData, dayMimCount, weekMimCount) {
   void overlay.offsetHeight; // force reflow
   overlay.classList.add('active');
 
-  // Show celebration video — video is ALREADY playing in loop behind dashboard
-  // Just bring it to front and reset to beginning. No play() needed.
-  const celebVideo = document.getElementById('mim-celebration-video');
-  if (celebVideo) {
-    celebVideo.currentTime = 0;
-    celebVideo.style.zIndex = '9998';
-  }
+  // Animated WebP background plays automatically via CSS background-image
 
   const comments = getComments(seller, mimData.kandidat, mimData.virk, mimData.gf, dayMimCount, weekMimCount, new Date().getHours());
   const avatar = generateSellerAvatar(seller);
@@ -1916,6 +1902,9 @@ function renderPerson(){
 // BOOT
 // ═══════════════════════════════════════════════════════════
 let _firstLoad = true;
+
+// Preload animated WebP celebration background
+(new Image()).src = 'celebration_anim.webp';
 
 // Load data and start auto-refresh
 loadAll();
