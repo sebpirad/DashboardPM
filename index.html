@@ -725,31 +725,31 @@ const GITHUB_PHOTOS = {
 };
 
 // Screener photo configuration
-const SCREENER_NAMES = ['Amalie', 'Ali', 'Josefine'];
+const SCREENER_NAMES = ['Amalie', 'Ali', 'Josefine', 'Nicholai'];
 const SCREENER_PHOTOS = {
   Amalie: PHOTO_BASE_URL + 'amalie.jpg',
   Ali: PHOTO_BASE_URL + 'ali.jpg',
-  Josefine: PHOTO_BASE_URL + 'josefine.jpg'
+  Josefine: PHOTO_BASE_URL + 'josefine.jpg',
+  Nicholai: PHOTO_BASE_URL + 'nicholai.jpg'
 };
-const SCREENER_COLORS = { Amalie: '#c084fc', Ali: '#fb923c', Josefine: '#f9a8d4' };
-const SCREENER_SHEET_MAP = {
-  'Amalie - Screened': 'Amalie',
-  'Ali - Screened': 'Ali',
-  'Josefine - Screened': 'Josefine'
-};
+const SCREENER_COLORS = { Amalie: '#c084fc', Ali: '#fb923c', Josefine: '#f9a8d4', Nicholai: '#60a5fa' };
 
-// Look up screener by candidate name (col D = index 3 in "Applicant name")
-function findScreener(kandidatNavn) {
+// HR Dashboard Apps Script endpoint for screener lookup
+const HR_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwNgVLagf3MT5_JeJSWySpkbIEBquFOOHyr0WplT66cf6l3eWgImS0BO7RUYV4TaCp2/exec';
+
+// Look up screener via HR Dashboard API (async)
+async function findScreenerAsync(kandidatNavn) {
   if (!kandidatNavn) return null;
-  const needle = kandidatNavn.trim().toLowerCase();
-  for (const [sheetName, screenerName] of Object.entries(SCREENER_SHEET_MAP)) {
-    const rows = _rawData[sheetName] || [];
-    for (let i = 1; i < rows.length; i++) { // skip header row
-      const cellVal = String(rows[i][3] || '').trim().toLowerCase(); // col D = index 3
-      if (cellVal === needle) return screenerName;
-    }
+  try {
+    const url = HR_APPS_SCRIPT_URL + '?action=findScreener&kandidat=' + encodeURIComponent(kandidatNavn.trim());
+    const resp = await fetch(url);
+    if (!resp.ok) { console.warn('HR screener lookup failed:', resp.status); return null; }
+    const data = await resp.json();
+    return data.screener || null;
+  } catch (e) {
+    console.warn('HR screener lookup error:', e);
+    return null;
   }
-  return null; // not found
 }
 const _githubPhotoVerified = {};
 function getSellerPhoto(name) {
@@ -1193,10 +1193,7 @@ function _launchCelebration(seller, mimData, dayMimCount, weekMimCount) {
   void overlay.offsetHeight;
   overlay.classList.add('active');
 
-  // Find screener
-  const screener = _testScreenerOverride || findScreener(mimData.kandidat);
   const sellerPhoto = GITHUB_PHOTOS[seller] || '';
-  const screenerPhoto = screener ? (SCREENER_PHOTOS[screener] || '') : '';
 
   // Combo text
   let comboText = '';
@@ -1212,31 +1209,18 @@ function _launchCelebration(seller, mimData, dayMimCount, weekMimCount) {
        <div class="cel-avatar-fallback" style="display:none">${seller.charAt(0)}</div>`
     : `<div class="cel-avatar-fallback">${seller.charAt(0)}</div>`;
 
-  // Build screener avatar HTML
-  const screenerAvatarHtml = screener
-    ? (screenerPhoto
-        ? `<img src="${screenerPhoto}" alt="${screener}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
-           <div class="cel-avatar-fallback" style="display:none">${screener.charAt(0)}</div>`
-        : `<div class="cel-avatar-fallback">${screener.charAt(0)}</div>`)
-    : '';
-
-  // === BUILD HTML — matches celebration_test.html layout ===
+  // === BUILD HTML — starts WITHOUT screener, added async when HR API responds ===
   let html = `
     <div class="cel-title-section">
       <div class="cel-title">Mand i Marken!</div>
       <div class="cel-combo" id="cel-combo"></div>
     </div>
 
-    <div class="cel-people-row">
+    <div class="cel-people-row" id="cel-people-row">
       <div class="cel-person" id="cel-person-closer">
         <div class="cel-avatar-ring closer">${sellerAvatarHtml}</div>
         <div class="cel-person-name">${seller}</div>
       </div>
-      ${screener ? `
-      <div class="cel-person" id="cel-person-screener">
-        <div class="cel-avatar-ring screener">${screenerAvatarHtml}</div>
-        <div class="cel-person-name">${screener}</div>
-      </div>` : ''}
     </div>
 
     <div class="cel-deal-card" id="cel-deal-card">
@@ -1262,6 +1246,36 @@ function _launchCelebration(seller, mimData, dayMimCount, weekMimCount) {
 
   content.innerHTML = html;
 
+  // === ASYNC: Fetch screener from HR Dashboard and inject when ready ===
+  const screenerPromise = _testScreenerOverride
+    ? Promise.resolve(_testScreenerOverride)
+    : findScreenerAsync(mimData.kandidat);
+
+  screenerPromise.then(function(screener) {
+    if (!screener) return;
+    const screenerPhoto = SCREENER_PHOTOS[screener] || '';
+    const screenerAvatarHtml = screenerPhoto
+      ? `<img src="${screenerPhoto}" alt="${screener}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+         <div class="cel-avatar-fallback" style="display:none">${screener.charAt(0)}</div>`
+      : `<div class="cel-avatar-fallback">${screener.charAt(0)}</div>`;
+
+    const peopleRow = document.getElementById('cel-people-row');
+    if (!peopleRow) return;
+
+    const screenerDiv = document.createElement('div');
+    screenerDiv.className = 'cel-person';
+    screenerDiv.id = 'cel-person-screener';
+    screenerDiv.innerHTML = `
+      <div class="cel-avatar-ring screener">${screenerAvatarHtml}</div>
+      <div class="cel-person-name">${screener}</div>`;
+    peopleRow.appendChild(screenerDiv);
+
+    // Trigger animation after DOM insert
+    requestAnimationFrame(function() {
+      screenerDiv.classList.add('animate-in');
+    });
+  });
+
   // === TIMELINE — matches celebration_test.html ===
   // 0.3s: Show overlay (already done via CSS transition)
   // 0.5s: Music
@@ -1272,12 +1286,6 @@ function _launchCelebration(seller, mimData, dayMimCount, weekMimCount) {
     const el = document.getElementById('cel-person-closer');
     if (el) el.classList.add('animate-in');
   }, 800);
-
-  // 1.2s: Screener avatar reveals
-  cTimeout(() => {
-    const el = document.getElementById('cel-person-screener');
-    if (el) el.classList.add('animate-in');
-  }, 1200);
 
   // 1.5s: Deal card slides up
   cTimeout(() => {
