@@ -806,8 +806,8 @@
 </div>
 
 <!-- Celebration video (hardware-decoded on Samsung TV) -->
-<video id="mim-celebration-video" muted playsinline preload="auto"
-  style="position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:9998;display:none;pointer-events:none;">
+<video id="mim-celebration-video" muted playsinline preload="auto" autoplay
+  style="position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:9998;opacity:0;pointer-events:none;">
   <source src="celebration.mp4" type="video/mp4">
 </video>
 
@@ -1229,9 +1229,9 @@ function clearCelebration() {
   const overlay = document.getElementById('mim-celebration-overlay');
   overlay.classList.remove('active');
   overlay.removeAttribute('style');
-  // Stop celebration video
+  // Stop celebration video (use opacity, NOT display:none — Samsung Tizen deallocs decoder)
   const celebVideo = document.getElementById('mim-celebration-video');
-  if (celebVideo) { celebVideo.pause(); celebVideo.currentTime = 0; celebVideo.style.display = 'none'; }
+  if (celebVideo) { celebVideo.pause(); celebVideo.currentTime = 0; celebVideo.style.opacity = '0'; }
 }
 
 // WILD & EXPLOSIVE Main celebration (30 seconds)
@@ -1257,8 +1257,14 @@ function showCelebration(seller, mimData, dayMimCount, weekMimCount) {
   const celebVideo = document.getElementById('mim-celebration-video');
   if (celebVideo) {
     celebVideo.currentTime = 0;
-    celebVideo.style.display = 'block';
-    celebVideo.play().catch(e => console.log('Video play failed:', e));
+    celebVideo.style.opacity = '1';
+    const playAttempt = celebVideo.play();
+    if (playAttempt !== undefined) {
+      playAttempt.catch(e => {
+        console.log('Video play failed, retrying:', e);
+        setTimeout(() => { celebVideo.play().catch(() => {}); }, 200);
+      });
+    }
   }
 
   const comments = getComments(seller, mimData.kandidat, mimData.virk, mimData.gf, dayMimCount, weekMimCount, new Date().getHours());
@@ -1912,6 +1918,15 @@ function renderPerson(){
 // BOOT
 // ═══════════════════════════════════════════════════════════
 let _firstLoad = true;
+
+// Pre-warm video decoder for Samsung Tizen TV
+(function() {
+  const v = document.getElementById('mim-celebration-video');
+  if (v) {
+    v.play().then(() => { v.pause(); v.currentTime = 0; console.log('Video decoder pre-warmed'); })
+      .catch(() => { console.log('Video pre-warm deferred'); });
+  }
+})();
 
 // Load data and start auto-refresh
 loadAll();
