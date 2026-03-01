@@ -271,29 +271,22 @@
     100% { opacity: 1; transform: scale(1); }
   }
 
-  /* Celebration overlay */
+  /* Celebration video — ALWAYS in DOM, ALWAYS visible, just behind dashboard */
+  #mim-celebration-video {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    object-fit: cover; z-index: -1; background: #000;
+  }
+
+  /* Celebration overlay — content only, transparent bg, sits on top of video */
   #mim-celebration-overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999;
-    background: #000;
+    background: transparent;
     display: none; align-items: center; justify-content: center;
-    opacity: 0; transition: opacity 0.3s;
     overflow: hidden;
   }
 
   #mim-celebration-overlay.active {
-    display: flex; opacity: 1;
-  }
-
-  /* CSS fallback background when video fails (Samsung TV) */
-  @keyframes celebFallbackBg {
-    0% { background: radial-gradient(ellipse at center, #4a0e2e 0%, #1a0012 100%); }
-    25% { background: radial-gradient(ellipse at 30% 40%, #5c1a3a 0%, #200018 100%); }
-    50% { background: radial-gradient(ellipse at 70% 60%, #6b2040 0%, #1a0012 100%); }
-    75% { background: radial-gradient(ellipse at 50% 30%, #4a0e2e 0%, #250020 100%); }
-    100% { background: radial-gradient(ellipse at center, #4a0e2e 0%, #1a0012 100%); }
-  }
-  #celebration-fallback-bg {
-    animation: celebFallbackBg 8s ease infinite;
+    display: flex;
   }
 
   .celebration-content {
@@ -813,14 +806,12 @@
   <div id="person-mim-details"></div>
 </div>
 
-<!-- Celebration overlay (video is INSIDE overlay for Samsung Tizen compatibility) -->
+<!-- Celebration video — ALWAYS in DOM, behind dashboard, Samsung TV compatible -->
+<video id="mim-celebration-video" src="celebration.mp4" muted playsinline preload="auto"
+  width="1920" height="1080"></video>
+
+<!-- Celebration overlay — content only, transparent, on top of video -->
 <div id="mim-celebration-overlay">
-  <video id="mim-celebration-video" muted playsinline preload="auto"
-    width="1920" height="1080"
-    style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;pointer-events:none;">
-    <source src="celebration.mp4" type="video/mp4">
-  </video>
-  <div id="celebration-fallback-bg" style="position:absolute;top:0;left:0;width:100%;height:100%;display:none;"></div>
   <div class="celebration-content" id="celebration-content"></div>
 </div>
 
@@ -1242,11 +1233,9 @@ function clearCelebration() {
   const overlay = document.getElementById('mim-celebration-overlay');
   overlay.classList.remove('active');
   overlay.removeAttribute('style');
-  // Stop celebration video
-  const celebVideo = document.getElementById('mim-celebration-video');
-  if (celebVideo) { celebVideo.pause(); celebVideo.currentTime = 0; }
-  const fallbackBg = document.getElementById('celebration-fallback-bg');
-  if (fallbackBg) { fallbackBg.style.display = 'none'; }
+  // Hide video by moving behind dashboard
+  const v = document.getElementById('mim-celebration-video');
+  if (v) { v.pause(); v.currentTime = 0; v.style.zIndex = '-1'; }
 }
 
 // WILD & EXPLOSIVE Main celebration (30 seconds)
@@ -1268,41 +1257,18 @@ function showCelebration(seller, mimData, dayMimCount, weekMimCount) {
   void overlay.offsetHeight; // force reflow
   overlay.classList.add('active');
 
-  // Start celebration video (Samsung Tizen compatible — video is inside overlay)
+  // Start celebration video — simple approach for Samsung TV
   const celebVideo = document.getElementById('mim-celebration-video');
-  const fallbackBg = document.getElementById('celebration-fallback-bg');
   if (celebVideo) {
-    console.log('CELEBRATION: Starting video. readyState:', celebVideo.readyState);
     celebVideo.currentTime = 0;
-    if (celebVideo.readyState < 3) { celebVideo.load(); }
-    // Try to play with fallback to CSS background
-    let videoPlaying = false;
-    const tryPlay = (attempt) => {
-      celebVideo.play().then(() => {
-        videoPlaying = true;
-        console.log('CELEBRATION: Video playing OK (attempt ' + attempt + ')');
-        if (fallbackBg) fallbackBg.style.display = 'none';
-      }).catch(e => {
-        console.log('CELEBRATION: play() failed attempt ' + attempt + ':', e.message);
-        if (attempt < 4) {
-          setTimeout(() => tryPlay(attempt + 1), 500 * attempt);
-        } else {
-          // All attempts failed — activate CSS fallback background
-          console.log('CELEBRATION: Video failed, using CSS fallback');
-          if (fallbackBg) fallbackBg.style.display = 'block';
-        }
+    // Bring video to front (above dashboard, below overlay content)
+    celebVideo.style.zIndex = '9998';
+    // Wait one frame for Samsung to register the layout change, then play
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        celebVideo.play().catch(e => console.log('Video play error:', e));
       });
-    };
-    tryPlay(1);
-    // Safety net: if video hasn't started within 1.5s, show fallback
-    cTimeout(() => {
-      if (!videoPlaying && fallbackBg) {
-        console.log('CELEBRATION: Video timeout, showing fallback');
-        fallbackBg.style.display = 'block';
-      }
-    }, 1500);
-  } else if (fallbackBg) {
-    fallbackBg.style.display = 'block';
+    });
   }
 
   const comments = getComments(seller, mimData.kandidat, mimData.virk, mimData.gf, dayMimCount, weekMimCount, new Date().getHours());
@@ -1956,25 +1922,6 @@ function renderPerson(){
 // BOOT
 // ═══════════════════════════════════════════════════════════
 let _firstLoad = true;
-
-// Pre-warm video decoder for Samsung Tizen TV
-(function() {
-  const v = document.getElementById('mim-celebration-video');
-  if (!v) { console.error('VIDEO ELEMENT NOT FOUND'); return; }
-  ['canplay','canplaythrough','error','stalled','playing','loadeddata','loadedmetadata'].forEach(evt => {
-    v.addEventListener(evt, () => console.log('VIDEO EVENT:', evt, 'readyState:', v.readyState));
-  });
-  v.addEventListener('error', () => {
-    const e = v.error;
-    console.error('VIDEO ERROR:', e ? e.code + ' ' + e.message : 'unknown');
-  });
-  v.load();
-  v.play().then(() => { v.pause(); v.currentTime = 0; console.log('Video decoder pre-warmed OK'); })
-    .catch(e => {
-      console.log('Video pre-warm failed:', e.message);
-      // On Samsung, pre-warm may fail but play() during celebration can still work
-    });
-})();
 
 // Load data and start auto-refresh
 loadAll();
