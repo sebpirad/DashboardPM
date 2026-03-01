@@ -1194,6 +1194,9 @@ function stopCelebrationSound() {
     if (_thunderAudio) {
       _thunderAudio.pause();
       _thunderAudio.currentTime = 0;
+      _thunderAudio.src = '';  // Force release audio resource
+      _thunderAudio.load();    // Reset the element
+      _thunderAudio = null;
     }
   } catch(e) {}
 }
@@ -1461,13 +1464,16 @@ async function loadAll(){
       initializeMiMTracking(); // marks all existing MiM as "seen" – no false celebrations
       _firstLoad = false;
     } else {
-      const newMiMs = checkForNewMiM();
-      // Add to celebration queue – played sequentially with 15s pause between
-      for (const { seller, mimData, dayCount } of newMiMs) {
-        const weekMiMs = _trendData[isoWeek(new Date())]?.[seller]?.MiM || 0;
-        _celebrationQueue.push({ seller, mimData, dayCount, weekMiMs });
+      // Skip MiM detection while celebration is active (prevents double-trigger)
+      if (!_celebrationRunning) {
+        const newMiMs = checkForNewMiM();
+        // Add to celebration queue – played sequentially with 15s pause between
+        for (const { seller, mimData, dayCount } of newMiMs) {
+          const weekMiMs = _trendData[isoWeek(new Date())]?.[seller]?.MiM || 0;
+          _celebrationQueue.push({ seller, mimData, dayCount, weekMiMs });
+        }
+        processCelebrationQueue();
       }
-      processCelebrationQueue();
     }
 
     // 5) Populate day-select – default to today
