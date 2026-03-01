@@ -1159,46 +1159,95 @@ function getComboLevel(dayMimCount) {
 }
 
 
-// ═══ AC/DC – THUNDERSTRUCK (iTunes 30s Preview) ═══
-const THUNDERSTRUCK_URL = 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview125/v4/f3/45/64/f3456422-afe5-5218-0144-6a2dd6754a2b/mzaf_8906497323614731144.plus.aac.p.m4a';
-let _thunderAudio = null;
+// ═══ CELEBRATION SONGS — Random pick from 10 bangers (iTunes 30s Previews) ═══
+const CELEBRATION_SONGS = [
+  { id: 574043691,  name: 'Thunderstruck',      artist: 'AC/DC',
+    fallback: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview125/v4/f3/45/64/f3456422-afe5-5218-0144-6a2dd6754a2b/mzaf_8906497323614731144.plus.aac.p.m4a' },
+  { id: 355893427,  name: 'Eye of the Tiger',   artist: 'Survivor' },
+  { id: 1440832696, name: 'Gonna Fly Now',      artist: 'Bill Conti' },
+  { id: 428086879,  name: 'Give Me Everything', artist: 'Pitbull' },
+  { id: 1715687117, name: 'Sexy Bitch',         artist: 'David Guetta ft. Akon' },
+  { id: 1441457437, name: 'We Will Rock You',   artist: 'Queen' },
+  { id: 1440773907, name: 'I Gotta Feeling',    artist: 'Black Eyed Peas' },
+  { id: 1443130548, name: 'On The Floor',       artist: 'Jennifer Lopez ft. Pitbull' },
+  { id: 1440849974, name: 'Levels',             artist: 'Avicii' },
+  { id: 1016535039, name: 'Orale',              artist: 'Orale' },
+];
+let _songPreviewUrls = {}; // Cache: trackId -> previewUrl
+let _celebrationAudio = null;
+let _lastSongIdx = -1; // Avoid repeating same song twice
 
-// Pre-load audio on page load for instant playback
-(function preloadThunderstruck() {
-  try {
-    _thunderAudio = new Audio(THUNDERSTRUCK_URL);
-    _thunderAudio.preload = 'auto';
-    _thunderAudio.volume = 0.85;
-    _thunderAudio.load();
-  } catch(e) { console.log('Audio preload failed:', e); }
+// Fetch preview URLs from iTunes API (JSONP — no CORS issues on TV stick)
+(function preloadSongUrls() {
+  const ids = CELEBRATION_SONGS.map(s => s.id).join(',');
+  const cb = '_itunesCb' + Date.now();
+  window[cb] = function(data) {
+    (data.results || []).forEach(function(r) {
+      if (r.previewUrl) _songPreviewUrls[r.trackId] = r.previewUrl;
+    });
+    console.log('iTunes previews loaded:', Object.keys(_songPreviewUrls).length + '/' + CELEBRATION_SONGS.length);
+    // Set fallback for Thunderstruck if not returned
+    if (!_songPreviewUrls[574043691] && CELEBRATION_SONGS[0].fallback) {
+      _songPreviewUrls[574043691] = CELEBRATION_SONGS[0].fallback;
+    }
+    delete window[cb];
+    document.body.removeChild(scr);
+  };
+  const scr = document.createElement('script');
+  scr.src = 'https://itunes.apple.com/lookup?id=' + ids + '&entity=song&callback=' + cb;
+  scr.onerror = function() {
+    console.warn('iTunes JSONP failed — using Thunderstruck fallback only');
+    _songPreviewUrls[574043691] = CELEBRATION_SONGS[0].fallback;
+    delete window[cb];
+  };
+  document.body.appendChild(scr);
 })();
+
+function pickRandomSong() {
+  // Build list of songs with available URLs
+  const available = CELEBRATION_SONGS.map((s, i) => ({ ...s, idx: i }))
+    .filter(s => _songPreviewUrls[s.id]);
+  if (available.length === 0) {
+    // Ultimate fallback
+    return { name: 'Thunderstruck', artist: 'AC/DC', url: CELEBRATION_SONGS[0].fallback };
+  }
+  // Avoid repeating last song
+  let pick;
+  if (available.length === 1) {
+    pick = available[0];
+  } else {
+    do { pick = available[Math.floor(Math.random() * available.length)]; }
+    while (pick.idx === _lastSongIdx);
+  }
+  _lastSongIdx = pick.idx;
+  return { name: pick.name, artist: pick.artist, url: _songPreviewUrls[pick.id] };
+}
 
 function playCelebrationSound(comboLevel = 1) {
   if (_soundMuted) return;
   stopCelebrationSound();
   try {
-    // Resume AudioContext if needed (unlocks audio on Chrome)
     if (_audioCtx && _audioCtx.state === 'suspended') _audioCtx.resume();
-
-    // Re-create audio element for clean playback every time
-    _thunderAudio = new Audio(THUNDERSTRUCK_URL);
-    _thunderAudio.volume = Math.min(0.7 + comboLevel * 0.05, 1.0);
-    _thunderAudio.loop = false;  // 30s preview matches 30s celebration
-    _thunderAudio.currentTime = 0;
-    _thunderAudio.play().catch(e => console.log('Audio play blocked:', e));
+    const song = pickRandomSong();
+    console.log('🎵 Playing:', song.name, '-', song.artist);
+    _celebrationAudio = new Audio(song.url);
+    _celebrationAudio.volume = Math.min(0.7 + comboLevel * 0.05, 1.0);
+    _celebrationAudio.loop = false;
+    _celebrationAudio.currentTime = 0;
+    _celebrationAudio.play().catch(e => console.log('Audio play blocked:', e));
   } catch(e) {
-    console.log('Thunderstruck failed:', e);
+    console.log('Celebration audio failed:', e);
   }
 }
 
 function stopCelebrationSound() {
   try {
-    if (_thunderAudio) {
-      _thunderAudio.pause();
-      _thunderAudio.currentTime = 0;
-      _thunderAudio.src = '';  // Force release audio resource
-      _thunderAudio.load();    // Reset the element
-      _thunderAudio = null;
+    if (_celebrationAudio) {
+      _celebrationAudio.pause();
+      _celebrationAudio.currentTime = 0;
+      _celebrationAudio.src = '';
+      _celebrationAudio.load();
+      _celebrationAudio = null;
     }
   } catch(e) {}
 }
