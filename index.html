@@ -1385,7 +1385,7 @@ function _launchCelebration(seller, mimData, dayMimCount, weekMimCount, webpUrl)
   const avatar = generateSellerAvatar(seller);
 
   // Find screener for this candidate
-  const screener = findScreener(mimData.kandidat);
+  const screener = _testScreenerOverride || findScreener(mimData.kandidat);
   const screenerPhoto = screener ? (SCREENER_PHOTOS[screener] || '') : '';
   const screenerColor = screener ? (SCREENER_COLORS[screener] || '#94a3b8') : '';
 
@@ -1565,13 +1565,17 @@ function toggleSoundMuted() {
 
 // Cycle through combo levels on each test click
 let _testComboLevel = 0;
+let _testScreenerOverride = null;
 function testCelebration() {
   _testComboLevel = (_testComboLevel % 6) + 1;
+  _testScreenerOverride = 'Amalie';
   showCelebration('William', {
     kandidat: 'Test Kandidat',
     virk: 'Test Virksomhed',
     gf: 2.15
   }, _testComboLevel, 5);
+  // Clear override after launch so real celebrations use lookup
+  setTimeout(() => { _testScreenerOverride = null; }, 2000);
 }
 
 // ═══════════════════════════════════════════════════════════
