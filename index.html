@@ -1210,13 +1210,13 @@ function processCelebrationQueue() {
   _celebrationRunning = true;
   const { seller, mimData, dayCount, weekMiMs } = _celebrationQueue.shift();
   showCelebration(seller, mimData, dayCount, weekMiMs);
-  // After 25s celebration ends, wait 15s, then play next
+  // After 33s celebration ends, wait 15s, then play next
   setTimeout(() => {
     _celebrationRunning = false;
     if (_celebrationQueue.length > 0) {
       setTimeout(() => processCelebrationQueue(), 15000);
     }
-  }, 25000);
+  }, 33000);
 }
 
 function clearCelebration() {
@@ -1330,8 +1330,8 @@ function showCelebration(seller, mimData, dayMimCount, weekMimCount) {
   // 1.0s: ROCK MUSIC STARTS
   cTimeout(() => playCelebrationSound(comboLevel), 1000);
 
-  // Auto-close at 25 seconds
-  cTimeout(() => clearCelebration(), 25000);
+  // Auto-close at 33 seconds (matches slower WebP animation)
+  cTimeout(() => clearCelebration(), 33000);
 }
 
 // Check for new MiM – only "Dato" (col 13) = today triggers celebration
