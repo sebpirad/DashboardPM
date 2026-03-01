@@ -284,8 +284,10 @@
   }
   #celebration-bg {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;
-    background-image: url('celebration_anim.webp');
-    background-size: cover; background-position: center; background-repeat: no-repeat;
+    background-color: #0d0008;
+    background-size: 1000% 500%; /* 10 cols x 5 rows sprite grid */
+    background-repeat: no-repeat;
+    background-position: 0 0;
   }
   .celebration-content {
     position: relative; z-index: 2;
@@ -1225,6 +1227,7 @@ function clearCelebration() {
   _celebrationTimers = [];
   _celebrationIntervals = [];
   stopCelebrationSound();
+  stopSpriteAnimation();
   const overlay = document.getElementById('mim-celebration-overlay');
   overlay.classList.remove('active');
   overlay.removeAttribute('style');
@@ -1249,7 +1252,8 @@ function showCelebration(seller, mimData, dayMimCount, weekMimCount) {
   void overlay.offsetHeight; // force reflow
   overlay.classList.add('active');
 
-  // Animated WebP background plays automatically via CSS background-image
+  // Start sprite sheet animation
+  startSpriteAnimation();
 
   const comments = getComments(seller, mimData.kandidat, mimData.virk, mimData.gf, dayMimCount, weekMimCount, new Date().getHours());
   const avatar = generateSellerAvatar(seller);
@@ -1903,8 +1907,52 @@ function renderPerson(){
 // ═══════════════════════════════════════════════════════════
 let _firstLoad = true;
 
-// Preload animated WebP celebration background
-(new Image()).src = 'celebration_anim.webp';
+// Preload sprite sheet celebration backgrounds
+const SPRITE_SHEETS = ['sprite0.jpg','sprite1.jpg','sprite2.jpg','sprite3.jpg'];
+const SPRITE_FRAMES_PER_SHEET = 50; // 10 cols x 5 rows
+const SPRITE_LAST_SHEET_FRAMES = 48; // sheet3 has 48 frames
+const SPRITE_COLS = 10;
+const SPRITE_ROWS = 5;
+const SPRITE_FPS = 6;
+const SPRITE_TOTAL_FRAMES = 198;
+const _spriteImages = [];
+SPRITE_SHEETS.forEach(src => { const img = new Image(); img.src = src; _spriteImages.push(img); });
+let _spriteInterval = null;
+
+function startSpriteAnimation() {
+  const bg = document.getElementById('celebration-bg');
+  if (!bg) return;
+  let frame = 0;
+  const interval = 1000 / SPRITE_FPS; // ~166ms per frame
+
+  // Set first sheet
+  bg.style.backgroundImage = "url('" + SPRITE_SHEETS[0] + "')";
+  bg.style.backgroundPosition = '0 0';
+
+  _spriteInterval = setInterval(() => {
+    frame++;
+    if (frame >= SPRITE_TOTAL_FRAMES) { frame = 0; } // loop
+
+    // Which sheet?
+    const sheetIdx = Math.min(Math.floor(frame / SPRITE_FRAMES_PER_SHEET), SPRITE_SHEETS.length - 1);
+    const frameInSheet = frame - (sheetIdx * SPRITE_FRAMES_PER_SHEET);
+    const col = frameInSheet % SPRITE_COLS;
+    const row = Math.floor(frameInSheet / SPRITE_COLS);
+
+    // Calculate background-position as percentages for background-size: 1000% 500%
+    const xPct = col * (100 / (SPRITE_COLS - 1));
+    const yPct = row * (100 / (SPRITE_ROWS - 1));
+
+    bg.style.backgroundImage = "url('" + SPRITE_SHEETS[sheetIdx] + "')";
+    bg.style.backgroundPosition = xPct + '% ' + yPct + '%';
+  }, interval);
+}
+
+function stopSpriteAnimation() {
+  if (_spriteInterval) { clearInterval(_spriteInterval); _spriteInterval = null; }
+  const bg = document.getElementById('celebration-bg');
+  if (bg) { bg.style.backgroundImage = 'none'; bg.style.backgroundPosition = '0 0'; }
+}
 
 // Load data and start auto-refresh
 loadAll();
