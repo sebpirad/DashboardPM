@@ -1214,7 +1214,7 @@ function processCelebrationQueue() {
   _celebrationRunning = true;
   const { seller, mimData, dayCount, weekMiMs } = _celebrationQueue.shift();
   showCelebration(seller, mimData, dayCount, weekMiMs);
-  // After 38s celebration ends (buffer for TV playback drift), wait 15s, then play next
+  // After 35s celebration ends, wait 15s, then play next
   setTimeout(() => {
     _celebrationRunning = false;
     if (_celebrationQueue.length > 0) {
@@ -1361,13 +1361,13 @@ function _launchCelebration(seller, mimData, dayMimCount, weekMimCount, webpUrl)
   html += `</div>`;
   content.innerHTML = html;
 
-  // === TIMELINE (25 seconds of video celebration) ===
+  // === TIMELINE (33s WebP animation + 30s Thunderstruck preview) ===
 
-  // 1.0s: ROCK MUSIC STARTS
-  cTimeout(() => playCelebrationSound(comboLevel), 1000);
+  // 0.5s: ROCK MUSIC STARTS (slightly before visuals settle)
+  cTimeout(() => playCelebrationSound(comboLevel), 500);
 
-  // Auto-close at 38 seconds (buffer for slow TV WebP playback)
-  cTimeout(() => clearCelebration(), 38000);
+  // 35s: Auto-close (33s animation + 2s buffer for TV decode drift)
+  cTimeout(() => clearCelebration(), 35000);
 }
 
 // Check for new MiM – only "Dato" (col 13) = today triggers celebration
