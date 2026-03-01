@@ -1155,13 +1155,13 @@ function processCelebrationQueue() {
   _celebrationRunning = true;
   const { seller, mimData, dayCount, weekMiMs } = _celebrationQueue.shift();
   showCelebration(seller, mimData, dayCount, weekMiMs);
-  // After 30s celebration ends, wait 15s, then play next
+  // After 32s celebration (2s warmup + 30s visible) ends, wait 15s, then play next
   setTimeout(() => {
     _celebrationRunning = false;
     if (_celebrationQueue.length > 0) {
       setTimeout(() => processCelebrationQueue(), 15000);
     }
-  }, 33000);
+  }, 35000);
 }
 
 function clearCelebration() {
@@ -1236,15 +1236,11 @@ function _launchCelebration(seller, mimData, dayMimCount, weekMimCount) {
     vid.src = 'celebration_final.mp4';
     bg.appendChild(vid);
   }
+  // Start video HIDDEN 2s before showing overlay — lets hardware decoder warm up
   overlay.insertBefore(bg, overlay.firstChild);
+  bg.style.opacity = '0';
   vid.currentTime = 0;
   vid.play().catch(function() {});
-
-  // Activate overlay
-  overlay.removeAttribute('style');
-  overlay.classList.remove('active');
-  void overlay.offsetHeight;
-  overlay.classList.add('active');
 
   const sellerPhoto = GITHUB_PHOTOS[seller] || '';
 
@@ -1329,33 +1325,45 @@ function _launchCelebration(seller, mimData, dayMimCount, weekMimCount) {
     });
   });
 
-  // === TIMELINE — matches celebration_test.html ===
-  // 0.3s: Show overlay (already done via CSS transition)
-  // 0.5s: Music
-  cTimeout(() => playCelebrationSound(comboLevel), 500);
+  // === TIMELINE — 2s warmup buffer, then reveal ===
+  // T=0: Video starts playing hidden (hardware decoder warming up)
+  // T=2s: Overlay fades in with video already smooth
+  const WARMUP = 2000;
 
-  // 0.8s: Closer avatar reveals
+  cTimeout(() => {
+    bg.style.transition = 'opacity 0.5s ease';
+    bg.style.opacity = '1';
+    overlay.removeAttribute('style');
+    overlay.classList.remove('active');
+    void overlay.offsetHeight;
+    overlay.classList.add('active');
+  }, WARMUP);
+
+  // T=2.5s: Music
+  cTimeout(() => playCelebrationSound(comboLevel), WARMUP + 500);
+
+  // T=2.8s: Closer avatar reveals
   cTimeout(() => {
     const el = document.getElementById('cel-person-closer');
     if (el) el.classList.add('animate-in');
-  }, 800);
+  }, WARMUP + 800);
 
-  // 1.5s: Deal card slides up
+  // T=3.5s: Deal card slides up
   cTimeout(() => {
     const el = document.getElementById('cel-deal-card');
     if (el) el.classList.add('show');
-  }, 1500);
+  }, WARMUP + 1500);
 
-  // 2.0s: Combo badge pops in
+  // T=4.0s: Combo badge pops in
   if (comboText) {
     cTimeout(() => {
       const el = document.getElementById('cel-combo');
       if (el) { el.textContent = comboText; el.classList.add('show'); }
-    }, 2000);
+    }, WARMUP + 2000);
   }
 
-  // 30s: Auto-close (matches Thunderstruck 30s preview length)
-  cTimeout(() => clearCelebration(), 30000);
+  // T=32s: Auto-close (2s warmup + 30s visible = matches Thunderstruck length)
+  cTimeout(() => clearCelebration(), WARMUP + 30000);
 }
 
 // Check for new MiM – only "Dato" (col 13) = today triggers celebration
