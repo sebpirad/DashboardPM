@@ -284,8 +284,9 @@
   }
   #celebration-bg {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;
-    background-image: url('celebration_anim.webp');
+    background-color: #0d0008;
     background-size: cover; background-position: center; background-repeat: no-repeat;
+    /* background-image set dynamically via JS to force fresh playback each time */
   }
   .celebration-content {
     position: relative; z-index: 2;
@@ -1228,17 +1229,43 @@ function clearCelebration() {
   _celebrationTimers = [];
   _celebrationIntervals = [];
   stopCelebrationSound();
+  // Kill WebP animation completely
+  const bg = document.getElementById('celebration-bg');
+  if (bg) { bg.style.backgroundImage = 'none'; }
   const overlay = document.getElementById('mim-celebration-overlay');
   overlay.classList.remove('active');
   overlay.removeAttribute('style');
 }
 
-// WILD & EXPLOSIVE Main celebration (30 seconds)
+// WILD & EXPLOSIVE Main celebration
 function showCelebration(seller, mimData, dayMimCount, weekMimCount) {
   // Kill any running celebration first
   clearCelebration();
 
+  // Preload WebP completely before showing anything
+  const freshUrl = 'celebration_anim.webp?' + Date.now();
+  const preloader = new Image();
+  preloader.onload = function() {
+    _launchCelebration(seller, mimData, dayMimCount, weekMimCount, freshUrl);
+  };
+  preloader.onerror = function() {
+    // Fallback: launch anyway after 3s even if preload fails
+    _launchCelebration(seller, mimData, dayMimCount, weekMimCount, freshUrl);
+  };
+  preloader.src = freshUrl;
+
+  // Safety timeout: if preload takes >5s, launch anyway
+  setTimeout(() => {
+    if (!document.getElementById('mim-celebration-overlay').classList.contains('active')) {
+      _launchCelebration(seller, mimData, dayMimCount, weekMimCount, freshUrl);
+    }
+  }, 5000);
+}
+
+function _launchCelebration(seller, mimData, dayMimCount, weekMimCount, webpUrl) {
   const overlay = document.getElementById('mim-celebration-overlay');
+  if (overlay.classList.contains('active')) return; // already launched
+
   const content = document.getElementById('celebration-content');
   const comboLevel = getComboLevel(dayMimCount);
 
@@ -1246,13 +1273,19 @@ function showCelebration(seller, mimData, dayMimCount, weekMimCount) {
   const cTimeout = (fn, ms) => { const t = setTimeout(fn, ms); _celebrationTimers.push(t); return t; };
   const cInterval = (fn, ms) => { const t = setInterval(fn, ms); _celebrationIntervals.push(t); return t; };
 
-  // Blackout overlay – force clean state, reflow, then activate
+  // Set preloaded WebP on background BEFORE showing overlay
+  const bg = document.getElementById('celebration-bg');
+  if (bg) {
+    bg.style.backgroundImage = 'none';
+    void bg.offsetHeight;
+    bg.style.backgroundImage = "url('" + webpUrl + "')";
+  }
+
+  // Now activate overlay — animation starts from frame 0
   overlay.removeAttribute('style');
   overlay.classList.remove('active');
-  void overlay.offsetHeight; // force reflow
+  void overlay.offsetHeight;
   overlay.classList.add('active');
-
-  // Animated WebP background plays automatically via CSS background-image
 
   const comments = getComments(seller, mimData.kandidat, mimData.virk, mimData.gf, dayMimCount, weekMimCount, new Date().getHours());
   const avatar = generateSellerAvatar(seller);
