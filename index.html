@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+´<!DOCTYPE html>
 <html lang="da">
 <head>
 <meta charset="UTF-8">
@@ -372,7 +372,8 @@
     box-shadow: 0 0 30px rgba(255,215,0,0.6), 0 0 60px rgba(255,165,0,0.3);
   }
   .cel-avatar-ring img {
-    width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: block;
+    width: 130%; height: 130%; border-radius: 50%; object-fit: cover; display: block;
+    margin: -15% 0 0 -15%; object-position: top center;
   }
   .cel-avatar-fallback {
     width: 100%; height: 100%; border-radius: 50%;
@@ -1384,17 +1385,20 @@ function checkForNewMiM() {
     for (const mimRow of data.mimRows) {
       const key = `${seller}|${mimRow.kandidat}|${mimRow.virk}|${mimRow.dato}`;
 
+      // Check ALL key fields are present BEFORE marking as seen
+      const hasKandidat = mimRow.kandidat && mimRow.kandidat.trim();
+      const hasVirk = mimRow.virk && mimRow.virk.trim();
+      const hasGF = !isNaN(mimRow.gf);
+      const hasTimelon = !isNaN(mimRow.timelon);
+      const hasKostpris = !isNaN(mimRow.ks);
+      const isComplete = hasKandidat && hasVirk && hasGF && hasTimelon && hasKostpris;
+
+      // Incomplete rows are SKIPPED — not marked seen — so next refresh rechecks them
+      if (!isComplete) continue;
+
       if (!_seenMiM.has(key)) {
         _seenMiM.add(key);
-        // Only trigger celebration if ALL key fields are present
-        const hasKandidat = mimRow.kandidat && mimRow.kandidat.trim();
-        const hasVirk = mimRow.virk && mimRow.virk.trim();
-        const hasGF = !isNaN(mimRow.gf);
-        const hasTimelon = !isNaN(mimRow.timelon);
-        const hasKostpris = !isNaN(mimRow.ks);
-        if (hasKandidat && hasVirk && hasGF && hasTimelon && hasKostpris) {
-          newMiMs.push({ seller, mimData: mimRow, dayCount: _sellerMimToday[seller] });
-        }
+        newMiMs.push({ seller, mimData: mimRow, dayCount: _sellerMimToday[seller] });
 
         _mimLog.push({
           time: new Date(),
@@ -1585,6 +1589,54 @@ async function loadAll(){
     document.getElementById('error-msg').style.display='block';
     document.getElementById('error-msg').textContent='⚠️ Fejl: '+e.message;
     console.error(e);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// SILENT BACKGROUND REFRESH (no UI flicker)
+// ═══════════════════════════════════════════════════════════
+async function silentRefresh() {
+  try {
+    const r = await fetch(APPS_SCRIPT_URL + '?cb=' + Date.now());
+    if (!r.ok) return;
+    const json = await r.json();
+    ['Data Input - William','Data Input - Jonas','Data Input - Andreas','Budgetter'].forEach(n => _rawData[n] = json[n] || []);
+
+    buildWeekRanges();
+
+    const sheets = ['Data Input - William','Data Input - Jonas','Data Input - Andreas'];
+    for (const wn of ALL_WEEKS) {
+      const [ws, we] = WEEK_RANGES[wn];
+      _trendData[wn] = {};
+      for (let i = 0; i < NAMES.length; i++) _trendData[wn][NAMES[i]] = calcSellerArr(_rawData[sheets[i]], ws, we);
+    }
+
+    _budgets = {};
+    const budRows = _rawData['Budgetter'] || [];
+    for (const br of budRows) {
+      const wn = parseInt(br[0]);
+      if (!isNaN(wn)) {
+        _budgets[wn] = { indiv: { KT: parseInt(br[1]) || 0, SS: parseInt(br[2]) || 0, Sam: parseInt(br[3]) || 0, MiM: parseInt(br[4]) || 0 } };
+        _budgets[wn].team = Object.fromEntries(Object.entries(_budgets[wn].indiv).map(([k, v]) => [k, v * 3]));
+      }
+    }
+
+    // MiM detection
+    if (!_celebrationRunning) {
+      const newMiMs = checkForNewMiM();
+      for (const { seller, mimData, dayCount } of newMiMs) {
+        const weekMiMs = _trendData[isoWeek(new Date())]?.[seller]?.MiM || 0;
+        _celebrationQueue.push({ seller, mimData, dayCount, weekMiMs });
+      }
+      processCelebrationQueue();
+    }
+
+    // Silent UI update — just re-render current tab + timestamp, no loading spinner
+    document.getElementById('last-updated').textContent = 'Opdateret: ' + new Date().toLocaleTimeString('da-DK');
+    switchTab(_currentTab);
+
+  } catch (e) {
+    console.warn('Silent refresh failed:', e);
   }
 }
 
@@ -1984,10 +2036,10 @@ let _firstLoad = true;
 // Load data and start auto-refresh
 loadAll();
 
-// Auto-refresh every 5 minutes
+// Silent background refresh every 60 seconds (no UI flicker)
 _autoRefreshInterval = setInterval(() => {
-  loadAll();
-}, 300000);
+  silentRefresh();
+}, 60000);
 
 // Verify GitHub-hosted photos
 verifyGitHubPhotos();
