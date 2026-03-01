@@ -399,6 +399,69 @@
     100% { opacity: 1; transform: translateY(0); }
   }
 
+  /* Avatars row: Closer + Screener side by side */
+  .celebration-avatars-row {
+    display: flex; align-items: flex-start; justify-content: center;
+    gap: 40px; width: 100%;
+  }
+
+  .celebration-person {
+    display: flex; flex-direction: column; align-items: center;
+  }
+
+  .celebration-role-label {
+    font-size: 12px; text-transform: uppercase; letter-spacing: 2px;
+    color: rgba(255,255,255,0.5); font-weight: 600; margin-top: 4px;
+    animation: fadeInUpSmall 0.6s ease forwards;
+    opacity: 0; animation-delay: 0.7s;
+  }
+
+  /* Screener (smaller than closer) */
+  .celebration-screener {
+    display: flex; flex-direction: column; align-items: center;
+    animation: fadeInUpSmall 0.6s ease forwards;
+    opacity: 0; animation-delay: 0.6s;
+  }
+
+  .celebration-screener-avatar-wrapper {
+    position: relative; width: 360px; height: 360px;
+    animation: avatarBounce 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    opacity: 0; animation-delay: 0.5s;
+    margin-bottom: 20px;
+  }
+
+  .celebration-screener-avatar {
+    width: 360px; height: 360px; border-radius: 50%;
+    border: 5px solid #c084fc;
+    box-shadow: 0 0 0 3px #fff, 0 0 60px rgba(192, 132, 252, 0.5);
+    position: relative; display: flex; align-items: center; justify-content: center;
+    font-size: 180px; font-weight: 900; overflow: hidden;
+    animation: screenerPulse 2s ease-in-out infinite;
+    animation-delay: 1.3s;
+  }
+
+  .celebration-screener-avatar img {
+    object-fit: cover; width: 100%; height: 100%; border-radius: 50%;
+  }
+
+  @keyframes screenerPulse {
+    0%, 100% { box-shadow: 0 0 0 3px #fff, 0 0 60px rgba(192, 132, 252, 0.5); }
+    50% { box-shadow: 0 0 0 3px #fff, 0 0 80px rgba(192, 132, 252, 0.7); }
+  }
+
+  .celebration-screener-name {
+    font-size: 28px; font-weight: 900; text-align: center;
+    animation: fadeInUpSmall 0.6s ease forwards;
+    opacity: 0; animation-delay: 0.7s;
+  }
+
+  .celebration-screener-label {
+    font-size: 12px; text-transform: uppercase; letter-spacing: 2px;
+    color: rgba(255,255,255,0.5); font-weight: 600; margin-top: 4px;
+    animation: fadeInUpSmall 0.6s ease forwards;
+    opacity: 0; animation-delay: 0.8s;
+  }
+
   /* Right column: Data cards grid */
   .celebration-right-column {
     width: 60%; flex-shrink: 0;
@@ -676,6 +739,9 @@
   body.tv-mode .celebration-avatar {
     border-radius: 0 !important; clip-path: circle(48%) !important;
   }
+  body.tv-mode .celebration-screener-avatar {
+    border-radius: 0 !important; clip-path: circle(48%) !important;
+  }
   /* Dashboard-only: no box-shadow on regular cards */
   body.tv-mode .card { backdrop-filter: none !important; box-shadow: none !important; }
   body.tv-mode .daily-card.state-gold::before { display: none !important; }
@@ -836,6 +902,34 @@ const GITHUB_PHOTOS = {
   Jonas: PHOTO_BASE_URL + 'jonas.jpg',
   Andreas: PHOTO_BASE_URL + 'andreas.jpg'
 };
+
+// Screener photo configuration
+const SCREENER_NAMES = ['Amalie', 'Ali', 'Josefine'];
+const SCREENER_PHOTOS = {
+  Amalie: PHOTO_BASE_URL + 'amalie.jpg',
+  Ali: PHOTO_BASE_URL + 'ali.jpg',
+  Josefine: PHOTO_BASE_URL + 'josefine.jpg'
+};
+const SCREENER_COLORS = { Amalie: '#c084fc', Ali: '#fb923c', Josefine: '#f9a8d4' };
+const SCREENER_SHEET_MAP = {
+  'Amalie - Screened': 'Amalie',
+  'Ali - Screened': 'Ali',
+  'Josefine - Screened': 'Josefine'
+};
+
+// Look up screener by candidate name (col D = index 3 in "Applicant name")
+function findScreener(kandidatNavn) {
+  if (!kandidatNavn) return null;
+  const needle = kandidatNavn.trim().toLowerCase();
+  for (const [sheetName, screenerName] of Object.entries(SCREENER_SHEET_MAP)) {
+    const rows = _rawData[sheetName] || [];
+    for (let i = 1; i < rows.length; i++) { // skip header row
+      const cellVal = String(rows[i][3] || '').trim().toLowerCase(); // col D = index 3
+      if (cellVal === needle) return screenerName;
+    }
+  }
+  return null; // not found
+}
 const _githubPhotoVerified = {};
 function getSellerPhoto(name) {
   if (GITHUB_PHOTOS[name] && _githubPhotoVerified[name] !== false) return GITHUB_PHOTOS[name];
@@ -1290,6 +1384,11 @@ function _launchCelebration(seller, mimData, dayMimCount, weekMimCount, webpUrl)
   const comments = getComments(seller, mimData.kandidat, mimData.virk, mimData.gf, dayMimCount, weekMimCount, new Date().getHours());
   const avatar = generateSellerAvatar(seller);
 
+  // Find screener for this candidate
+  const screener = findScreener(mimData.kandidat);
+  const screenerPhoto = screener ? (SCREENER_PHOTOS[screener] || '') : '';
+  const screenerColor = screener ? (SCREENER_COLORS[screener] || '#94a3b8') : '';
+
   // Build HTML
   let comboText = '';
   let comboClass = `level-${comboLevel}`;
@@ -1300,15 +1399,33 @@ function _launchCelebration(seller, mimData, dayMimCount, weekMimCount, webpUrl)
   else if (comboLevel === 5) comboText = 'GODLIKE! 💥';
   else if (comboLevel === 6) comboText = 'LEGENDARY! ✨✨✨';
 
+  // Build screener HTML (only shown if screener found)
+  const screenerHtml = screener ? `
+        <div class="celebration-screener">
+          <div class="celebration-screener-avatar-wrapper">
+            <div class="celebration-screener-avatar">
+              <img src="${screenerPhoto}" alt="${screener}" onerror="this.parentElement.textContent='${screener.charAt(0)}'">
+            </div>
+          </div>
+          <div class="celebration-screener-name" style="color:${screenerColor}">${screener}</div>
+          <div class="celebration-screener-label">Screener</div>
+        </div>` : '';
+
   let html = `
     <div class="celebration-title">MAND I MARKEN</div>
     <div class="celebration-combo ${comboClass}">${comboText}</div>
     <div class="celebration-main-layout">
       <div class="celebration-left-column">
-        <div class="celebration-avatar-wrapper">
-          <div class="celebration-avatar" style="color:${COLORS[seller]}">${avatar}</div>
+        <div class="celebration-avatars-row">
+          <div class="celebration-person">
+            <div class="celebration-avatar-wrapper">
+              <div class="celebration-avatar" style="color:${COLORS[seller]}">${avatar}</div>
+            </div>
+            <div class="celebration-seller-name" style="color:${COLORS[seller]}">${seller}</div>
+            <div class="celebration-role-label">Closer</div>
+          </div>
+          ${screenerHtml}
         </div>
-        <div class="celebration-seller-name" style="color:${COLORS[seller]}">${seller}</div>
       </div>
       <div class="celebration-right-column">
         <div class="celebration-data-card card-1">
@@ -1469,6 +1586,11 @@ async function loadAll(){
     if(!r.ok) throw new Error('HTTP '+r.status);
     const json=await r.json();
     ['Data Input - William','Data Input - Jonas','Data Input - Andreas','Budgetter'].forEach(n=>_rawData[n]=json[n]||[]);
+
+    // Store screener data (from external spreadsheet)
+    _rawData['Amalie - Screened'] = json['Amalie - Screened'] || [];
+    _rawData['Ali - Screened'] = json['Ali - Screened'] || [];
+    _rawData['Josefine - Screened'] = json['Josefine - Screened'] || [];
 
     // 1) Build dynamic week ranges from data
     buildWeekRanges();
