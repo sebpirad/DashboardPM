@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PowerMatch - MiM Celebration</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Inter:wght@400;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 100vw; height: 100vh;
+    overflow: hidden;
+    background: #000;
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* === VIDEO BACKGROUND === */
+  #bg-video {
+    position: fixed;
+    top: 50%; left: 50%;
+    min-width: 100vw; min-height: 100vh;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+    z-index: 0;
+  }
+
+  /* === OVERLAY CONTAINER === */
+  .overlay {
+    position: fixed;
+    top: 0; left: 0;
+    z-index: 10;
+    width: 100vw; height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 1.5s ease;
+  }
+  .overlay.visible { opacity: 1; }
+
+  /* === TITLE + COMBO WRAPPER === */
+  .title-section {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .title {
+    font-family: 'Cinzel', serif;
+    font-size: 52px;
+    font-weight: 900;
+    color: #ffd700;
+    -webkit-text-stroke: 1.5px rgba(0,0,0,0.4);
+    text-shadow:
+      0 0 20px rgba(255, 215, 0, 0.8),
+      0 0 40px rgba(255, 215, 0, 0.4),
+      0 2px 8px rgba(0,0,0,0.6);
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  /* === COMBO BADGE (under title) === */
+  .combo-badge {
+    font-family: 'Cinzel', serif;
+    font-size: 24px;
+    font-weight: 900;
+    color: #ffd700;
+    -webkit-text-stroke: 1px rgba(0,0,0,0.4);
+    text-shadow: 0 0 20px rgba(255,215,0,0.8), 0 2px 6px rgba(0,0,0,0.8);
+    letter-spacing: 4px;
+    opacity: 0;
+  }
+  .combo-badge.show {
+    animation: comboPop 0.6s ease-out forwards;
+  }
+  @keyframes comboPop {
+    0% { opacity: 0; transform: scale(2); }
+    60% { opacity: 1; transform: scale(0.9); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+
+  /* === PEOPLE ROW === */
+  .people-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 80px;
+  }
+
+  /* === PERSON CARD === */
+  .person {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+  }
+  .person.animate-in {
+    animation: personReveal 1s ease-out forwards;
+  }
+
+  @keyframes personReveal {
+    0% { opacity: 0; transform: scale(0.8) translateY(20px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  /* === AVATAR === */
+  .avatar-ring {
+    width: 260px; height: 260px;
+    border-radius: 50%;
+    padding: 5px;
+    margin-bottom: 16px;
+    position: relative;
+  }
+  .avatar-ring.closer {
+    background: linear-gradient(135deg, #ffd700, #ff8c00, #ffd700);
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.6), 0 0 60px rgba(255, 165, 0, 0.3);
+  }
+  .avatar-ring.screener {
+    background: linear-gradient(135deg, #c0c0c0, #ffffff, #c0c0c0);
+    box-shadow: 0 0 30px rgba(192, 192, 192, 0.6), 0 0 60px rgba(255, 255, 255, 0.3);
+  }
+
+  .avatar-img {
+    width: 100%; height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+  }
+  .avatar-fallback {
+    width: 100%; height: 100%;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 80px;
+    font-weight: 900;
+    color: #ffd700;
+    font-family: 'Cinzel', serif;
+  }
+
+  /* === NAME (no role label) === */
+  .person-name {
+    font-family: 'Cinzel', serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: #ffd700;
+    -webkit-text-stroke: 1px rgba(0,0,0,0.5);
+    text-shadow: 0 0 15px rgba(255,215,0,0.6), 0 2px 6px rgba(0,0,0,0.8);
+  }
+
+  /* === DEAL CARD === */
+  .deal-card {
+    margin-top: 24px;
+    padding: 18px 50px;
+    background: rgba(0, 0, 0, 0.65);
+    border: 1px solid rgba(255, 215, 0, 0.4);
+    border-radius: 14px;
+    text-align: center;
+    opacity: 0;
+  }
+  .deal-card.show {
+    animation: cardSlideUp 0.8s ease-out forwards;
+  }
+  @keyframes cardSlideUp {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  .deal-card .kandidat {
+    font-size: 22px;
+    font-weight: 700;
+    color: #ffd700;
+    margin-bottom: 2px;
+  }
+  .deal-card .virksomhed {
+    font-size: 22px;
+    font-weight: 700;
+    color: #ffd700;
+    margin-bottom: 8px;
+  }
+  .deal-card .deal-stats {
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+    align-items: center;
+  }
+  .deal-card .stat {
+    text-align: center;
+  }
+  .deal-card .stat-value {
+    font-size: 26px;
+    font-weight: 700;
+    color: #ffd700;
+    display: block;
+  }
+  .deal-card .stat-label {
+    font-size: 11px;
+    color: rgba(255,255,255,0.6);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .deal-card .stat-divider {
+    width: 1px;
+    height: 40px;
+    background: rgba(255,215,0,0.3);
+  }
+
+  /* === START SCREEN === */
+  #start-screen {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    z-index: 100;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: opacity 0.8s ease;
+  }
+  #start-screen.hidden { opacity: 0; pointer-events: none; }
+  #start-screen span {
+    font-family: 'Cinzel', serif;
+    font-size: 24px;
+    color: #ffd700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    animation: startPulse 2s ease-in-out infinite;
+  }
+  @keyframes startPulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+
+  /* === TV MODE (1200px+) === */
+  @media (min-width: 1200px) {
+    .title { font-size: 64px; letter-spacing: 8px; }
+    .combo-badge { font-size: 30px; }
+    .avatar-ring { width: 300px; height: 300px; }
+    .person-name { font-size: 38px; }
+    .people-row { gap: 120px; }
+    .deal-card { padding: 22px 70px; }
+    .deal-card .kandidat { font-size: 26px; }
+    .deal-card .virksomhed { font-size: 26px; }
+    .deal-card .stat-value { font-size: 30px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- START SCREEN -->
+<div id="start-screen" onclick="startCelebration()">
+  <span>Klik for at starte celebration</span>
+</div>
+
+<!-- BACKGROUND VIDEO -->
+<video id="bg-video" muted loop playsinline preload="auto">
+  <source src="celebration_final.mp4" type="video/mp4">
+</video>
+
+<!-- CONTENT OVERLAY -->
+<div class="overlay" id="overlay">
+
+  <div class="title-section">
+    <div class="title">Mand i Marken!</div>
+    <div class="combo-badge" id="combo-badge"></div>
+  </div>
+
+  <div class="people-row">
+    <div class="person" id="person-closer">
+      <div class="avatar-ring closer" id="closer-ring">
+        <img class="avatar-img" id="closer-img" src="photos/william.jpg"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" alt="">
+        <div class="avatar-fallback" style="display:none" id="closer-fallback">W</div>
+      </div>
+      <div class="person-name" id="closer-name">William</div>
+    </div>
+
+    <div class="person" id="person-screener">
+      <div class="avatar-ring screener" id="screener-ring">
+        <img class="avatar-img" id="screener-img" src="photos/amalie.jpg"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" alt="">
+        <div class="avatar-fallback" style="display:none" id="screener-fallback">A</div>
+      </div>
+      <div class="person-name" id="screener-name">Amalie</div>
+    </div>
+  </div>
+
+  <div class="deal-card" id="deal-card">
+    <div class="kandidat" id="deal-kandidat">Test Kandidat</div>
+    <div class="virksomhed" id="deal-virksomhed">Test Virksomhed</div>
+    <div class="deal-stats">
+      <div class="stat">
+        <span class="stat-value" id="deal-gf">2.15</span>
+        <span class="stat-label">Garantifaktor</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <span class="stat-value" id="deal-timelon">285 kr</span>
+        <span class="stat-label">Timel&oslash;n</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <span class="stat-value" id="deal-kostpris">195 kr</span>
+        <span class="stat-label">Kostpris</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AUDIO -->
+<audio id="celebration-audio" preload="auto">
+  <source src="https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview125/v4/f3/45/64/f3456422-afe5-5218-0144-6a2dd6754a2b/mzaf_8906497323614731144.plus.aac.p.m4a" type="audio/mp4">
+</audio>
+
+<script>
+  var CELEBRATION_DURATION = 35000;
+
+  function startCelebration() {
+    var startScreen = document.getElementById('start-screen');
+    var video = document.getElementById('bg-video');
+    var audio = document.getElementById('celebration-audio');
+    var overlay = document.getElementById('overlay');
+    var combo = document.getElementById('combo-badge');
+    var dealCard = document.getElementById('deal-card');
+
+    // Hide start screen
+    startScreen.classList.add('hidden');
+
+    // Start video
+    video.currentTime = 0;
+    video.play();
+
+    // Start audio
+    audio.currentTime = 0;
+    audio.volume = 0.8;
+    audio.play();
+
+    // Show overlay
+    setTimeout(function() { overlay.classList.add('visible'); }, 300);
+
+    // Animate closer in
+    setTimeout(function() {
+      document.getElementById('person-closer').classList.add('animate-in');
+    }, 800);
+
+    // Animate screener in
+    setTimeout(function() {
+      document.getElementById('person-screener').classList.add('animate-in');
+    }, 1200);
+
+    // Show combo badge under title
+    setTimeout(function() {
+      combo.textContent = 'COMBO x3';
+      combo.classList.add('show');
+    }, 2000);
+
+    // Show deal card
+    setTimeout(function() {
+      dealCard.classList.add('show');
+    }, 1500);
+
+    // Auto-end
+    setTimeout(function() {
+      overlay.classList.remove('visible');
+      setTimeout(function() {
+        video.pause();
+        audio.pause();
+        audio.currentTime = 0;
+        startScreen.classList.remove('hidden');
+        document.getElementById('person-closer').classList.remove('animate-in');
+        document.getElementById('person-screener').classList.remove('animate-in');
+        combo.classList.remove('show');
+        dealCard.classList.remove('show');
+      }, 1500);
+    }, CELEBRATION_DURATION);
+  }
+</script>
+</body>
+</html>
