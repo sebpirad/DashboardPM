@@ -19,6 +19,26 @@
     font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; background: #050510; color: var(--text); padding: 28px 32px;
     min-height: 100vh; position: relative; overflow-x: hidden;
   }
+  /* ── Splash preloader (prevents glitch on TV stick) ── */
+  #splash-preloader {
+    position: fixed; inset: 0; z-index: 99999; background: #050510;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px;
+  }
+  #splash-preloader .splash-logo {
+    font-family: 'Inter', sans-serif; font-weight: 900; font-size: 42px;
+    background: linear-gradient(135deg, #818cf8 0%, #6366f1 50%, #a78bfa 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  #splash-preloader .splash-spinner {
+    width: 36px; height: 36px; border: 3px solid rgba(129,140,248,0.2);
+    border-top-color: #818cf8; border-radius: 50%;
+    animation: splash-spin 0.8s linear infinite;
+  }
+  @keyframes splash-spin { to { transform: rotate(360deg); } }
+  #splash-preloader.fade-out {
+    opacity: 0; transition: opacity 0.5s ease; pointer-events: none;
+  }
   /* ── Ambient gradient orbs ── */
   body::before, body::after {
     content: ''; position: fixed; border-radius: 50%; pointer-events: none; z-index: 0;
@@ -569,6 +589,11 @@
   body.tv-mode .bar-fill.c-gold { animation: none !important; box-shadow: none !important; }</style>
 </head>
 <body>
+<!-- Splash preloader: covers screen until data is ready -->
+<div id="splash-preloader">
+  <div class="splash-logo">PowerMatch</div>
+  <div class="splash-spinner"></div>
+</div>
 <div id="app">
 
 <div class="header">
@@ -1411,10 +1436,7 @@ async function loadAll(){
     const json=await r.json();
     ['Data Input - William','Data Input - Jonas','Data Input - Andreas','Budgetter'].forEach(n=>_rawData[n]=json[n]||[]);
 
-    // Store screener data (from external spreadsheet)
-    _rawData['Amalie - Screened'] = json['Amalie - Screened'] || [];
-    _rawData['Ali - Screened'] = json['Ali - Screened'] || [];
-    _rawData['Josefine - Screened'] = json['Josefine - Screened'] || [];
+    // Screener lookup now handled via HR Dashboard API (findScreenerAsync)
 
     // 1) Build dynamic week ranges from data
     buildWeekRanges();
@@ -1489,8 +1511,32 @@ async function loadAll(){
     document.getElementById('last-updated').textContent='Opdateret: '+new Date().toLocaleTimeString('da-DK');
     document.getElementById('loading').style.display='none';
     switchTab(_currentTab);
+
+    // Dismiss splash preloader after first successful load
+    const splash = document.getElementById('splash-preloader');
+    if (splash) {
+      splash.classList.add('fade-out');
+      setTimeout(() => splash.remove(), 600);
+    }
+
+    // Preload celebration video in background (prevents glitch when celebration triggers)
+    if (!window._celebrationVideoPreloaded) {
+      window._celebrationVideoPreloaded = true;
+      const preloadVid = document.createElement('video');
+      preloadVid.preload = 'auto';
+      preloadVid.muted = true;
+      preloadVid.src = 'celebration_final.mp4';
+      preloadVid.load();
+    }
+
   }catch(e){
     document.getElementById('loading').style.display='none';
+    // Also dismiss splash on error so user sees the error message
+    const splash = document.getElementById('splash-preloader');
+    if (splash) {
+      splash.classList.add('fade-out');
+      setTimeout(() => splash.remove(), 600);
+    }
     document.getElementById('error-msg').style.display='block';
     document.getElementById('error-msg').textContent='⚠️ Fejl: '+e.message;
     console.error(e);
