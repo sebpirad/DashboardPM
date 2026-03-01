@@ -1229,9 +1229,9 @@ function clearCelebration() {
   _celebrationTimers = [];
   _celebrationIntervals = [];
   stopCelebrationSound();
-  // Kill WebP animation completely
-  const bg = document.getElementById('celebration-bg');
-  if (bg) { bg.style.backgroundImage = 'none'; }
+  // Destroy and recreate bg element — guarantees zero animation state leaks
+  const oldBg = document.getElementById('celebration-bg');
+  if (oldBg) { oldBg.parentNode.removeChild(oldBg); }
   const overlay = document.getElementById('mim-celebration-overlay');
   overlay.classList.remove('active');
   overlay.removeAttribute('style');
@@ -1254,12 +1254,12 @@ function showCelebration(seller, mimData, dayMimCount, weekMimCount) {
   };
   preloader.src = freshUrl;
 
-  // Safety timeout: if preload takes >5s, launch anyway
+  // Safety timeout: only fires if browser gives neither onload nor onerror (edge case)
   setTimeout(() => {
     if (!document.getElementById('mim-celebration-overlay').classList.contains('active')) {
       _launchCelebration(seller, mimData, dayMimCount, weekMimCount, freshUrl);
     }
-  }, 5000);
+  }, 15000);
 }
 
 function _launchCelebration(seller, mimData, dayMimCount, weekMimCount, webpUrl) {
@@ -1273,13 +1273,13 @@ function _launchCelebration(seller, mimData, dayMimCount, weekMimCount, webpUrl)
   const cTimeout = (fn, ms) => { const t = setTimeout(fn, ms); _celebrationTimers.push(t); return t; };
   const cInterval = (fn, ms) => { const t = setInterval(fn, ms); _celebrationIntervals.push(t); return t; };
 
-  // Set preloaded WebP on background BEFORE showing overlay
-  const bg = document.getElementById('celebration-bg');
-  if (bg) {
-    bg.style.backgroundImage = 'none';
-    void bg.offsetHeight;
-    bg.style.backgroundImage = "url('" + webpUrl + "')";
-  }
+  // Create FRESH bg element — zero state from previous animations
+  const existingBg = document.getElementById('celebration-bg');
+  if (existingBg) existingBg.parentNode.removeChild(existingBg);
+  const bg = document.createElement('div');
+  bg.id = 'celebration-bg';
+  bg.style.backgroundImage = "url('" + webpUrl + "')";
+  overlay.insertBefore(bg, overlay.firstChild);
 
   // Now activate overlay — animation starts from frame 0
   overlay.removeAttribute('style');
