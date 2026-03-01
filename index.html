@@ -1123,6 +1123,7 @@ function playCelebrationSound(comboLevel = 1) {
     // Re-create audio element for clean playback every time
     _thunderAudio = new Audio(THUNDERSTRUCK_URL);
     _thunderAudio.volume = Math.min(0.7 + comboLevel * 0.05, 1.0);
+    _thunderAudio.loop = true;  // Loop to cover full 35s celebration
     _thunderAudio.currentTime = 0;
     _thunderAudio.play().catch(e => console.log('Audio play blocked:', e));
   } catch(e) {
@@ -1169,7 +1170,7 @@ function clearCelebration() {
   _celebrationTimers = [];
   _celebrationIntervals = [];
   stopCelebrationSound();
-  // Stop video and destroy bg element — guarantees zero state leaks
+  // Stop video and destroy bg element
   const oldVid = document.getElementById('celebration-video');
   if (oldVid) { oldVid.pause(); oldVid.removeAttribute('src'); oldVid.load(); }
   const oldBg = document.getElementById('celebration-bg');
@@ -1177,6 +1178,23 @@ function clearCelebration() {
   const overlay = document.getElementById('mim-celebration-overlay');
   overlay.classList.remove('active');
   overlay.removeAttribute('style');
+  // Re-create pre-buffered video for next celebration (instant playback)
+  if (!document.getElementById('celebration-video-preloaded')) {
+    const pv = document.createElement('video');
+    pv.id = 'celebration-video-preloaded';
+    pv.muted = true;
+    pv.playsInline = true;
+    pv.preload = 'auto';
+    pv.src = 'celebration_final.mp4';
+    pv.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none;';
+    document.body.appendChild(pv);
+    pv.load();
+    pv.addEventListener('canplaythrough', function() {
+      pv.play().then(function() {
+        setTimeout(function() { pv.pause(); pv.currentTime = 0; }, 100);
+      }).catch(function() {});
+    }, { once: true });
+  }
 }
 
 // WILD & EXPLOSIVE Main celebration
@@ -1196,18 +1214,28 @@ function _launchCelebration(seller, mimData, dayMimCount, weekMimCount) {
 
   const cTimeout = (fn, ms) => { const t = setTimeout(fn, ms); _celebrationTimers.push(t); return t; };
 
-  // Create FRESH bg with VIDEO
+  // Reuse pre-buffered video (already decoded in hardware) or create fallback
   const existingBg = document.getElementById('celebration-bg');
   if (existingBg) existingBg.parentNode.removeChild(existingBg);
   const bg = document.createElement('div');
   bg.id = 'celebration-bg';
-  const vid = document.createElement('video');
-  vid.id = 'celebration-video';
-  vid.muted = true;
-  vid.playsInline = true;
-  vid.preload = 'auto';
-  vid.src = 'celebration_final.mp4?' + Date.now();
-  bg.appendChild(vid);
+
+  let vid = document.getElementById('celebration-video-preloaded');
+  if (vid) {
+    // Move pre-buffered video into celebration bg — instant playback
+    vid.id = 'celebration-video';
+    vid.style.cssText = '';  // Remove hidden positioning
+    bg.appendChild(vid);
+  } else {
+    // Fallback: create new video element
+    vid = document.createElement('video');
+    vid.id = 'celebration-video';
+    vid.muted = true;
+    vid.playsInline = true;
+    vid.preload = 'auto';
+    vid.src = 'celebration_final.mp4';
+    bg.appendChild(vid);
+  }
   overlay.insertBefore(bg, overlay.firstChild);
   vid.currentTime = 0;
   vid.play().catch(function() {});
@@ -1519,14 +1547,23 @@ async function loadAll(){
       setTimeout(() => splash.remove(), 600);
     }
 
-    // Preload celebration video in background (prevents glitch when celebration triggers)
-    if (!window._celebrationVideoPreloaded) {
-      window._celebrationVideoPreloaded = true;
-      const preloadVid = document.createElement('video');
-      preloadVid.preload = 'auto';
-      preloadVid.muted = true;
-      preloadVid.src = 'celebration_final.mp4';
-      preloadVid.load();
+    // Pre-buffer celebration video: hidden, fully decoded, ready for instant playback
+    if (!document.getElementById('celebration-video-preloaded')) {
+      const pv = document.createElement('video');
+      pv.id = 'celebration-video-preloaded';
+      pv.muted = true;
+      pv.playsInline = true;
+      pv.preload = 'auto';
+      pv.src = 'celebration_final.mp4';
+      pv.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none;';
+      document.body.appendChild(pv);
+      pv.load();
+      // Force hardware decoder warmup: play briefly then pause at frame 0
+      pv.addEventListener('canplaythrough', function() {
+        pv.play().then(function() {
+          setTimeout(function() { pv.pause(); pv.currentTime = 0; }, 100);
+        }).catch(function() {});
+      }, { once: true });
     }
 
   }catch(e){
