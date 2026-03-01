@@ -1212,13 +1212,13 @@ function processCelebrationQueue() {
   _celebrationRunning = true;
   const { seller, mimData, dayCount, weekMiMs } = _celebrationQueue.shift();
   showCelebration(seller, mimData, dayCount, weekMiMs);
-  // After 33s celebration ends, wait 15s, then play next
+  // After 38s celebration ends (extra buffer for slow TV setInterval), wait 15s, then play next
   setTimeout(() => {
     _celebrationRunning = false;
     if (_celebrationQueue.length > 0) {
       setTimeout(() => processCelebrationQueue(), 15000);
     }
-  }, 33000);
+  }, 38000);
 }
 
 function clearCelebration() {
@@ -1334,8 +1334,8 @@ function showCelebration(seller, mimData, dayMimCount, weekMimCount) {
   // 1.0s: ROCK MUSIC STARTS
   cTimeout(() => playCelebrationSound(comboLevel), 1000);
 
-  // Auto-close at 33 seconds (matches slower WebP animation)
-  cTimeout(() => clearCelebration(), 33000);
+  // Auto-close at 38 seconds (extra buffer for slow TV setInterval drift)
+  cTimeout(() => clearCelebration(), 38000);
 }
 
 // Check for new MiM – only "Dato" (col 13) = today triggers celebration
@@ -1923,15 +1923,22 @@ function startSpriteAnimation() {
   const bg = document.getElementById('celebration-bg');
   if (!bg) return;
   let frame = 0;
+  let lastSheetIdx = -1;
   const interval = 1000 / SPRITE_FPS; // ~166ms per frame
 
-  // Set first sheet
+  // Set first sheet immediately
   bg.style.backgroundImage = "url('" + SPRITE_SHEETS[0] + "')";
   bg.style.backgroundPosition = '0 0';
+  lastSheetIdx = 0;
 
   _spriteInterval = setInterval(() => {
     frame++;
-    if (frame >= SPRITE_TOTAL_FRAMES) { frame = 0; } // loop
+    // Hold last frame when done (no loop) — clearCelebration handles cleanup
+    if (frame >= SPRITE_TOTAL_FRAMES) {
+      clearInterval(_spriteInterval);
+      _spriteInterval = null;
+      return;
+    }
 
     // Which sheet?
     const sheetIdx = Math.min(Math.floor(frame / SPRITE_FRAMES_PER_SHEET), SPRITE_SHEETS.length - 1);
@@ -1943,7 +1950,11 @@ function startSpriteAnimation() {
     const xPct = col * (100 / (SPRITE_COLS - 1));
     const yPct = row * (100 / (SPRITE_ROWS - 1));
 
-    bg.style.backgroundImage = "url('" + SPRITE_SHEETS[sheetIdx] + "')";
+    // Only swap background-image when sheet changes (reduces repaints)
+    if (sheetIdx !== lastSheetIdx) {
+      bg.style.backgroundImage = "url('" + SPRITE_SHEETS[sheetIdx] + "')";
+      lastSheetIdx = sheetIdx;
+    }
     bg.style.backgroundPosition = xPct + '% ' + yPct + '%';
   }, interval);
 }
