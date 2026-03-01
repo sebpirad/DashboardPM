@@ -1789,15 +1789,11 @@ function ringSVG(pct, color, size=200, stroke=12){
     const isMajor=i%5===0;
     ticks+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${isMajor?'rgba(130,252,224,0.3)':'rgba(130,252,224,0.1)'}" stroke-width="${isMajor?1.5:0.5}"/>`;
   }
-  // Glow = extra circles with wider stroke + low opacity (NO filters — Mali-G31 renders all filters in rectangular buffer)
+  // Clean ring — NO glow effects (Mali-G31 creates rectangular artifacts with any overlay)
   return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
     ${ticks}
     <circle cx="${cx}" cy="${cy}" r="${rOuter}" fill="none" stroke="rgba(130,252,224,0.08)" stroke-width="1" stroke-dasharray="3 3"/>
     <circle class="ring-bg" cx="${cx}" cy="${cy}" r="${r}" stroke-width="${stroke}"/>
-    <circle fill="none" cx="${cx}" cy="${cy}" r="${r}" stroke="${color}" opacity="0.15"
-      stroke-dasharray="${circ}" stroke-dashoffset="${offset}" stroke-width="${stroke+16}" stroke-linecap="round"/>
-    <circle fill="none" cx="${cx}" cy="${cy}" r="${r}" stroke="${color}" opacity="0.08"
-      stroke-dasharray="${circ}" stroke-dashoffset="${offset}" stroke-width="${stroke+30}" stroke-linecap="round"/>
     <circle class="ring-fg" cx="${cx}" cy="${cy}" r="${r}" stroke="${color}"
       stroke-dasharray="${circ}" stroke-dashoffset="${offset}" stroke-width="${stroke}"/>
   </svg>`;
