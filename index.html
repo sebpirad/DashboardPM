@@ -368,8 +368,8 @@
     box-shadow: 0 0 30px rgba(255,215,0,0.6), 0 0 60px rgba(255,165,0,0.3);
   }
   .cel-avatar-ring.screener {
-    background: linear-gradient(135deg, #c0c0c0, #ffffff, #c0c0c0);
-    box-shadow: 0 0 30px rgba(192,192,192,0.6), 0 0 60px rgba(255,255,255,0.3);
+    background: linear-gradient(135deg, #ffd700, #ff8c00, #ffd700);
+    box-shadow: 0 0 30px rgba(255,215,0,0.6), 0 0 60px rgba(255,165,0,0.3);
   }
   .cel-avatar-ring img {
     width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: block;
@@ -1123,7 +1123,7 @@ function playCelebrationSound(comboLevel = 1) {
     // Re-create audio element for clean playback every time
     _thunderAudio = new Audio(THUNDERSTRUCK_URL);
     _thunderAudio.volume = Math.min(0.7 + comboLevel * 0.05, 1.0);
-    _thunderAudio.loop = true;  // Loop to cover full 35s celebration
+    _thunderAudio.loop = false;  // 30s preview matches 30s celebration
     _thunderAudio.currentTime = 0;
     _thunderAudio.play().catch(e => console.log('Audio play blocked:', e));
   } catch(e) {
@@ -1155,13 +1155,13 @@ function processCelebrationQueue() {
   _celebrationRunning = true;
   const { seller, mimData, dayCount, weekMiMs } = _celebrationQueue.shift();
   showCelebration(seller, mimData, dayCount, weekMiMs);
-  // After 35s celebration ends, wait 15s, then play next
+  // After 30s celebration ends, wait 15s, then play next
   setTimeout(() => {
     _celebrationRunning = false;
     if (_celebrationQueue.length > 0) {
       setTimeout(() => processCelebrationQueue(), 15000);
     }
-  }, 38000);
+  }, 33000);
 }
 
 function clearCelebration() {
@@ -1354,8 +1354,8 @@ function _launchCelebration(seller, mimData, dayMimCount, weekMimCount) {
     }, 2000);
   }
 
-  // 35s: Auto-close
-  cTimeout(() => clearCelebration(), 35000);
+  // 30s: Auto-close (matches Thunderstruck 30s preview length)
+  cTimeout(() => clearCelebration(), 30000);
 }
 
 // Check for new MiM – only "Dato" (col 13) = today triggers celebration
