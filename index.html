@@ -806,8 +806,8 @@
   <div id="person-mim-details"></div>
 </div>
 
-<!-- Celebration video — ALWAYS in DOM, behind dashboard, Samsung TV compatible -->
-<video id="mim-celebration-video" src="celebration.mp4" muted playsinline preload="auto"
+<!-- Celebration video — ALWAYS playing in loop behind dashboard, Samsung TV compatible -->
+<video id="mim-celebration-video" src="celebration.mp4" muted playsinline autoplay loop
   width="1920" height="1080"></video>
 
 <!-- Celebration overlay — content only, transparent, on top of video -->
@@ -1233,9 +1233,9 @@ function clearCelebration() {
   const overlay = document.getElementById('mim-celebration-overlay');
   overlay.classList.remove('active');
   overlay.removeAttribute('style');
-  // Hide video by moving behind dashboard
+  // Hide video by moving behind dashboard (keep playing in loop)
   const v = document.getElementById('mim-celebration-video');
-  if (v) { v.pause(); v.currentTime = 0; v.style.zIndex = '-1'; }
+  if (v) { v.style.zIndex = '-1'; }
 }
 
 // WILD & EXPLOSIVE Main celebration (30 seconds)
@@ -1257,18 +1257,12 @@ function showCelebration(seller, mimData, dayMimCount, weekMimCount) {
   void overlay.offsetHeight; // force reflow
   overlay.classList.add('active');
 
-  // Start celebration video — simple approach for Samsung TV
+  // Show celebration video — video is ALREADY playing in loop behind dashboard
+  // Just bring it to front and reset to beginning. No play() needed.
   const celebVideo = document.getElementById('mim-celebration-video');
   if (celebVideo) {
     celebVideo.currentTime = 0;
-    // Bring video to front (above dashboard, below overlay content)
     celebVideo.style.zIndex = '9998';
-    // Wait one frame for Samsung to register the layout change, then play
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        celebVideo.play().catch(e => console.log('Video play error:', e));
-      });
-    });
   }
 
   const comments = getComments(seller, mimData.kandidat, mimData.virk, mimData.gf, dayMimCount, weekMimCount, new Date().getHours());
