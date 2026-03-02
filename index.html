@@ -575,6 +575,54 @@
     50% { opacity: 0.4; }
   }
 
+  /* ── Bottom panels: MiM Log + Taletid side by side ── */
+  .bottom-panels {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+  }
+
+  /* ── Taletid panel ── */
+  .taletid-section {
+    background: linear-gradient(160deg, #1B1A30 0%, #272745 100%);
+    border: 1px solid var(--card-border); border-radius: 12px;
+    padding: 16px; max-height: 200px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    border-top: 2px solid rgba(130,252,224,0.2);
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .taletid-title {
+    font-size: 14px; font-weight: 700; color: var(--cyan); margin-bottom: 14px;
+    text-shadow: 0 0 10px rgba(130,252,224,0.4);
+  }
+  .taletid-bars { display: flex; flex-direction: column; gap: 10px; }
+  .taletid-row { display: flex; align-items: center; gap: 10px; }
+  .taletid-name { font-size: 13px; font-weight: 800; width: 80px; white-space: nowrap; }
+  .taletid-crown { font-size: 14px; margin-left: 2px; }
+  .taletid-bar-wrap { flex: 1; position: relative; height: 20px; }
+  .taletid-bar-track {
+    height: 20px; background: #3a3a5c; border-radius: 6px; overflow: visible; position: relative;
+  }
+  .taletid-bar-fill {
+    height: 100%; border-radius: 6px; transition: width 0.8s ease; min-width: 2px;
+    position: relative; z-index: 1;
+  }
+  .taletid-bar-fill.under-target {
+    background: linear-gradient(90deg, #d97706, #fbbf24);
+    box-shadow: 0 0 10px rgba(251,191,36,0.4);
+  }
+  .taletid-bar-fill.over-target {
+    background: linear-gradient(90deg, #059669, #34D399);
+    box-shadow: 0 0 10px rgba(52,211,153,0.4);
+  }
+  .taletid-target-line {
+    position: absolute; top: -3px; bottom: -3px; width: 2px;
+    background: repeating-linear-gradient(180deg, rgba(255,255,255,0.8) 0px, rgba(255,255,255,0.8) 3px, transparent 3px, transparent 6px);
+    z-index: 2;
+    border-radius: 1px;
+  }
+  .taletid-time {
+    font-size: 12px; font-weight: 700; width: 65px; text-align: right; font-variant-numeric: tabular-nums;
+  }
+
 
 
   /* Photo upload */
@@ -707,7 +755,13 @@
   <div class="section-title" style="font-size:13px;color:var(--lightblue);letter-spacing:3px">TEAM – DAGENS TOTALER</div>
   <div class="daily-team-row" id="daily-team-donuts"></div>
 
-  <div class="mim-log-section" id="mim-log-section"></div>
+  <div class="bottom-panels">
+    <div class="mim-log-section" id="mim-log-section"></div>
+    <div class="taletid-section" id="taletid-section">
+      <div class="taletid-title">Taletid 📞</div>
+      <div class="taletid-bars" id="taletid-bars"><span style="color:var(--dim);font-size:12px">Henter taletid...</span></div>
+    </div>
+  </div>
 </div>
 
 <!-- ══ UGE VIEW ══════════════════════════════════════════════════ -->
@@ -867,6 +921,9 @@ let WEEKS_IN_MONTH = {}; // 'YYYY-MM' → [wn, ...]
 let ALL_WEEKS = [];     // sorted week numbers
 
 let _rawData={}, _trendData={}, _budgets={}, _charts={}, _currentTab='daglig';
+let _taletidData = null;
+const TALETID_URL = 'https://script.google.com/macros/s/AKfycbyG5fM6vaBvjrnSw2DtF3X8-VwLBToDrWJbqVVuwSG0dkQE5-Sv0-fo7CkNhLK4quAb/exec';
+const TALETID_TARGET_SECS = 3 * 3600; // 3 timer dagligt mål
 
 // MiM tracking
 let _seenMiM = new Set();
@@ -1689,6 +1746,9 @@ async function loadAll(){
     document.getElementById('loading').style.display='none';
     switchTab(_currentTab);
 
+    // Hent taletid fra Google Sheet
+    fetchTaletid();
+
     // Dismiss splash preloader after first successful load
     const splash = document.getElementById('splash-preloader');
     if (splash) {
@@ -1850,6 +1910,9 @@ function renderDaglig(){
   const logHTML = renderMimLog(d);
   document.getElementById('mim-log-section').innerHTML = logHTML;
 
+  // Taletid panel
+  renderTaletid();
+
   // ── Individual cards: big ring + 4 bars (KT, SS, Samtaler, MiM) with % ──
   document.getElementById('daily-cards').innerHTML=NAMES.map(name=>{
     const s=dayData[name];
@@ -1958,6 +2021,75 @@ function renderDaglig(){
 
 }
 
+// ═══════════════════════════════════════════════════════════
+// TALETID
+// ═══════════════════════════════════════════════════════════
+
+function renderTaletid() {
+  const el = document.getElementById('taletid-bars');
+  if (!_taletidData) {
+    el.innerHTML = '<span style="color:var(--dim);font-size:12px">Henter taletid...</span>';
+    return;
+  }
+
+  if (_taletidData.error) {
+    el.innerHTML = '<span style="color:var(--yellow);font-size:12px">Fejl: ' + _taletidData.error + '</span>';
+    return;
+  }
+
+  // Find max for scaling + who has crown
+  const sellers = ['Jonas', 'William', 'Andreas'];
+  let maxSecs = TALETID_TARGET_SECS; // minimum scale = target
+  let crownName = '';
+  let crownSecs = 0;
+
+  sellers.forEach(n => {
+    const secs = _taletidData[n] ? _taletidData[n].seconds : 0;
+    if (secs > maxSecs) maxSecs = secs;
+    if (secs > crownSecs) { crownSecs = secs; crownName = n; }
+  });
+
+  const scaleMax = maxSecs * 1.15; // 15% headroom
+  const targetPct = (TALETID_TARGET_SECS / scaleMax) * 100;
+
+  el.innerHTML = sellers.map(name => {
+    const secs = _taletidData[name] ? _taletidData[name].seconds : 0;
+    const formatted = _taletidData[name] ? _taletidData[name].formatted : '0t 00m 00s';
+    const pct = (secs / scaleMax) * 100;
+    const isOver = secs >= TALETID_TARGET_SECS;
+    const isCrown = name === crownName && crownSecs > 0;
+    const color = COLORS[name] || '#fff';
+
+    return `<div class="taletid-row">
+      <div class="taletid-name" style="color:${color}">${name}${isCrown ? ' <span class="taletid-crown">👑</span>' : ''}</div>
+      <div class="taletid-bar-wrap">
+        <div class="taletid-bar-track">
+          <div class="taletid-bar-fill ${isOver ? 'over-target' : 'under-target'}" style="width:${Math.min(pct, 100)}%"></div>
+          <div class="taletid-target-line" style="left:${targetPct}%"></div>
+        </div>
+      </div>
+      <div class="taletid-time" style="color:${isOver ? 'var(--cyan)' : 'var(--yellow)'}">${formatted}</div>
+    </div>`;
+  }).join('');
+}
+
+async function fetchTaletid() {
+  try {
+    const resp = await fetch(TALETID_URL + '?cb=' + Date.now());
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    if (data.error) throw new Error(data.error);
+    _taletidData = data;
+  } catch (err) {
+    console.log('Taletid fetch fejl:', err);
+    // Behold gamle data hvis vi har dem, vis kun fejl hvis ingen data
+    if (!_taletidData || _taletidData.error) {
+      _taletidData = { error: err.message };
+    }
+  }
+  renderTaletid();
+}
+
 // Hall of Fame renderer
 function renderMimLog(date) {
   const dateStr = fmtDate(date);
@@ -1983,7 +2115,6 @@ function renderMimLog(date) {
       : '';
 
     return `<div class="mim-log-card">
-      <div class="mim-log-time">${timeStr}</div>
       <div class="mim-log-seller" style="color:${COLORS[entry.seller]}">${entry.seller}</div>
       <div class="mim-log-candidate"><strong>${entry.candidate}</strong></div>
       <div class="mim-log-company">${entry.company}</div>
@@ -1994,8 +2125,47 @@ function renderMimLog(date) {
     </div>`;
   }).join('');
 
-  return `<div class="mim-log-title">Dagens MiM Log 🏆</div>
-    <div class="mim-log-grid">${cards}</div>`;
+  // Maks 4 synlige, roterer hvis flere
+  const maxVisible = 4;
+  if (todaysLogs.length <= maxVisible) {
+    return `<div class="mim-log-title">Dagens MiM Log 🏆</div>
+      <div class="mim-log-grid">${cards}</div>`;
+  }
+
+  // Rotation: vis 4 ad gangen, skift hvert 5. sekund
+  if (!window._mimRotateIdx) window._mimRotateIdx = 0;
+  const allCards = todaysLogs.map(entry => {
+    const timeStr = entry.time.toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
+    const screenerTag = entry.screener
+      ? `<span class="mim-log-tag" style="background:rgba(130,252,224,0.1); color:#82FCE0; border-color:rgba(130,252,224,0.25);">Screener: ${entry.screener}</span>`
+      : '';
+    return `<div class="mim-log-card">
+      <div class="mim-log-seller" style="color:${COLORS[entry.seller]}">${entry.seller}</div>
+      <div class="mim-log-candidate"><strong>${entry.candidate}</strong></div>
+      <div class="mim-log-company">${entry.company}</div>
+      <div class="mim-log-meta">
+        <span>GF ${isNaN(entry.gf) ? '—' : entry.gf.toFixed(2)}</span>
+        ${screenerTag}
+      </div>
+    </div>`;
+  });
+
+  const start = window._mimRotateIdx % allCards.length;
+  const visible = [];
+  for (let i = 0; i < maxVisible; i++) {
+    visible.push(allCards[(start + i) % allCards.length]);
+  }
+
+  // Auto-rotate timer
+  clearInterval(window._mimRotateTimer);
+  window._mimRotateTimer = setInterval(() => {
+    window._mimRotateIdx = (window._mimRotateIdx + maxVisible) % allCards.length;
+    const logEl = document.getElementById('mim-log-section');
+    if (logEl) logEl.innerHTML = renderMimLog(date);
+  }, 5000);
+
+  return `<div class="mim-log-title">Dagens MiM Log 🏆 <span style="font-size:10px;color:var(--dim);font-weight:400">${todaysLogs.length} total</span></div>
+    <div class="mim-log-grid">${visible.join('')}</div>`;
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -2189,6 +2359,7 @@ loadAll();
 // Silent background refresh every 60 seconds (no UI flicker)
 _autoRefreshInterval = setInterval(() => {
   silentRefresh();
+  fetchTaletid(); // Opdater taletid
 }, 60000);
 
 // Verify GitHub-hosted photos
