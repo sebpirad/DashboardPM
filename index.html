@@ -1646,11 +1646,6 @@ async function loadAll(){
     const json=await r.json();
     ['Data Input - William','Data Input - Jonas','Data Input - Andreas','Budgetter'].forEach(n=>_rawData[n]=json[n]||[]);
 
-    // Adversus taletid data
-    if (json.adversus && !json.adversus.error) {
-      _adversusData = json.adversus;
-    }
-
     // Screener lookup now handled via HR Dashboard API (findScreenerAsync)
 
     // 1) Build dynamic week ranges from data
@@ -2272,6 +2267,21 @@ let _firstLoad = true;
 
 // Load data and start auto-refresh
 loadAll();
+
+// ── Adversus taletid: separate fetch, never blocks dashboard ──
+async function fetchAdversus() {
+  try {
+    const r = await fetch(APPS_SCRIPT_URL + '?action=adversus&cb=' + Date.now());
+    if (!r.ok) return;
+    const data = await r.json();
+    if (data && !data.error) {
+      _adversusData = data;
+      if (_currentTab === 'daglig') renderTaletid();
+    }
+  } catch(e) { console.log('Adversus fetch error:', e.message); }
+}
+fetchAdversus();
+setInterval(fetchAdversus, 120000); // refresh taletid every 2 min
 
 // Silent background refresh every 60 seconds (no UI flicker)
 _autoRefreshInterval = setInterval(() => {
