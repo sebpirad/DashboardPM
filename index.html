@@ -498,17 +498,7 @@
   }
 
 
-  /* Sound toggle button */
-  .sound-toggle {
-    position: fixed; bottom: 20px; right: 20px; z-index: 10001;
-    background: var(--card); border: 1px solid var(--card-border);
-    border-radius: 50%; width: 44px; height: 44px;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; transition: all 0.2s; font-size: 20px;
-  }
-  .sound-toggle:hover {
-    background: #1e2236; border-color: var(--blue);
-  }
+  /* Sound toggle (now inline in header) */
   .sound-toggle.muted { opacity: 0.5; }
 
   /* Hall of Fame */
@@ -654,18 +644,6 @@
   .photo-mgr-action { font-size: 10px; color: var(--blue); cursor: pointer; margin-top: 2px; }
   .photo-mgr-action:hover { text-decoration: underline; }
 
-  /* Test button */
-  .test-celebration-btn {
-    position: fixed; bottom: 70px; right: 20px; z-index: 10001;
-    background: var(--blue); border: none;
-    border-radius: 50%; width: 44px; height: 44px;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; transition: all 0.2s; font-size: 18px;
-    color: #fff; font-weight: 700;
-  }
-  .test-celebration-btn:hover {
-    background: #3b82f6; transform: scale(1.1);
-  }
 
   @media (max-width: 900px) {
     .grid-2, .grid-3, .seller-grid, .mim-grid, .daily-grid { grid-template-columns: 1fr; }
@@ -714,6 +692,8 @@
   </div>
   <div style="text-align:right;display:flex;align-items:center;gap:4px">
     <button class="photo-settings-btn" onclick="togglePhotoMgr()">📷 Fotos</button>
+    <button class="refresh-btn" onclick="testCelebration()">🎉 Test</button>
+    <button class="refresh-btn" id="sound-toggle" onclick="toggleSoundMuted()">🔊</button>
     <button class="refresh-btn" onclick="loadAll()">↻ Opdater</button>
     <div class="last-updated" id="last-updated"></div>
   </div>
@@ -837,11 +817,6 @@
   <div class="celebration-content" id="celebration-content"></div>
 </div>
 
-<!-- Sound toggle -->
-<button class="sound-toggle" id="sound-toggle" title="Toggle celebration sound" onclick="toggleSoundMuted()">🔊</button>
-
-<!-- Test celebration button -->
-<button class="test-celebration-btn" title="Test celebration" onclick="testCelebration()">=</button>
 
 <script>
 // TV MODE – always on (optimized for Samsung Smart TV)
