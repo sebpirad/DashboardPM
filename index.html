@@ -575,34 +575,6 @@
     50% { opacity: 0.4; }
   }
 
-  /* ── Bottom panels: MiM Log + Taletid side by side ── */
-  .bottom-panels {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;
-  }
-
-  /* ── Adversus Taletid Section ── */
-  .taletid-section {
-    background: linear-gradient(160deg, #1B1A30 0%, #272745 100%);
-    border: 1px solid var(--card-border); border-radius: 12px;
-    padding: 16px; margin-bottom: 16px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-    border-top: 2px solid rgba(99,174,250,0.25);
-  }
-  .taletid-title {
-    font-size: 14px; font-weight: 700; color: var(--blue); margin-bottom: 12px;
-    text-shadow: 0 0 10px rgba(99,174,250,0.3);
-  }
-  .taletid-grid {
-    display: flex; flex-direction: column; gap: 6px;
-  }
-  .taletid-card {
-    background: #272745; border: 1px solid var(--card-border); border-radius: 8px;
-    padding: 10px 14px; display: flex; align-items: center; justify-content: space-between;
-  }
-  .taletid-name { font-size: 12px; font-weight: 700; }
-  .taletid-right { text-align: right; }
-  .taletid-duration { font-size: 18px; font-weight: 900; color: var(--cyan); font-variant-numeric: tabular-nums; }
-  .taletid-calls { font-size: 10px; color: var(--dim); margin-top: 2px; }
 
 
   /* Photo upload */
@@ -735,11 +707,7 @@
   <div class="section-title" style="font-size:13px;color:var(--lightblue);letter-spacing:3px">TEAM – DAGENS TOTALER</div>
   <div class="daily-team-row" id="daily-team-donuts"></div>
 
-  <!-- MiM Log + Taletid side by side -->
-  <div class="bottom-panels">
-    <div class="mim-log-section" id="mim-log-section"></div>
-    <div id="taletid-section"></div>
-  </div>
+  <div class="mim-log-section" id="mim-log-section"></div>
 </div>
 
 <!-- ══ UGE VIEW ══════════════════════════════════════════════════ -->
@@ -899,7 +867,6 @@ let WEEKS_IN_MONTH = {}; // 'YYYY-MM' → [wn, ...]
 let ALL_WEEKS = [];     // sorted week numbers
 
 let _rawData={}, _trendData={}, _budgets={}, _charts={}, _currentTab='daglig';
-let _adversusData = null; // Adversus taletid data
 
 // MiM tracking
 let _seenMiM = new Set();
@@ -1989,56 +1956,7 @@ function renderDaglig(){
   const compareEl = document.getElementById('daily-compare');
   if (compareEl) compareEl.innerHTML=`<thead><tr>${headers}</tr></thead><tbody>${trows.join('')}</tbody>`;
 
-  // ── Adversus Taletid ──
-  renderTaletid();
 }
-
-function renderTaletid() {
-  const el = document.getElementById('taletid-section');
-  if (!el) return;
-  if (!_adversusData) {
-    el.innerHTML = '';
-    return;
-  }
-
-  const ADVERSUS_IDS = { '271656': 'Jonas', '294014': 'Andreas', '300442': 'William' };
-
-  function fmtDur(secs) {
-    const h = Math.floor(secs / 3600);
-    const m = Math.floor((secs % 3600) / 60);
-    const s = secs % 60;
-    return `${h}t ${String(m).padStart(2,'0')}m`;
-  }
-
-  // Parse today's data
-  const todayDur = {};
-  const todayCnt = {};
-  (_adversusData.todayDuration || []).forEach(function(r) { todayDur[r[0]] = r[1]; });
-  (_adversusData.todayCount || []).forEach(function(r) { todayCnt[r[0]] = r[1]; });
-
-  const cards = NAMES.map(function(name) {
-    // Find Adversus ID for this seller
-    let advId = null;
-    for (const id in ADVERSUS_IDS) {
-      if (ADVERSUS_IDS[id] === name) { advId = id; break; }
-    }
-    if (!advId) return '';
-
-    const dur = todayDur[advId] || 0;
-    const cnt = todayCnt[advId] || 0;
-
-    return '<div class="taletid-card">' +
-      '<div class="taletid-name" style="color:' + COLORS[name] + '">' + name + '</div>' +
-      '<div class="taletid-right">' +
-        '<div class="taletid-duration">' + fmtDur(dur) + '</div>' +
-      '</div>' +
-    '</div>';
-  }).join('');
-
-  el.innerHTML = '<div class="taletid-section">' +
-    '<div class="taletid-title">Taletid i dag (Adversus)</div>' +
-    '<div class="taletid-grid">' + cards + '</div>' +
-  '</div>';
 
 // Hall of Fame renderer
 function renderMimLog(date) {
@@ -2267,21 +2185,6 @@ let _firstLoad = true;
 
 // Load data and start auto-refresh
 loadAll();
-
-// ── Adversus taletid: separate fetch, never blocks dashboard ──
-async function fetchAdversus() {
-  try {
-    const r = await fetch(APPS_SCRIPT_URL + '?action=adversus&cb=' + Date.now());
-    if (!r.ok) return;
-    const data = await r.json();
-    if (data && !data.error) {
-      _adversusData = data;
-      if (_currentTab === 'daglig') renderTaletid();
-    }
-  } catch(e) { console.log('Adversus fetch error:', e.message); }
-}
-fetchAdversus();
-setInterval(fetchAdversus, 120000); // refresh taletid every 2 min
 
 // Silent background refresh every 60 seconds (no UI flicker)
 _autoRefreshInterval = setInterval(() => {
