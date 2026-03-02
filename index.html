@@ -1508,13 +1508,19 @@ function checkForNewMiM() {
         _seenMiM.add(key);
         newMiMs.push({ seller, mimData: mimRow, dayCount: _sellerMimToday[seller] });
 
-        _mimLog.push({
+        const logEntry = {
           time: new Date(),
           seller,
           candidate: mimRow.kandidat,
           company: mimRow.virk,
           gf: mimRow.gf,
-          combo: getComboLevel(_sellerMimToday[seller])
+          combo: getComboLevel(_sellerMimToday[seller]),
+          screener: null
+        };
+        _mimLog.push(logEntry);
+        // Async screener lookup — updates log entry when resolved
+        findScreenerAsync(mimRow.kandidat).then(s => {
+          if (s) { logEntry.screener = s; switchTab(_currentTab); }
         });
       }
     }
@@ -1528,10 +1534,12 @@ function initializeMiMTracking() {
   _seenMiM.clear();
   _mimLog = [];
   const sheets = ['Data Input - William', 'Data Input - Jonas', 'Data Input - Andreas'];
+  const todayStr = fmtDate(new Date());
 
   for (let i = 0; i < NAMES.length; i++) {
     const seller = NAMES[i];
     const rows = _rawData[sheets[i]] || [];
+    let sellerMimToday = 0;
     for (let j = 1; j < rows.length; j++) {
       const r = rows[j];
       const g = v => v instanceof Date ? fmtDate(v) : String(v || '');
@@ -1541,10 +1549,30 @@ function initializeMiMTracking() {
         if (!/startede aldrig/i.test(r21) && !/opsagt samme uge/i.test(r21)) {
           const key = `${seller}|${r14}|${r15}|${r13}`;
           _seenMiM.add(key);
+
+          // Populate _mimLog with TODAY's existing MiM so they show in the log from boot
+          if (r13 === todayStr) {
+            sellerMimToday++;
+            const logEntry = {
+              time: new Date(),
+              seller,
+              candidate: r14 || 'Ukendt',
+              company: r15 || 'Ukendt',
+              gf: parseFloat(String(r[17] || '').replace(',', '.')) || NaN,
+              combo: getComboLevel(sellerMimToday),
+              screener: null
+            };
+            _mimLog.push(logEntry);
+            // Async screener lookup
+            findScreenerAsync(r14).then(s => {
+              if (s) { logEntry.screener = s; switchTab(_currentTab); }
+            });
+          }
         }
       }
     }
   }
+  console.log('MiM Log initialized with', _mimLog.length, 'entries from today');
 }
 
 function toggleSoundMuted() {
@@ -1957,6 +1985,10 @@ function renderMimLog(date) {
     else if (entry.combo === 5) comboTag = '<span class="mim-log-tag" style="background:#ec489922; color:#ec4899; font-weight: 700;">GODLIKE 💥</span>';
     else if (entry.combo === 6) comboTag = '<span class="mim-log-tag" style="background:linear-gradient(90deg, #f59e0b22, #ec489922, #a855f722); color:#fbbf24; font-weight: 700; border: 1px solid #f59e0b;">LEGENDARY ✨</span>';
 
+    const screenerTag = entry.screener
+      ? `<span class="mim-log-tag" style="background:rgba(99,174,250,0.15); color:#63AEFA;">Screener: ${entry.screener}</span>`
+      : '';
+
     return `<div class="mim-log-card">
       <div class="mim-log-time">${timeStr}</div>
       <div class="mim-log-seller" style="color:${COLORS[entry.seller]}">${entry.seller}</div>
@@ -1964,6 +1996,7 @@ function renderMimLog(date) {
       <div class="mim-log-company">${entry.company}</div>
       <div class="mim-log-meta">
         <span>GF ${isNaN(entry.gf) ? '—' : entry.gf.toFixed(2)}</span>
+        ${screenerTag}
         ${comboTag}
       </div>
     </div>`;
