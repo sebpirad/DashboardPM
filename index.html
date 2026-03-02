@@ -543,11 +543,11 @@
   }
 
   .mim-log-candidate {
-    font-size: 11px; color: #94a3b8;
+    font-size: 11px; color: #e2e8f0;
   }
 
   .mim-log-company {
-    font-size: 11px; color: #94a3b8;
+    font-size: 11px; color: #a5b4fc;
   }
 
   .mim-log-meta {
@@ -1551,7 +1551,8 @@ function initializeMiMTracking() {
           _seenMiM.add(key);
 
           // Populate _mimLog with TODAY's existing MiM so they show in the log from boot
-          if (r13 === todayStr) {
+          const r13Date = parseDate(r13);
+          if (r13Date && fmtDate(r13Date) === todayStr) {
             sellerMimToday++;
             const logEntry = {
               time: new Date(),
@@ -1572,7 +1573,7 @@ function initializeMiMTracking() {
       }
     }
   }
-  console.log('MiM Log initialized with', _mimLog.length, 'entries from today');
+  console.log('MiM tracking initialized | todayStr:', todayStr, '| entries found:', _mimLog.length, '| seenMiM:', _seenMiM.size);
 }
 
 function toggleSoundMuted() {
@@ -1978,15 +1979,8 @@ function renderMimLog(date) {
 
   const cards = todaysLogs.map(entry => {
     const timeStr = entry.time.toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
-    let comboTag = '';
-    if (entry.combo === 2) comboTag = '<span class="mim-log-tag" style="background:#f59e0b22; color:#f59e0b; font-weight: 700;">DOUBLE 🎯</span>';
-    else if (entry.combo === 3) comboTag = '<span class="mim-log-tag" style="background:#ef444422; color:#ef4444; font-weight: 700;">HAT-TRICK 🔥</span>';
-    else if (entry.combo === 4) comboTag = '<span class="mim-log-tag" style="background:#a855f722; color:#a855f7; font-weight: 700;">RAMPAGE ⚡</span>';
-    else if (entry.combo === 5) comboTag = '<span class="mim-log-tag" style="background:#ec489922; color:#ec4899; font-weight: 700;">GODLIKE 💥</span>';
-    else if (entry.combo === 6) comboTag = '<span class="mim-log-tag" style="background:linear-gradient(90deg, #f59e0b22, #ec489922, #a855f722); color:#fbbf24; font-weight: 700; border: 1px solid #f59e0b;">LEGENDARY ✨</span>';
-
     const screenerTag = entry.screener
-      ? `<span class="mim-log-tag" style="background:rgba(99,174,250,0.15); color:#63AEFA;">Screener: ${entry.screener}</span>`
+      ? `<span class="mim-log-tag" style="background:rgba(130,252,224,0.1); color:#82FCE0; border-color:rgba(130,252,224,0.25);">Screener: ${entry.screener}</span>`
       : '';
 
     return `<div class="mim-log-card">
@@ -1997,7 +1991,6 @@ function renderMimLog(date) {
       <div class="mim-log-meta">
         <span>GF ${isNaN(entry.gf) ? '—' : entry.gf.toFixed(2)}</span>
         ${screenerTag}
-        ${comboTag}
       </div>
     </div>`;
   }).join('');
