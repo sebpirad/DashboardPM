@@ -18,7 +18,7 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; background: #0D0D17; color: var(--text);
-    padding: 16px 20px; min-height: 100vh; position: relative; overflow-x: hidden;
+    padding: 14px 16px; min-height: 100vh; position: relative; overflow-x: hidden;
   }
   /* ── Cycling background system ── */
   .bg-cycle-layer {
@@ -64,7 +64,6 @@
     opacity: 0; transition: opacity 0.5s ease; pointer-events: none;
   }
   #app { position: relative; z-index: 1; }
-
   /* ── Header ── */
   .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
   h1 {
@@ -93,7 +92,6 @@
   }
   .refresh-btn:hover { background: #292948; color: #fff; }
   .last-updated { font-size: 10px; color: var(--dimmer); margin-top: 4px; text-align: right; }
-
   /* ── Tabs ── */
   .tab-nav {
     display: flex; gap: 3px; margin-bottom: 14px;
@@ -111,7 +109,6 @@
     background: linear-gradient(135deg, #6C2BF7, #63AEFA); color: #fff;
     box-shadow: 0 0 20px rgba(99,174,250,0.4), 0 0 40px rgba(108,43,247,0.2);
   }
-
   /* ── Pickers ── */
   .picker-row { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; flex-wrap: wrap; }
   .picker-row label { font-size: 12px; color: var(--dim); font-weight: 600; }
@@ -119,20 +116,17 @@
     background: #1B1A30; border: 1px solid var(--card-border); border-radius: 8px;
     color: var(--text); font-size: 12px; padding: 6px 12px; cursor: pointer;
   }
-
   /* ── Loading / Error ── */
   #loading { display: flex; align-items: center; justify-content: center; height: 200px; flex-direction: column; gap: 12px; }
   .spinner { width: 28px; height: 28px; border: 3px solid var(--card-border); border-top-color: var(--cyan); border-radius: 50%; animation: spin 0.7s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   #error-msg { color: #DC7243; font-size: 13px; display: none; }
-
   /* ── Section titles — neon glow ── */
   .section-title {
     font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 3px;
     color: var(--cyan); margin: 16px 0 10px;
     text-shadow: 0 0 10px rgba(130,252,224,0.5), 0 0 30px rgba(130,252,224,0.2);
   }
-
   /* ── Cards — premium depth + glow ── */
   .card {
     background: linear-gradient(135deg, #1B1A30 0%, #272745 100%);
@@ -141,11 +135,9 @@
     border-top: 2px solid rgba(130,252,224,0.2);
   }
   .card-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--dim); margin-bottom: 14px; }
-
   /* ── Grids ── */
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
-
   /* ── KPI badges ── */
   .kpi-row { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
   .kpi-card {
@@ -163,21 +155,18 @@
   }
   .kpi-sub { font-size: 11px; color: var(--dim); }
   .kpi-idx { font-size: 12px; font-weight: 700; margin-top: 5px; }
-
   /* ── Badges (0-65 red, 66-99 yellow, 100+ green) ── */
   .badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
   .badge-red    { background: rgba(167,36,68,0.25); color: #ff6b6b; }
   .badge-yellow { background: rgba(220,114,67,0.25); color: #fbbf24; }
   .badge-green  { background: rgba(130,252,224,0.15); color: var(--cyan); }
   .badge-gold   { background: linear-gradient(135deg, rgba(130,252,224,0.25), rgba(99,174,250,0.15)); color: #82FCE0; border: 1px solid rgba(130,252,224,0.4); }
-
   .delta-pos { color: var(--cyan); font-size: 11px; }
   .delta-neg { color: #DC7243; font-size: 11px; }
   .delta-neu { color: var(--dim); font-size: 11px; }
   .divider { border: none; border-top: 1px solid var(--card-border); margin: 10px 0; }
-
   /* ── Seller cards ── */
-  .seller-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .seller-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 16px; }
   .seller-card {
     background: linear-gradient(160deg, #1B1A30 0%, #272745 100%);
     border: 1px solid var(--card-border); border-radius: 12px; padding: 16px;
@@ -193,7 +182,6 @@
   .seller-kpi-label { font-size: 11px; color: var(--dim); }
   .seller-kpi-right { display: flex; align-items: center; gap: 6px; }
   .seller-kpi-val { font-size: 12px; font-weight: 700; color: #fff; }
-
   /* ── MiM table ── */
   .mim-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
   .mim-table { width: 100%; border-collapse: collapse; font-size: 11px; }
@@ -201,16 +189,14 @@
   .mim-table td { padding: 6px 6px; border-bottom: 1px solid #272745; color: var(--text); }
   .mim-table tr:hover td { background: #272745; }
   .tag-low { color: var(--yellow); font-size: 10px; }
-
   /* ════════════════════════════════════════════════════════
      DAGLIG DASHBOARD
      ════════════════════════════════════════════════════════ */
-
-  .daily-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .daily-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 10px; overflow: hidden; }
   .daily-card {
     background: linear-gradient(160deg, #1B1A30 0%, #272745 50%, #1B1A30 100%);
     border: 1px solid var(--card-border); border-radius: 16px;
-    padding: 20px 18px 16px; text-align: center; position: relative; overflow: hidden;
+    padding: 18px 16px 16px; text-align: center; position: relative; overflow: hidden; min-width: 0;
     transition: border-color 0.3s, box-shadow 0.3s;
     box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 40px rgba(108,43,247,0.08);
     border-top: 2px solid rgba(99,174,250,0.25);
@@ -227,12 +213,10 @@
   }
   @keyframes goldShimmer { 0%,100%{opacity:.5} 50%{opacity:1} }
   .daily-card > * { position: relative; z-index: 1; }
-
   .daily-name {
-    font-size: 18px; font-weight: 900; color: #fff; margin-bottom: 12px; letter-spacing: 1px;
+    font-size: 17px; font-weight: 900; color: #fff; margin-bottom: 6px; letter-spacing: 1px;
     text-shadow: 0 0 20px currentColor, 0 0 40px rgba(255,255,255,0.1);
   }
-
   /* Big ring — compact for TV */
   .ring-wrap { position: relative; width: 180px; height: 180px; margin: 0 auto 12px; }
   .ring-wrap svg { width: 180px; height: 180px; transform: rotate(-90deg); }
@@ -248,7 +232,6 @@
     text-shadow: 0 0 20px currentColor, 0 0 40px rgba(255,255,255,0.15);
   }
   .ring-label { font-size: 11px; color: var(--dim); margin-top: 4px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; }
-
   /* Small ring for team donuts */
   .ring-sm { position: relative; width: 140px; height: 140px; margin: 0 auto 8px; }
   .ring-sm svg { width: 140px; height: 140px; transform: rotate(-90deg); }
@@ -257,15 +240,14 @@
     text-shadow: 0 0 15px currentColor;
   }
   .ring-sm .ring-label { font-size: 12px; font-weight: 700; letter-spacing: 1px; }
-
   /* Progress bars — bolder for TV readability */
   .daily-bars { text-align: left; margin-top: 4px; }
-  .bar-row { margin-bottom: 10px; }
+  .bar-row { margin-bottom: 12px; }
   .bar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
   .bar-label { font-size: 14px; font-weight: 800; color: #E8E5F8; }
-  .bar-val { font-size: 15px; font-weight: 900; color: #fff; font-variant-numeric: tabular-nums; }
-  .bar-pct { font-size: 14px; font-weight: 900; margin-left: 6px; }
-  .bar-track { height: 12px; background: #3a3a5c; border-radius: 6px; overflow: hidden; position: relative; }
+  .bar-val { font-size: 14px; font-weight: 900; color: #fff; font-variant-numeric: tabular-nums; }
+  .bar-pct { font-size: 13px; font-weight: 900; margin-left: 4px; }
+  .bar-track { height: 14px; background: #3a3a5c; border-radius: 7px; overflow: hidden; position: relative; }
   .bar-fill { height: 100%; border-radius: 6px; transition: width 0.8s ease; min-width: 2px; }
   .bar-fill.c-red    { background: linear-gradient(90deg, #dc2626, #ef4444); box-shadow: 0 0 14px rgba(239,68,68,0.5); }
   .bar-fill.c-yellow { background: linear-gradient(90deg, #d97706, #fbbf24); box-shadow: 0 0 14px rgba(251,191,36,0.5); }
@@ -276,22 +258,31 @@
     animation: barGoldPulse 2s ease-in-out infinite;
   }
   @keyframes barGoldPulse { 0%,100%{box-shadow:0 0 10px rgba(130,252,224,0.3)} 50%{box-shadow:0 0 20px rgba(130,252,224,0.6)} }
-
   /* Team donuts row */
-  .daily-team-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .daily-team-row {
+    display: flex; gap: 10px; margin-bottom: 10px;
+  }
   .daily-team-card {
+    flex: 1;
     background: linear-gradient(160deg, #1B1A30 0%, #272745 100%);
-    border: 1px solid var(--card-border); border-radius: 14px;
-    padding: 18px; text-align: center;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 30px rgba(99,174,250,0.06);
-    border-top: 2px solid rgba(99,174,250,0.25);
+    border: 1px solid var(--card-border); border-radius: 12px;
+    padding: 16px 12px; text-align: center;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 0 20px rgba(99,174,250,0.06);
   }
   .daily-team-card-title {
-    font-size: 14px; font-weight: 900; text-transform: uppercase; letter-spacing: 3px;
-    color: var(--cyan); margin-bottom: 10px;
-    text-shadow: 0 0 10px rgba(130,252,224,0.4);
+    font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;
+    color: var(--dim); white-space: nowrap;
   }
-
+  .daily-team-val {
+    font-size: 28px; font-weight: 900; line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .daily-team-meta {
+    font-size: 11px; color: var(--dim); white-space: nowrap;
+  }
+  .daily-team-bar-wrap { flex: 1; }
+  .daily-team-bar-track { height: 10px; background: #3a3a5c; border-radius: 5px; overflow: hidden; }
+  .daily-team-bar-fill { height: 100%; border-radius: 5px; transition: width 0.8s ease; min-width: 2px; }
   /* Comparison table */
   .compare-table { width: 100%; border-collapse: collapse; font-size: 12px; }
   .compare-table th {
@@ -311,7 +302,6 @@
   .compare-bar-fill.c-yellow { background: linear-gradient(90deg, #d97706, #fbbf24); }
   .compare-bar-fill.c-green  { background: linear-gradient(90deg, #059669, #34D399); }
   .compare-bar-fill.c-gold   { background: linear-gradient(90deg, #34D399, #82FCE0); }
-
   /* ── Person dashboard ── */
   .person-hero {
     background: linear-gradient(135deg, var(--card) 0%, #1a1e2e 100%);
@@ -324,44 +314,34 @@
   }
   .person-hero-name { font-size: 22px; font-weight: 900; }
   .person-hero-sub { font-size: 12px; color: var(--dim); margin-top: 3px; }
-
   .week-table { width: 100%; border-collapse: collapse; font-size: 12px; }
   .week-table th { text-align: center; color: var(--dim); font-weight: 700; padding: 7px 8px; border-bottom: 1px solid var(--card-border); font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; }
   .week-table td { padding: 8px 8px; border-bottom: 1px solid #151825; text-align: center; }
   .week-table td:first-child { text-align: left; font-weight: 700; color: #94a3b8; }
   .week-table tr:hover td { background: #1a1e2e; }
-
   .red { color: var(--red); } .yellow { color: var(--yellow); } .green { color: var(--green); } .gold { color: var(--gold); }
-
   /* ── No-data message ── */
   .no-data { color: var(--dim); font-size: 13px; text-align: center; padding: 40px; }
-
   /* ════════════════════════════════════════════════════════
      MIM CELEBRATION SYSTEM - WORLD CLASS REDESIGN
      ════════════════════════════════════════════════════════ */
-
-
   @keyframes avatarBounce {
     0% { opacity: 0; transform: scale(0); }
     70% { transform: scale(1.1); }
     100% { opacity: 1; transform: scale(1); }
   }
-
   @keyframes avatarShine {
     0% { transform: translateX(-100%); }
     100% { transform: translateX(100%); }
   }
-
   @keyframes cardSlideUp {
     0% { opacity: 0; transform: translateY(30px); }
     100% { opacity: 1; transform: translateY(0); }
   }
-
   @keyframes titleScaleIn {
     0% { opacity: 0; transform: scale(0.5); }
     100% { opacity: 1; transform: scale(1); }
   }
-
   /* === CELEBRATION OVERLAY (matches celebration_test.html) === */
   #mim-celebration-overlay {
     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 9999;
@@ -390,7 +370,6 @@
     justify-content: center;
     width: 100vw; height: 100vh;
   }
-
   /* Title section */
   .cel-title-section { text-align: center; margin-bottom: 30px; }
   .cel-title {
@@ -414,7 +393,6 @@
     60% { opacity: 1; transform: scale(0.9); }
     100% { opacity: 1; transform: scale(1); }
   }
-
   /* People row — two avatars side by side */
   .cel-people-row {
     display: flex; align-items: center; justify-content: center; gap: 80px;
@@ -428,7 +406,6 @@
     0% { opacity: 0; transform: scale(0.8) translateY(20px); }
     100% { opacity: 1; transform: scale(1) translateY(0); }
   }
-
   /* Avatar rings */
   .cel-avatar-ring {
     width: 260px; height: 260px; border-radius: 50%;
@@ -453,7 +430,6 @@
     font-size: 80px; font-weight: 900; color: #ffd700;
     font-family: 'Cinzel', serif;
   }
-
   /* Person name */
   .cel-person-name {
     font-family: 'Cinzel', serif;
@@ -462,7 +438,6 @@
     -webkit-text-stroke: 1px rgba(0,0,0,0.5);
     text-shadow: 0 0 15px rgba(255,215,0,0.6), 0 2px 6px rgba(0,0,0,0.8);
   }
-
   /* Deal card */
   .cel-deal-card {
     margin-top: 24px; padding: 18px 50px;
@@ -483,7 +458,6 @@
   .cel-stat-value { font-size: 26px; font-weight: 700; color: #ffd700; display: block; }
   .cel-stat-label { font-size: 11px; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 1px; }
   .cel-stat-divider { width: 1px; height: 40px; background: rgba(255,215,0,0.3); }
-
   /* TV mode (1200px+) */
   @media (min-width: 1200px) {
     .cel-title { font-size: 64px; letter-spacing: 8px; }
@@ -496,103 +470,92 @@
     .cel-deal-virksomhed { font-size: 26px; }
     .cel-stat-value { font-size: 30px; }
   }
-
-
   /* Sound toggle (now inline in header) */
   .sound-toggle.muted { opacity: 0.5; }
-
   /* Hall of Fame */
   .mim-log-section {
     background: linear-gradient(160deg, #1B1A30 0%, #272745 100%);
-    border: 1px solid var(--card-border); border-radius: 12px;
-    padding: 16px; max-height: 200px; overflow-y: auto;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    border: 1px solid var(--card-border); border-radius: 14px;
+    padding: 18px 20px; overflow-y: auto;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4), 0 0 30px rgba(108,43,247,0.06);
     border-top: 2px solid rgba(130,252,224,0.2);
+    display: flex; flex-direction: column; justify-content: center;
+    min-height: 180px;
   }
-
   .mim-log-title {
-    font-size: 14px; font-weight: 700; color: var(--cyan); margin-bottom: 16px;
+    font-size: 15px; font-weight: 800; color: var(--cyan); margin-bottom: 14px;
     text-shadow: 0 0 10px rgba(130,252,224,0.4);
+    letter-spacing: 0.5px;
   }
-
   .mim-log-grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px;
   }
-
   .mim-log-card {
-    background: #272745; border: 1px solid var(--card-border); border-radius: 8px;
-    padding: 8px 10px; display: flex; flex-direction: column; gap: 4px;
+    background: #272745; border: 1px solid var(--card-border); border-radius: 10px;
+    padding: 10px 12px; display: flex; flex-direction: column; gap: 5px;
   }
-
   .mim-log-time {
     font-size: 10px; color: var(--dim); text-transform: uppercase; letter-spacing: 0.5px;
   }
-
   .mim-log-seller {
-    font-size: 12px; font-weight: 700;
+    font-size: 13px; font-weight: 700;
   }
-
   .mim-log-candidate {
-    font-size: 11px; color: #e2e8f0;
+    font-size: 12px; color: #e2e8f0;
   }
-
   .mim-log-company {
-    font-size: 11px; color: #a5b4fc;
+    font-size: 12px; color: #a5b4fc;
   }
-
   .mim-log-meta {
     display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
     font-size: 10px; color: var(--dim);
   }
-
   .mim-log-tag {
     background: #151825; border: 1px solid var(--card-border); border-radius: 4px;
     padding: 2px 6px; font-size: 9px; font-weight: 600;
   }
-
   .mim-log-empty {
-    color: var(--dim); font-size: 13px; text-align: center; padding: 40px 20px;
+    color: var(--dimmer); font-size: 14px; text-align: center; padding: 30px 20px;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
   }
-
   .pulse-dot {
-    display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+    display: inline-block; width: 8px; height: 8px; border-radius: 50%;
     background: var(--cyan); animation: pulse 2s ease-in-out infinite;
     margin-right: 4px;
   }
-
   @keyframes pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.4; }
   }
-
   /* ── Bottom panels: MiM Log + Taletid side by side ── */
   .bottom-panels {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+    display: grid; grid-template-columns: 2fr 3fr; gap: 12px;
   }
-
   /* ── Taletid panel ── */
   .taletid-section {
     background: linear-gradient(160deg, #1B1A30 0%, #272745 100%);
-    border: 1px solid var(--card-border); border-radius: 12px;
-    padding: 16px; max-height: 200px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    border: 1px solid var(--card-border); border-radius: 14px;
+    padding: 18px 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4), 0 0 30px rgba(108,43,247,0.06);
     border-top: 2px solid rgba(130,252,224,0.2);
     display: flex; flex-direction: column; justify-content: center;
+    min-height: 180px;
   }
   .taletid-title {
-    font-size: 14px; font-weight: 700; color: var(--cyan); margin-bottom: 14px;
+    font-size: 15px; font-weight: 800; color: var(--cyan); margin-bottom: 12px;
     text-shadow: 0 0 10px rgba(130,252,224,0.4);
+    letter-spacing: 0.5px;
   }
-  .taletid-bars { display: flex; flex-direction: column; gap: 10px; }
+  .taletid-bars { display: flex; flex-direction: column; gap: 8px; }
   .taletid-row { display: flex; align-items: center; gap: 10px; }
   .taletid-name { font-size: 13px; font-weight: 800; width: 80px; white-space: nowrap; }
   .taletid-crown { font-size: 14px; margin-left: 2px; }
-  .taletid-bar-wrap { flex: 1; position: relative; height: 20px; }
+  .taletid-bar-wrap { flex: 1; position: relative; height: 22px; }
   .taletid-bar-track {
-    height: 20px; background: #3a3a5c; border-radius: 6px; overflow: visible; position: relative;
+    height: 22px; background: #3a3a5c; border-radius: 7px; overflow: visible; position: relative;
   }
   .taletid-bar-fill {
-    height: 100%; border-radius: 6px; transition: width 0.8s ease; min-width: 2px;
+    height: 100%; border-radius: 7px; transition: width 0.8s ease; min-width: 2px;
     position: relative; z-index: 1;
   }
   .taletid-bar-fill.under-target {
@@ -604,17 +567,14 @@
     box-shadow: 0 0 10px rgba(52,211,153,0.4);
   }
   .taletid-target-line {
-    position: absolute; top: -3px; bottom: -3px; width: 2px;
+    position: absolute; top: -4px; bottom: -4px; width: 2px;
     background: repeating-linear-gradient(180deg, rgba(255,255,255,0.8) 0px, rgba(255,255,255,0.8) 3px, transparent 3px, transparent 6px);
     z-index: 2;
     border-radius: 1px;
   }
   .taletid-time {
-    font-size: 12px; font-weight: 700; width: 65px; text-align: right; font-variant-numeric: tabular-nums;
+    font-size: 13px; font-weight: 700; width: 85px; text-align: right; font-variant-numeric: tabular-nums;
   }
-
-
-
   /* Photo upload */
   .photo-upload-hint {
     position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.7);
@@ -643,8 +603,6 @@
   .photo-mgr-name { font-size: 11px; font-weight: 700; color: #94a3b8; }
   .photo-mgr-action { font-size: 10px; color: var(--blue); cursor: pointer; margin-top: 2px; }
   .photo-mgr-action:hover { text-decoration: underline; }
-
-
   @media (max-width: 900px) {
     .grid-2, .grid-3, .seller-grid, .mim-grid, .daily-grid { grid-template-columns: 1fr; }
     .kpi-row { flex-wrap: wrap; }
@@ -657,9 +615,7 @@
     .cel-person-name { font-size: 24px; }
     .cel-combo { font-size: 20px; }
   }
-
   /* ═══ TV-OPTIMISED — No backdrop-filter anywhere, solid backgrounds ═══ */
-
   /* Card entrance animation */
   @keyframes cardFadeIn {
     0% { opacity: 0; transform: translateY(12px); }
@@ -669,10 +625,116 @@
   .daily-card:nth-child(1) { animation-delay: 0.1s; }
   .daily-card:nth-child(2) { animation-delay: 0.2s; }
   .daily-card:nth-child(3) { animation-delay: 0.3s; }
+  .daily-card:nth-child(4) { animation-delay: 0.4s; }
+  .daily-card:nth-child(5) { animation-delay: 0.5s; }
   .daily-team-card { animation: cardFadeIn 0.6s ease-out both; }
   .daily-team-card:nth-child(1) { animation-delay: 0.4s; }
   .daily-team-card:nth-child(2) { animation-delay: 0.5s; }
-  .daily-team-card:nth-child(3) { animation-delay: 0.6s; }</style>
+  .daily-team-card:nth-child(3) { animation-delay: 0.6s; }
+  /* ════════════════════════════════════════════════════════
+     COMPACT DAILY CARD — Index number (no ring)
+     ════════════════════════════════════════════════════════ */
+  .daily-index-num {
+    font-size: 48px; font-weight: 900; line-height: 1; margin-bottom: 4px;
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 0 20px currentColor, 0 0 40px rgba(255,255,255,0.1);
+  }
+  .daily-index-label { font-size: 11px; color: var(--dim); text-transform: uppercase; letter-spacing: 2px; font-weight: 700; margin-bottom: 12px; }
+  /* ════════════════════════════════════════════════════════
+     F1 COMPETITION OVERLAY
+     ════════════════════════════════════════════════════════ */
+  #comp-overlay {
+    position: fixed; inset: 0; z-index: 8000;
+    display: none; flex-direction: column;
+    background: #000;
+    overflow: hidden;
+  }
+  #comp-overlay.active { display: flex; }
+  #comp-overlay .bg-video {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: cover; z-index: 0;
+    background: url('stage_poster.jpg') center/cover no-repeat;
+  }
+  #comp-overlay .bg-gradient {
+    position: absolute; inset: 0; z-index: 1;
+    background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.4) 40%, rgba(0,0,0,0.7) 100%);
+  }
+  .comp-content { position: relative; z-index: 2; display: flex; flex-direction: column; height: 100vh; padding: 24px 40px; }
+  /* Header */
+  .comp-hdr {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-bottom: 16px; border-bottom: 2px solid rgba(255,215,0,0.3);
+    flex-shrink: 0;
+  }
+  .comp-logo-mim {
+    font-family: 'Cinzel', serif; font-size: 36px; font-weight: 900; color: #ffd700;
+    text-shadow: 0 0 20px rgba(255,215,0,0.6); letter-spacing: 5px;
+  }
+  .comp-logo-gp {
+    font-family: 'Cinzel', serif; font-size: 16px; font-weight: 700; color: rgba(255,215,0,0.7);
+    letter-spacing: 6px; margin-top: 2px;
+  }
+  .comp-day-badge {
+    background: rgba(255,215,0,0.15); border: 1px solid rgba(255,215,0,0.4);
+    border-radius: 10px; padding: 8px 20px;
+    font-family: 'Cinzel', serif; font-size: 18px; font-weight: 700; color: #ffd700;
+    letter-spacing: 3px;
+  }
+  .comp-clock {
+    font-family: 'Inter', monospace; font-size: 28px; font-weight: 800; color: rgba(255,255,255,0.9);
+    letter-spacing: 3px; font-variant-numeric: tabular-nums;
+  }
+  /* Race grid — fills ALL remaining vertical space */
+  .comp-grid {
+    flex: 1; display: flex; flex-direction: column;
+    justify-content: space-evenly; /* even distribution! */
+    padding: 10px 0;
+  }
+  .comp-lane {
+    display: flex; align-items: center; gap: 16px; padding: 8px 14px;
+    border-radius: 12px; transition: all 0.5s ease;
+    background: rgba(0,0,0,0.15);
+  }
+  .comp-lane:hover { background: rgba(255,215,0,0.05); }
+  .comp-pos {
+    width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 22px; flex-shrink: 0;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  }
+  .comp-pos-1 { background: linear-gradient(135deg, #ffd700, #ffed4a); color: #000; box-shadow: 0 0 20px rgba(255,215,0,0.4); }
+  .comp-pos-2 { background: linear-gradient(135deg, #b0b0b0, #e0e0e0); color: #000; }
+  .comp-pos-3 { background: linear-gradient(135deg, #cd7f32, #e0a060); color: #000; }
+  .comp-pos-n { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7); }
+  .comp-photo {
+    width: 60px; height: 60px; border-radius: 50%; overflow: hidden; flex-shrink: 0;
+    border: 3px solid rgba(255,215,0,0.3);
+  }
+  .comp-photo img { width: 100%; height: 100%; object-fit: cover; }
+  .comp-nm { font-size: 22px; font-weight: 800; width: 120px; }
+  .comp-sc { font-size: 32px; font-weight: 900; width: 60px; text-align: center; color: #ffd700; font-variant-numeric: tabular-nums; }
+  .comp-track-area { flex: 1; position: relative; height: 44px; }
+  .comp-track-bg { position: absolute; inset: 0; background: rgba(255,255,255,0.06); border-radius: 8px; }
+  .comp-track-fill {
+    position: absolute; top: 0; bottom: 0; left: 0; border-radius: 8px;
+    transition: width 1s ease;
+  }
+  .comp-track-fill::after {
+    content: ''; position: absolute; inset: 0;
+    background: repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(255,255,255,0.06) 10px, rgba(255,255,255,0.06) 20px);
+    animation: comp-stripes 1.5s linear infinite; border-radius: 8px;
+  }
+  @keyframes comp-stripes { 0%{background-position:0 0} 100%{background-position:40px 0} }
+  .comp-car-wrap {
+    position: absolute; top: 50%; right: -30px; transform: translateY(-50%);
+    width: 68px; height: 32px;
+    transition: right 1s ease;
+  }
+  .comp-car-wrap svg { width: 100%; height: 100%; }
+  /* Flash effect for score increase */
+  .comp-flash { animation: comp-flash-anim 0.3s ease-out; }
+  @keyframes comp-flash-anim { 0%{transform:scale(1.3);text-shadow:0 0 20px #ffd700} 100%{transform:scale(1);text-shadow:none} }
+
+</style>
 </head>
 <body>
 <!-- Cycling Deep Space backgrounds — two layers for crossfade -->
@@ -684,7 +746,6 @@
   <div class="splash-spinner"></div>
 </div>
 <div id="app">
-
 <div class="header">
   <div>
     <h1>POWERMATCH — SALES DASHBOARD</h1>
@@ -694,14 +755,13 @@
     <button class="photo-settings-btn" onclick="togglePhotoMgr()">📷 Fotos</button>
     <button class="refresh-btn" onclick="testCelebration()">🎉 Test</button>
     <button class="refresh-btn" id="sound-toggle" onclick="toggleSoundMuted()">🔊</button>
+    <button class="refresh-btn" id="comp-toggle-btn" onclick="manualToggleCompetition()" title="Vis/skjul konkurrence">🏁</button>
     <button class="refresh-btn" onclick="loadAll()">↻ Opdater</button>
     <div class="last-updated" id="last-updated"></div>
   </div>
 </div>
-
 <!-- Hidden file input for photo upload -->
 <input type="file" id="photo-upload-input" accept="image/*" style="display:none" onchange="handlePhotoUpload(event)">
-
 <!-- Photo Manager Panel -->
 <div class="photo-mgr" id="photo-mgr">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
@@ -710,31 +770,24 @@
   </div>
   <div class="photo-mgr-grid" id="photo-mgr-grid"></div>
 </div>
-
 <div class="tab-nav">
   <button class="tab-btn active" id="tab-daglig" onclick="switchTab('daglig')">Daglig</button>
   <button class="tab-btn"        id="tab-uge"    onclick="switchTab('uge')">Uge</button>
   <button class="tab-btn"        id="tab-maaned" onclick="switchTab('maaned')">Måned</button>
   <button class="tab-btn"        id="tab-person" onclick="switchTab('person')">Person</button>
 </div>
-
 <div id="loading" style="display:none"></div>
 <div id="error-msg"></div>
-
 <!-- ══ DAGLIG VIEW ═══════════════════════════════════════════════ -->
 <div id="view-daglig" style="display:none">
   <div class="picker-row">
     <label>Dato:</label>
     <select id="day-select" onchange="renderDaglig()"></select>
   </div>
-
   <!-- Individual seller cards with big rings -->
   <div class="daily-grid" id="daily-cards"></div>
-
   <!-- Team donuts: KT, Samtaler, MiM -->
-  <div class="section-title" style="font-size:13px;color:var(--lightblue);letter-spacing:3px">TEAM – DAGENS TOTALER</div>
   <div class="daily-team-row" id="daily-team-donuts"></div>
-
   <div class="bottom-panels">
     <div class="mim-log-section" id="mim-log-section"></div>
     <div class="taletid-section" id="taletid-section">
@@ -743,7 +796,6 @@
     </div>
   </div>
 </div>
-
 <!-- ══ UGE VIEW ══════════════════════════════════════════════════ -->
 <div id="view-uge" style="display:none">
   <div class="picker-row">
@@ -757,7 +809,7 @@
   <div class="section-title">Trend – Alle uger</div>
   <div class="grid-2" style="margin-bottom:14px">
     <div class="card"><div class="card-title">MiM pr. sælger</div><canvas id="mimChart" height="200"></canvas></div>
-    <div class="card"><div class="card-title">KT + SS pr. sælger</div><canvas id="ktChart" height="200"></canvas></div>
+    <div class="card"><div class="card-title">KT pr. sælger</div><canvas id="ktChart" height="200"></canvas></div>
   </div>
   <div class="grid-2">
     <div class="card"><div class="card-title">Samtaler pr. sælger</div><canvas id="samChart" height="200"></canvas></div>
@@ -766,7 +818,6 @@
   <div class="section-title" id="mim-details-title">MiM-detaljer</div>
   <div class="mim-grid" id="mim-details"></div>
 </div>
-
 <!-- ══ MÅNED VIEW ════════════════════════════════════════════════ -->
 <div id="view-maaned" style="display:none">
   <div class="picker-row">
@@ -780,12 +831,11 @@
   <div class="section-title">Ugentlig progression</div>
   <div class="grid-2">
     <div class="card"><div class="card-title">MiM pr. uge</div><canvas id="monthMimChart" height="200"></canvas></div>
-    <div class="card"><div class="card-title">KT + SS pr. uge</div><canvas id="monthKtChart" height="200"></canvas></div>
+    <div class="card"><div class="card-title">KT pr. uge</div><canvas id="monthKtChart" height="200"></canvas></div>
   </div>
   <div class="section-title" id="month-mim-title">MiM-detaljer</div>
   <div class="mim-grid" id="month-mim-details"></div>
 </div>
-
 <!-- ══ PERSON VIEW ═══════════════════════════════════════════════ -->
 <div id="view-person" style="display:none">
   <div class="picker-row">
@@ -794,6 +844,8 @@
       <option value="William">William</option>
       <option value="Jonas">Jonas</option>
       <option value="Andreas">Andreas</option>
+      <option value="Flora">Flora</option>
+      <option value="Ali">Ali</option>
     </select>
     <label style="margin-left:14px">Uge:</label>
     <select id="person-week-select" onchange="renderPerson()"></select>
@@ -804,53 +856,38 @@
   <div class="section-title">Trend</div>
   <div class="grid-3" style="margin-bottom:16px">
     <div class="card"><div class="card-title">MiM</div><canvas id="personMimChart" height="200"></canvas></div>
-    <div class="card"><div class="card-title">KT + SS</div><canvas id="personKtChart" height="200"></canvas></div>
+    <div class="card"><div class="card-title">KT</div><canvas id="personKtChart" height="200"></canvas></div>
     <div class="card"><div class="card-title">GF gennemsnit</div><canvas id="personGfChart" height="200"></canvas></div>
   </div>
   <div class="section-title" id="person-mim-title">MiM-detaljer</div>
   <div id="person-mim-details"></div>
 </div>
-
 <!-- Celebration overlay — animated WebP background, Samsung TV compatible -->
 <div id="mim-celebration-overlay">
   <div id="celebration-bg"></div>
   <div class="celebration-content" id="celebration-content"></div>
 </div>
-
-
 <script>
 // TV MODE – always on (optimized for Samsung Smart TV)
 const TV_MODE = true;
 document.body.classList.add('tv-mode');
-
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxTb_Qpuo-mTBTxXdKydQqDUGmJ_VBq7f0r_QHmvJ7B1cXmDiXHG_Kp1jFHHzcs0SSK/exec';
-const NAMES = ['William','Jonas','Andreas'];
-const COLORS = { William:'#63AEFA', Jonas:'#DC7243', Andreas:'#82FCE0', floor:'#A72444', maal:'#3B3B61' };
-
+const NAMES = ['William','Jonas','Andreas','Flora','Ali'];
+const COLORS = { William:'#63AEFA', Jonas:'#DC7243', Andreas:'#82FCE0', Flora:'#f472b6', Ali:'#fb923c', floor:'#A72444', maal:'#3B3B61' };
 // Seller photo configuration – GitHub-hosted + localStorage fallback
 const PHOTO_BASE_URL = 'https://raw.githubusercontent.com/sebpirad/DashboardPM/main/photos/';
-const GITHUB_PHOTOS = {
-  William: PHOTO_BASE_URL + 'william.jpg',
-  Jonas: PHOTO_BASE_URL + 'jonas.jpg',
-  Andreas: PHOTO_BASE_URL + 'andreas.jpg'
-};
-
+const GITHUB_PHOTOS = {};
+NAMES.forEach(n => GITHUB_PHOTOS[n] = PHOTO_BASE_URL + n.toLowerCase() + '.jpg');
 // Screener photo configuration
-const SCREENER_NAMES = ['Amalie', 'Ali', 'Josefine', 'Nicholai'];
-const SCREENER_PHOTOS = {
-  Amalie: PHOTO_BASE_URL + 'amalie.jpg',
-  Ali: PHOTO_BASE_URL + 'ali.jpg',
-  Josefine: PHOTO_BASE_URL + 'josefine.jpg',
-  Nicholai: PHOTO_BASE_URL + 'nicholai.jpg'
-};
-const SCREENER_COLORS = { Amalie: '#c084fc', Ali: '#fb923c', Josefine: '#f9a8d4', Nicholai: '#60a5fa' };
-
+const SCREENER_NAMES = ['Amalie', 'Ali', 'Josefine'];
+const SCREENER_PHOTOS = {};
+SCREENER_NAMES.forEach(n => SCREENER_PHOTOS[n] = PHOTO_BASE_URL + n.toLowerCase() + '.jpg');
+const SCREENER_COLORS = { Amalie: '#c084fc', Ali: '#fb923c', Josefine: '#f9a8d4' };
 // HR Dashboard Apps Script endpoint for screener lookup
 const HR_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwNgVLagf3MT5_JeJSWySpkbIEBquFOOHyr0WplT66cf6l3eWgImS0BO7RUYV4TaCp2/exec';
-
 // Look up screener via HR Dashboard API (async)
 async function findScreenerAsync(kandidatNavn) {
   if (!kandidatNavn) return null;
@@ -887,30 +924,61 @@ function verifyGitHubPhotos() {
   }
 }
 let _photoUploadTarget = null; // which seller we're uploading for
-
 // Dynamic – computed from data at load time
 let WEEK_RANGES = {};   // wn → [start, end]
 let MONTH_RANGES = {};  // 'YYYY-MM' → [start, end]
 let WEEK_LABELS = {};   // wn → 'U5 (26/1)'
 let WEEKS_IN_MONTH = {}; // 'YYYY-MM' → [wn, ...]
 let ALL_WEEKS = [];     // sorted week numbers
-
 let _rawData={}, _trendData={}, _budgets={}, _charts={}, _currentTab='daglig';
 let _taletidData = null;
 const TALETID_URL = 'https://script.google.com/macros/s/AKfycbyG5fM6vaBvjrnSw2DtF3X8-VwLBToDrWJbqVVuwSG0dkQE5-Sv0-fo7CkNhLK4quAb/exec';
 const TALETID_TARGET_SECS = 3 * 3600; // 3 timer dagligt mål
 
+// ═══════════════════════════════════════════════════════════
+// INDIVIDUAL TARGET SYSTEM (from sheet columns Y-AB)
+// ═══════════════════════════════════════════════════════════
+let _targets = {}; // { William: { Mandag: {KT:3,Samtaler:5,MIM:2}, ... }, ... }
+const DAY_MAP = { 1:'Mandag', 2:'Tirsdag', 3:'Onsdag', 4:'Torsdag', 5:'Fredag' };
+const DAY_MAP_REV = { Mandag:1, Tirsdag:2, Onsdag:3, Torsdag:4, Fredag:5 };
+
+function getTarget(sellerName, date) {
+  const dayNum = date.getDay();
+  const dayName = DAY_MAP[dayNum];
+  if (!dayName) return {KT:0, Samtaler:0, MIM:0};
+  const t = _targets[sellerName]?.[dayName];
+  if (t) return t;
+  // Fallback to budgets
+  const wn = weekForDate(date);
+  const bud = _budgets[wn]?.indiv || {};
+  return {KT: Math.ceil((bud.KT||0)/5), Samtaler: Math.ceil((bud.Sam||0)/5), MIM: Math.ceil((bud.MiM||0)/5)};
+}
+
+function getWeekTarget(sellerName, weekNum) {
+  const days = ['Mandag','Tirsdag','Onsdag','Torsdag','Fredag'];
+  const t = {KT:0, Samtaler:0, MIM:0};
+  const st = _targets[sellerName];
+  if (st) {
+    days.forEach(d => {
+      if (st[d]) { t.KT += st[d].KT||0; t.Samtaler += st[d].Samtaler||0; t.MIM += st[d].MIM||0; }
+    });
+    if (t.KT > 0 || t.Samtaler > 0 || t.MIM > 0) return t;
+  }
+  // Fallback
+  const bud = _budgets[weekNum]?.indiv || {KT:15, Sam:13, MiM:7};
+  return {KT: bud.KT||15, Samtaler: bud.Sam||13, MIM: bud.MiM||7};
+}
+
 // MiM tracking
 let _seenMiM = new Set();
 let _mimLog = [];
-let _sellerMimCount = { William: 0, Jonas: 0, Andreas: 0 };
-let _sellerMimToday = { William: 0, Jonas: 0, Andreas: 0 };
-let _sellerStreak = { William: 0, Jonas: 0, Andreas: 0 };
+let _sellerMimCount = {}; NAMES.forEach(n => _sellerMimCount[n] = 0);
+let _sellerMimToday = {}; NAMES.forEach(n => _sellerMimToday[n] = 0);
+let _sellerStreak = {}; NAMES.forEach(n => _sellerStreak[n] = 0);
 let _soundMuted = false;
 let _autoRefreshInterval = null;
 let _userHasInteracted = false;
 let _audioCtx = null;
-
 // Unlock audio on FIRST user interaction (Chrome autoplay policy)
 document.addEventListener('click', function _unlockAudio() {
   _userHasInteracted = true;
@@ -919,7 +987,6 @@ document.addEventListener('click', function _unlockAudio() {
     if (_audioCtx.state === 'suspended') _audioCtx.resume();
   } catch(e) {}
 }, { once: false });
-
 // ═══════════════════════════════════════════════════════════
 // UTILS
 // ═══════════════════════════════════════════════════════════
@@ -940,7 +1007,6 @@ function parseDate(str) {
 function inRange(ds,s,e){ const d=parseDate(ds); return d&&d>=s&&d<=e; }
 function dk(s){ if(s===null||s===undefined||s==='') return NaN; if(typeof s==='number') return s; return parseFloat(String(s).trim().replace(',','.')); }
 function fmt(v,dec=0){ return v===null?'—':typeof v==='number'?v.toFixed(dec):v; }
-
 // ── Thresholds: 0-65 red, 66-99 yellow, 100+ green ──
 function idx(a,t){ return t>0?Math.round(a/t*100):0; }
 function idxBadge(i){
@@ -952,22 +1018,20 @@ function idxBadge(i){
 function idxColor(i){ return i>=126?'gold':i>=100?'green':i>=66?'yellow':'red'; }
 function barColorClass(i){ return i>=126?'c-gold':i>=100?'c-green':i>=66?'c-yellow':'c-red'; }
 function ringColor(i){ return i>=126?'#82FCE0':i>=100?'#34D399':i>=66?'#fbbf24':'#ef4444'; }
-
 function delta(a,b){ const d=a-b; return d>0?`<span class="delta-pos">+${d}</span>`:d<0?`<span class="delta-neg">${d}</span>`:`<span class="delta-neu">0</span>`; }
 function deltaF(a,b){ if(a===null||b===null) return ''; const d=(a-b).toFixed(3); return parseFloat(d)>0?`<span class="delta-pos">+${d}</span>`:parseFloat(d)<0?`<span class="delta-neg">${d}</span>`:`<span class="delta-neu">0</span>`; }
-
 // ═══════════════════════════════════════════════════════════
 // CORE CALC
 // ═══════════════════════════════════════════════════════════
 function calcSellerArr(rows,ws,we){
-  if(!rows||rows.length<2) return {KT:0,SS:0,Samtaler:0,MiM:0,mimRows:[],gnsGF:null,gnsKS:null,lowGF:0};
-  let KT=0,SS=0,Samtaler=0,mimRows=[];
+  if(!rows||rows.length<2) return {KT:0,Samtaler:0,MiM:0,mimRows:[],gnsGF:null,gnsKS:null,lowGF:0};
+  let KT=0,Samtaler=0,mimRows=[];
   for(let i=1;i<rows.length;i++){
     const r=rows[i];
     const g=v=>v instanceof Date?fmtDate(v):String(v||'');
-    const r0=g(r[0]),r1=g(r[1]),r3=g(r[3]),r6=g(r[6]),r7=g(r[7]);
+    const r0=g(r[0]),r1=g(r[1]),r6=g(r[6]),r7=g(r[7]);
     const r13=g(r[13]),r14=g(r[14]),r15=g(r[15]),r16=g(r[16]),r17=g(r[17]),r18=g(r[18]),r21=g(r[21]);
-    if(inRange(r0,ws,we)&&r1.trim()){ KT++; if(/\bJa\b/i.test(r3)) SS++; }
+    if(inRange(r0,ws,we)&&r1.trim()) KT++;
     if(inRange(r6,ws,we)&&r7.trim()) Samtaler++;
     if(inRange(r13,ws,we)&&r15.trim()){
       if(/startede aldrig/i.test(r21)||/opsagt samme uge/i.test(r21)) continue;
@@ -975,12 +1039,11 @@ function calcSellerArr(rows,ws,we){
     }
   }
   const vGF=mimRows.filter(r=>!isNaN(r.gf)), vKS=mimRows.filter(r=>!isNaN(r.ks));
-  return { KT,SS,Samtaler,MiM:mimRows.length,mimRows,
+  return { KT,Samtaler,MiM:mimRows.length,mimRows,
     gnsGF:vGF.length?vGF.reduce((s,r)=>s+r.gf,0)/vGF.length:null,
     gnsKS:vKS.length?vKS.reduce((s,r)=>s+r.ks,0)/vKS.length:null,
     lowGF:vGF.filter(r=>r.gf<1.90).length };
 }
-
 // ISO week number for a date
 function isoWeek(d){
   const t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));
@@ -988,7 +1051,6 @@ function isoWeek(d){
   const y=new Date(Date.UTC(t.getUTCFullYear(),0,1));
   return Math.ceil(((t-y)/86400000+1)/7);
 }
-
 // Get Monday of ISO week
 function mondayOfWeek(wn, year){
   const jan4=new Date(year,0,4);
@@ -997,10 +1059,9 @@ function mondayOfWeek(wn, year){
   mon.setDate(jan4.getDate()-(dow-1)+(wn-1)*7);
   return mon;
 }
-
 // Build dynamic week ranges from all dates found in data + ALWAYS include today's week
 function buildWeekRanges(){
-  const sheets=['Data Input - William','Data Input - Jonas','Data Input - Andreas'];
+  const sheets=NAMES.map(n=>'Data Input - '+n);
   const weekSet=new Set();
   // Always include today
   const today=new Date(); today.setHours(0,0,0,0);
@@ -1041,7 +1102,6 @@ function buildWeekRanges(){
   }
   ALL_WEEKS=Object.keys(WEEK_RANGES).map(Number).sort((a,b)=>a-b);
 }
-
 // Find which week a date belongs to
 function weekForDate(d){
   for(const [wn,[ws,we]] of Object.entries(WEEK_RANGES)){
@@ -1049,14 +1109,13 @@ function weekForDate(d){
   }
   return null;
 }
-
 // Get all unique dates in the dataset + always include today (if weekday)
 function getAllDates(){
   const dates = new Set();
   // Always include today if it's a weekday
   const today=new Date(); today.setHours(0,0,0,0);
   if(today.getDay()!==0 && today.getDay()!==6) dates.add(fmtDate(today));
-  const sheets = ['Data Input - William','Data Input - Jonas','Data Input - Andreas'];
+  const sheets = NAMES.map(n => 'Data Input - ' + n);
   for(const sheet of sheets){
     const rows = _rawData[sheet]||[];
     for(let i=1;i<rows.length;i++){
@@ -1071,11 +1130,9 @@ function getAllDates(){
   const sorted=[...dates].sort((a,b)=>parseDate(b)-parseDate(a));
   return sorted;
 }
-
 // ═══════════════════════════════════════════════════════════
 // MIM CELEBRATION SYSTEM
 // ═══════════════════════════════════════════════════════════
-
 // Generate avatar from initials or stored photo
 function generateSellerAvatar(name, size=180) {
   const photo = getSellerPhoto(name);
@@ -1087,7 +1144,6 @@ function generateSellerAvatar(name, size=180) {
   const fs = size > 120 ? 80 : size > 60 ? 36 : 24;
   return `<div style="background:${color}22; color:${color}; width:100%; height:100%; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:${fs}px; font-weight:900;">${initial}</div>`;
 }
-
 // Photo Manager
 function togglePhotoMgr() {
   const el = document.getElementById('photo-mgr');
@@ -1139,26 +1195,21 @@ function handlePhotoUpload(e) {
   reader.readAsDataURL(file);
   e.target.value = ''; // reset for re-upload
 }
-
 // Dynamic comment selection
 function getComments(seller, candidate, company, gf, dayMimCount, weekMimCount, dayOfWeek, hour) {
   const comments = [];
-
   // First MiM of the day
   if (dayMimCount === 1) {
     comments.push(`${seller} åbner ballet!`);
   }
-
   // 2nd MiM same day
   if (dayMimCount === 2) {
     comments.push(`${seller} er VARM i dag!`);
   }
-
   // 3rd+ MiM same day
   if (dayMimCount >= 3) {
     comments.push(`HAT-TRICK! ${seller} er USTOPPELIG!`);
   }
-
   // GF checks
   if (!isNaN(gf)) {
     if (gf >= 2.20) {
@@ -1167,19 +1218,15 @@ function getComments(seller, candidate, company, gf, dayMimCount, weekMimCount, 
       comments.push(`Obs: GF under floor (${gf.toFixed(2)})`);
     }
   }
-
   // Time-based
   if (hour < 10) {
     comments.push(`Tidlig fugl fanger ormen!`);
   } else if (hour >= 15) {
     comments.push(`Endnu én inden lukketid!`);
   }
-
   // Weekly leader (would need comparison logic)
-
   return comments.length > 0 ? comments : ['MiM confirmed!'];
 }
-
 // Get combo level (expanded to 6 levels)
 function getComboLevel(dayMimCount) {
   if (dayMimCount >= 6) return 6;
@@ -1189,8 +1236,6 @@ function getComboLevel(dayMimCount) {
   if (dayMimCount === 2) return 2;
   return 1;
 }
-
-
 // ═══ CELEBRATION SONGS — Random pick from 10 bangers (iTunes 30s Previews) ═══
 const CELEBRATION_SONGS = [
   { id: 574043691,  name: 'Thunderstruck',      artist: 'AC/DC',
@@ -1208,7 +1253,6 @@ const CELEBRATION_SONGS = [
 let _songPreviewUrls = {}; // Cache: trackId -> previewUrl
 let _celebrationAudio = null;
 let _lastSongIdx = -1; // Avoid repeating same song twice
-
 // Fetch preview URLs from iTunes API (JSONP — no CORS issues on TV stick)
 (function preloadSongUrls() {
   const ids = CELEBRATION_SONGS.map(s => s.id).join(',');
@@ -1234,7 +1278,6 @@ let _lastSongIdx = -1; // Avoid repeating same song twice
   };
   document.body.appendChild(scr);
 })();
-
 function pickRandomSong() {
   // Build list of songs with available URLs
   const available = CELEBRATION_SONGS.map((s, i) => ({ ...s, idx: i }))
@@ -1254,7 +1297,6 @@ function pickRandomSong() {
   _lastSongIdx = pick.idx;
   return { name: pick.name, artist: pick.artist, url: _songPreviewUrls[pick.id] };
 }
-
 function playCelebrationSound(comboLevel = 1) {
   if (_soundMuted) return;
   stopCelebrationSound();
@@ -1271,7 +1313,6 @@ function playCelebrationSound(comboLevel = 1) {
     console.log('Celebration audio failed:', e);
   }
 }
-
 function stopCelebrationSound() {
   try {
     if (_celebrationAudio) {
@@ -1283,13 +1324,11 @@ function stopCelebrationSound() {
     }
   } catch(e) {}
 }
-
 // Track all celebration timers so we can clean up
 let _celebrationTimers = [];
 let _celebrationIntervals = [];
 let _celebrationQueue = [];
 let _celebrationRunning = false;
-
 // Process celebration queue – one at a time, 15s pause between
 function processCelebrationQueue() {
   if (_celebrationRunning || _celebrationQueue.length === 0) return;
@@ -1304,7 +1343,6 @@ function processCelebrationQueue() {
     }
   }, 35000);
 }
-
 function clearCelebration() {
   _celebrationTimers.forEach(t => clearTimeout(t));
   _celebrationIntervals.forEach(t => clearInterval(t));
@@ -1337,7 +1375,6 @@ function clearCelebration() {
     }, { once: true });
   }
 }
-
 // WILD & EXPLOSIVE Main celebration
 function showCelebration(seller, mimData, dayMimCount, weekMimCount) {
   // Kill any running celebration first
@@ -1345,22 +1382,17 @@ function showCelebration(seller, mimData, dayMimCount, weekMimCount) {
   // Launch immediately — video starts inside _launchCelebration
   _launchCelebration(seller, mimData, dayMimCount, weekMimCount);
 }
-
 function _launchCelebration(seller, mimData, dayMimCount, weekMimCount) {
   const overlay = document.getElementById('mim-celebration-overlay');
   if (overlay.classList.contains('active')) return;
-
   const content = document.getElementById('celebration-content');
   const comboLevel = getComboLevel(dayMimCount);
-
   const cTimeout = (fn, ms) => { const t = setTimeout(fn, ms); _celebrationTimers.push(t); return t; };
-
   // Reuse pre-buffered video (already decoded in hardware) or create fallback
   const existingBg = document.getElementById('celebration-bg');
   if (existingBg) existingBg.parentNode.removeChild(existingBg);
   const bg = document.createElement('div');
   bg.id = 'celebration-bg';
-
   let vid = document.getElementById('celebration-video-preloaded');
   if (vid) {
     // Move pre-buffered video into celebration bg — instant playback
@@ -1382,9 +1414,7 @@ function _launchCelebration(seller, mimData, dayMimCount, weekMimCount) {
   bg.style.opacity = '0';
   vid.currentTime = 0;
   vid.play().catch(function() {});
-
   const sellerPhoto = GITHUB_PHOTOS[seller] || '';
-
   // Combo text
   let comboText = '';
   if (comboLevel === 2) comboText = 'COMBO x2';
@@ -1392,27 +1422,23 @@ function _launchCelebration(seller, mimData, dayMimCount, weekMimCount) {
   else if (comboLevel === 4) comboText = 'COMBO x4';
   else if (comboLevel === 5) comboText = 'COMBO x5';
   else if (comboLevel >= 6) comboText = 'COMBO x' + dayMimCount;
-
   // Build seller avatar HTML
   const sellerAvatarHtml = sellerPhoto
     ? `<img src="${sellerPhoto}" alt="${seller}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
        <div class="cel-avatar-fallback" style="display:none">${seller.charAt(0)}</div>`
     : `<div class="cel-avatar-fallback">${seller.charAt(0)}</div>`;
-
   // === BUILD HTML — starts WITHOUT screener, added async when HR API responds ===
   let html = `
     <div class="cel-title-section">
       <div class="cel-title">Mand i Marken!</div>
       <div class="cel-combo" id="cel-combo"></div>
     </div>
-
     <div class="cel-people-row" id="cel-people-row">
       <div class="cel-person" id="cel-person-closer">
         <div class="cel-avatar-ring closer">${sellerAvatarHtml}</div>
         <div class="cel-person-name">${seller}</div>
       </div>
     </div>
-
     <div class="cel-deal-card" id="cel-deal-card">
       <div class="cel-deal-kandidat">${mimData.kandidat || '—'}</div>
       <div class="cel-deal-virksomhed">${mimData.virk || '—'}</div>
@@ -1433,14 +1459,11 @@ function _launchCelebration(seller, mimData, dayMimCount, weekMimCount) {
         </div>
       </div>
     </div>`;
-
   content.innerHTML = html;
-
   // === ASYNC: Fetch screener from HR Dashboard and inject when ready ===
   const screenerPromise = _testScreenerOverride
     ? Promise.resolve(_testScreenerOverride)
     : findScreenerAsync(mimData.kandidat);
-
   screenerPromise.then(function(screener) {
     if (!screener) return;
     const screenerPhoto = SCREENER_PHOTOS[screener] || '';
@@ -1448,10 +1471,8 @@ function _launchCelebration(seller, mimData, dayMimCount, weekMimCount) {
       ? `<img src="${screenerPhoto}" alt="${screener}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
          <div class="cel-avatar-fallback" style="display:none">${screener.charAt(0)}</div>`
       : `<div class="cel-avatar-fallback">${screener.charAt(0)}</div>`;
-
     const peopleRow = document.getElementById('cel-people-row');
     if (!peopleRow) return;
-
     const screenerDiv = document.createElement('div');
     screenerDiv.className = 'cel-person';
     screenerDiv.id = 'cel-person-screener';
@@ -1459,18 +1480,15 @@ function _launchCelebration(seller, mimData, dayMimCount, weekMimCount) {
       <div class="cel-avatar-ring screener">${screenerAvatarHtml}</div>
       <div class="cel-person-name">${screener}</div>`;
     peopleRow.appendChild(screenerDiv);
-
     // Trigger animation after DOM insert
     requestAnimationFrame(function() {
       screenerDiv.classList.add('animate-in');
     });
   });
-
   // === TIMELINE — 2s warmup buffer, then reveal ===
   // T=0: Video starts playing hidden (hardware decoder warming up)
   // T=2s: Overlay fades in with video already smooth
   const WARMUP = 2000;
-
   cTimeout(() => {
     bg.style.transition = 'opacity 0.5s ease';
     bg.style.opacity = '1';
@@ -1479,22 +1497,18 @@ function _launchCelebration(seller, mimData, dayMimCount, weekMimCount) {
     void overlay.offsetHeight;
     overlay.classList.add('active');
   }, WARMUP);
-
   // T=2.5s: Music
   cTimeout(() => playCelebrationSound(comboLevel), WARMUP + 500);
-
   // T=2.8s: Closer avatar reveals
   cTimeout(() => {
     const el = document.getElementById('cel-person-closer');
     if (el) el.classList.add('animate-in');
   }, WARMUP + 800);
-
   // T=3.5s: Deal card slides up
   cTimeout(() => {
     const el = document.getElementById('cel-deal-card');
     if (el) el.classList.add('show');
   }, WARMUP + 1500);
-
   // T=4.0s: Combo badge pops in
   if (comboText) {
     cTimeout(() => {
@@ -1502,29 +1516,22 @@ function _launchCelebration(seller, mimData, dayMimCount, weekMimCount) {
       if (el) { el.textContent = comboText; el.classList.add('show'); }
     }, WARMUP + 2000);
   }
-
   // T=32s: Auto-close (2s warmup + 30s visible = matches Thunderstruck length)
   cTimeout(() => clearCelebration(), WARMUP + 30000);
 }
-
 // Check for new MiM – only "Dato" (col 13) = today triggers celebration
 function checkForNewMiM() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const sheets = ['Data Input - William', 'Data Input - Jonas', 'Data Input - Andreas'];
-
+  const sheets = NAMES.map(n => 'Data Input - ' + n);
   const newMiMs = [];
-
   for (let i = 0; i < NAMES.length; i++) {
     const seller = NAMES[i];
     const rows = _rawData[sheets[i]] || [];
     const data = calcSellerArr(rows, today, today);
-
     _sellerMimToday[seller] = data.MiM;
-
     for (const mimRow of data.mimRows) {
       const key = `${seller}|${mimRow.kandidat}|${mimRow.virk}|${mimRow.dato}`;
-
       // Check ALL key fields are present BEFORE marking as seen
       const hasKandidat = mimRow.kandidat && mimRow.kandidat.trim();
       const hasVirk = mimRow.virk && mimRow.virk.trim();
@@ -1532,14 +1539,11 @@ function checkForNewMiM() {
       const hasTimelon = !isNaN(mimRow.timelon);
       const hasKostpris = !isNaN(mimRow.ks);
       const isComplete = hasKandidat && hasVirk && hasGF && hasTimelon && hasKostpris;
-
       // Incomplete rows are SKIPPED — not marked seen — so next refresh rechecks them
       if (!isComplete) continue;
-
       if (!_seenMiM.has(key)) {
         _seenMiM.add(key);
         newMiMs.push({ seller, mimData: mimRow, dayCount: _sellerMimToday[seller] });
-
         const logEntry = {
           time: new Date(),
           seller,
@@ -1557,17 +1561,14 @@ function checkForNewMiM() {
       }
     }
   }
-
   return newMiMs;
 }
-
 // Mark all current MiM as seen (on first load)
 function initializeMiMTracking() {
   _seenMiM.clear();
   _mimLog = [];
-  const sheets = ['Data Input - William', 'Data Input - Jonas', 'Data Input - Andreas'];
+  const sheets = NAMES.map(n => 'Data Input - ' + n);
   const todayStr = fmtDate(new Date());
-
   for (let i = 0; i < NAMES.length; i++) {
     const seller = NAMES[i];
     const rows = _rawData[sheets[i]] || [];
@@ -1576,12 +1577,10 @@ function initializeMiMTracking() {
       const r = rows[j];
       const g = v => v instanceof Date ? fmtDate(v) : String(v || '');
       const r13 = g(r[13]), r14 = g(r[14]), r15 = g(r[15]), r21 = g(r[21]);
-
       if (r15.trim() && r13.trim()) {
         if (!/startede aldrig/i.test(r21) && !/opsagt samme uge/i.test(r21)) {
           const key = `${seller}|${r14}|${r15}|${r13}`;
           _seenMiM.add(key);
-
           // Populate _mimLog with TODAY's existing MiM so they show in the log from boot
           const r13Date = parseDate(r13);
           if (r13Date && fmtDate(r13Date) === todayStr) {
@@ -1607,14 +1606,12 @@ function initializeMiMTracking() {
   }
   console.log('MiM tracking initialized | todayStr:', todayStr, '| entries found:', _mimLog.length, '| seenMiM:', _seenMiM.size);
 }
-
 function toggleSoundMuted() {
   _soundMuted = !_soundMuted;
   const btn = document.getElementById('sound-toggle');
   btn.textContent = _soundMuted ? '🔇' : '🔊';
   btn.classList.toggle('muted', _soundMuted);
 }
-
 // Cycle through combo levels on each test click
 let _testComboLevel = 0;
 let _testScreenerOverride = null;
@@ -1631,7 +1628,6 @@ function testCelebration() {
   // Clear override after launch so real celebrations use lookup
   setTimeout(() => { _testScreenerOverride = null; }, 2000);
 }
-
 // ═══════════════════════════════════════════════════════════
 // FETCH
 // ═══════════════════════════════════════════════════════════
@@ -1643,32 +1639,29 @@ async function loadAll(){
     const r=await fetch(APPS_SCRIPT_URL+'?cb='+Date.now());
     if(!r.ok) throw new Error('HTTP '+r.status);
     const json=await r.json();
-    ['Data Input - William','Data Input - Jonas','Data Input - Andreas','Budgetter'].forEach(n=>_rawData[n]=json[n]||[]);
-
+    NAMES.map(n=>'Data Input - '+n).concat(['Budgetter']).forEach(n=>_rawData[n]=json[n]||[]);
+    // Load individual targets from API response
+    if (json['Targets']) _targets = json['Targets'];
     // Screener lookup now handled via HR Dashboard API (findScreenerAsync)
-
     // 1) Build dynamic week ranges from data
     buildWeekRanges();
-
     // 2) Compute trend for every discovered week
-    const sheets=['Data Input - William','Data Input - Jonas','Data Input - Andreas'];
+    const sheets=NAMES.map(n=>'Data Input - '+n);
     for(const wn of ALL_WEEKS){
       const [ws,we]=WEEK_RANGES[wn];
       _trendData[wn]={};
       for(let i=0;i<NAMES.length;i++) _trendData[wn][NAMES[i]]=calcSellerArr(_rawData[sheets[i]],ws,we);
     }
-
     // 3) Parse ALL budget rows (not limited to specific weeks)
     _budgets={};
     const budRows=_rawData['Budgetter']||[];
     for(const r of budRows){
       const wn=parseInt(r[0]);
       if(!isNaN(wn)){
-        _budgets[wn]={ indiv:{KT:parseInt(r[1])||0,SS:parseInt(r[2])||0,Sam:parseInt(r[3])||0,MiM:parseInt(r[4])||0} };
-        _budgets[wn].team=Object.fromEntries(Object.entries(_budgets[wn].indiv).map(([k,v])=>[k,v*3]));
+        _budgets[wn]={ indiv:{KT:parseInt(r[1])||0,Sam:parseInt(r[3])||0,MiM:parseInt(r[4])||0} };
+        _budgets[wn].team=Object.fromEntries(Object.entries(_budgets[wn].indiv).map(([k,v])=>[k,v*NAMES.length]));
       }
     }
-
     // 4) MiM tracking: on first load mark all as seen, on subsequent loads detect & celebrate
     if (_firstLoad) {
       initializeMiMTracking(); // marks all existing MiM as "seen" – no false celebrations
@@ -1685,7 +1678,6 @@ async function loadAll(){
         processCelebrationQueue();
       }
     }
-
     // 5) Populate day-select – default to today
     const today=new Date(); today.setHours(0,0,0,0);
     const todayStr=fmtDate(today);
@@ -1697,7 +1689,6 @@ async function loadAll(){
       const isSel=ds===todayStr;
       return `<option value="${ds}"${isSel?' selected':''}>${dNames[d.getDay()]} ${ds}</option>`;
     }).join('');
-
     // 6) Populate week-select – default to current week
     const curWeek=isoWeek(today);
     const weeksDesc=[...ALL_WEEKS].reverse();
@@ -1707,7 +1698,6 @@ async function loadAll(){
     };
     document.getElementById('week-select').innerHTML=weeksDesc.map(wn=>`<option value="${wn}"${wn===curWeek?' selected':''}>${fmtW(wn)}</option>`).join('');
     document.getElementById('person-week-select').innerHTML=weeksDesc.map(wn=>`<option value="${wn}"${wn===curWeek?' selected':''}>Uge ${wn}</option>`).join('');
-
     // 7) Populate month-select – default to current month
     const curMonth=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`;
     const months=Object.keys(MONTH_RANGES).sort().reverse();
@@ -1716,21 +1706,17 @@ async function loadAll(){
       const [yr,mo]=mk.split('-').map(Number);
       return `<option value="${mk}"${mk===curMonth?' selected':''}>${mNames[mo]} ${yr}</option>`;
     }).join('');
-
     document.getElementById('last-updated').textContent='Opdateret: '+new Date().toLocaleTimeString('da-DK');
     document.getElementById('loading').style.display='none';
     switchTab(_currentTab);
-
     // Hent taletid fra Google Sheet
     fetchTaletid();
-
     // Dismiss splash preloader after first successful load
     const splash = document.getElementById('splash-preloader');
     if (splash) {
       splash.classList.add('fade-out');
       setTimeout(() => splash.remove(), 600);
     }
-
     // Pre-buffer celebration video: hidden, fully decoded, ready for instant playback
     if (!document.getElementById('celebration-video-preloaded')) {
       const pv = document.createElement('video');
@@ -1749,7 +1735,6 @@ async function loadAll(){
         }).catch(function() {});
       }, { once: true });
     }
-
   }catch(e){
     document.getElementById('loading').style.display='none';
     // Also dismiss splash on error so user sees the error message
@@ -1763,7 +1748,6 @@ async function loadAll(){
     console.error(e);
   }
 }
-
 // ═══════════════════════════════════════════════════════════
 // SILENT BACKGROUND REFRESH (no UI flicker)
 // ═══════════════════════════════════════════════════════════
@@ -1772,27 +1756,24 @@ async function silentRefresh() {
     const r = await fetch(APPS_SCRIPT_URL + '?cb=' + Date.now());
     if (!r.ok) return;
     const json = await r.json();
-    ['Data Input - William','Data Input - Jonas','Data Input - Andreas','Budgetter'].forEach(n => _rawData[n] = json[n] || []);
-
+    NAMES.map(n=>'Data Input - '+n).concat(['Budgetter']).forEach(n => _rawData[n] = json[n] || []);
+    if (json['Targets']) _targets = json['Targets'];
     buildWeekRanges();
-
-    const sheets = ['Data Input - William','Data Input - Jonas','Data Input - Andreas'];
+    const sheets = NAMES.map(n => 'Data Input - ' + n);
     for (const wn of ALL_WEEKS) {
       const [ws, we] = WEEK_RANGES[wn];
       _trendData[wn] = {};
       for (let i = 0; i < NAMES.length; i++) _trendData[wn][NAMES[i]] = calcSellerArr(_rawData[sheets[i]], ws, we);
     }
-
     _budgets = {};
     const budRows = _rawData['Budgetter'] || [];
     for (const br of budRows) {
       const wn = parseInt(br[0]);
       if (!isNaN(wn)) {
-        _budgets[wn] = { indiv: { KT: parseInt(br[1]) || 0, SS: parseInt(br[2]) || 0, Sam: parseInt(br[3]) || 0, MiM: parseInt(br[4]) || 0 } };
-        _budgets[wn].team = Object.fromEntries(Object.entries(_budgets[wn].indiv).map(([k, v]) => [k, v * 3]));
+        _budgets[wn] = { indiv: { KT: parseInt(br[1]) || 0, Sam: parseInt(br[3]) || 0, MiM: parseInt(br[4]) || 0 } };
+        _budgets[wn].team = Object.fromEntries(Object.entries(_budgets[wn].indiv).map(([k, v]) => [k, v * NAMES.length]));
       }
     }
-
     // MiM detection
     if (!_celebrationRunning) {
       const newMiMs = checkForNewMiM();
@@ -1802,16 +1783,15 @@ async function silentRefresh() {
       }
       processCelebrationQueue();
     }
-
     // Silent UI update — just re-render current tab + timestamp, no loading spinner
     document.getElementById('last-updated').textContent = 'Opdateret: ' + new Date().toLocaleTimeString('da-DK');
     switchTab(_currentTab);
-
+    // Update competition scores if visible
+    if (document.getElementById('comp-overlay')?.classList.contains('active')) renderCompetition();
   } catch (e) {
     console.warn('Silent refresh failed:', e);
   }
 }
-
 // ═══════════════════════════════════════════════════════════
 // TAB SWITCH
 // ═══════════════════════════════════════════════════════════
@@ -1826,13 +1806,11 @@ function switchTab(tab){
   if(tab==='maaned') renderMaaned();
   if(tab==='person') renderPerson();
 }
-
 // ═══════════════════════════════════════════════════════════
 // CHART HELPERS
 // ═══════════════════════════════════════════════════════════
 function mkChart(id,cfg){ if(_charts[id]) _charts[id].destroy(); _charts[id]=new Chart(document.getElementById(id),cfg); }
 const COP={plugins:{legend:{labels:{color:'#A499E2',font:{size:10}}}},scales:{x:{ticks:{color:'#757FBF'},grid:{color:'#272745'}},y:{ticks:{color:'#757FBF'},grid:{color:'#272745'}}}};
-
 // SVG progress ring helper — HUD-style with tick marks and outer decoration
 function ringSVG(pct, color, size=200, stroke=12){
   const cx=size/2, cy=size/2;
@@ -1862,7 +1840,6 @@ function ringSVG(pct, color, size=200, stroke=12){
       stroke-dasharray="${circ}" stroke-dashoffset="${offset}" stroke-width="${stroke}"/>
   </svg>`;
 }
-
 // ═══════════════════════════════════════════════════════════
 // DAGLIG RENDERER
 // ═══════════════════════════════════════════════════════════
@@ -1871,162 +1848,98 @@ function renderDaglig(){
   if(!ds) return;
   const d=parseDate(ds);
   const wn=weekForDate(d);
-  const bud=_budgets[wn]?.indiv||{KT:15,SS:3,Sam:13,MiM:7};
-  const dBud={KT:Math.ceil(bud.KT/5),SS:Math.ceil(bud.SS/5),Sam:Math.ceil(bud.Sam/5),MiM:Math.ceil(bud.MiM/5)};
-
   const dayNames=['Søndag','Mandag','Tirsdag','Onsdag','Torsdag','Fredag','Lørdag'];
   document.getElementById('period-label').textContent=`${dayNames[d.getDay()]} ${ds} · Dagligt mål · Live`;
-
-  const sheets=['Data Input - William','Data Input - Jonas','Data Input - Andreas'];
+  const sheets=NAMES.map(n=>'Data Input - '+n);
   const dayData={};
   for(let i=0;i<NAMES.length;i++) dayData[NAMES[i]]=calcSellerArr(_rawData[sheets[i]],d,d);
-
   // Hall of Fame / MiM Log
-  const logHTML = renderMimLog(d);
-  document.getElementById('mim-log-section').innerHTML = logHTML;
-
-  // Taletid panel
+  document.getElementById('mim-log-section').innerHTML = renderMimLog(d);
   renderTaletid();
-
-  // ── Individual cards: big ring + 4 bars (KT, SS, Samtaler, MiM) with % ──
+  // ── Individual cards: compact bar cards with index number (NO rings) ──
   document.getElementById('daily-cards').innerHTML=NAMES.map(name=>{
     const s=dayData[name];
-    const pctKT=idx(s.KT,dBud.KT), pctSS=idx(s.SS,dBud.SS), pctSam=idx(s.Samtaler,dBud.Sam), pctMiM=idx(s.MiM,dBud.MiM);
-    const avgPct=Math.round((pctKT+pctSS+pctSam+pctMiM)/4);
+    const tgt=getTarget(name, d);
+    const pctKT=idx(s.KT,tgt.KT), pctSam=idx(s.Samtaler,tgt.Samtaler), pctMiM=idx(s.MiM,tgt.MIM);
+    const avgPct=Math.round((pctKT+pctSam+pctMiM)/3);
     const color=COLORS[name];
     const isGold=avgPct>=126;
-
     function bar(label,actual,target,pct){
       const cc=barColorClass(pct);
       const rc=ringColor(pct);
       return `<div class="bar-row">
         <div class="bar-header">
           <span class="bar-label">${label}</span>
-          <span class="bar-val">${actual} / ${target} <span class="bar-pct" style="color:${rc}">${pct}%</span></span>
+          <span class="bar-val">${actual}/${target} <span class="bar-pct" style="color:${rc}">${pct}%</span></span>
         </div>
         <div class="bar-track"><div class="bar-fill ${cc}" style="width:${Math.min(pct,100)}%"></div></div>
       </div>`;
     }
-
     return `<div class="${isGold?'daily-card state-gold':'daily-card'}">
       <div class="daily-name" style="color:${color}">${name}</div>
-      <div class="ring-wrap">
-        ${ringSVG(avgPct, ringColor(avgPct), 180, 12)}
-        <div class="ring-center">
-          <div class="ring-pct" style="color:${ringColor(avgPct)}">${avgPct}%</div>
-          <div class="ring-label">Samlet index</div>
-        </div>
-      </div>
+      <div class="daily-index-num" style="color:${ringColor(avgPct)}">${avgPct}%</div>
+      <div class="daily-index-label">Samlet index</div>
       <div class="daily-bars">
-        ${bar('KT', s.KT, dBud.KT, pctKT)}
-        ${bar('SS', s.SS, dBud.SS, pctSS)}
-        ${bar('Samtaler', s.Samtaler, dBud.Sam, pctSam)}
-        ${bar('MiM', s.MiM, dBud.MiM, pctMiM)}
-        ${s.gnsGF!==null?`<div style="margin-top:8px;font-size:11px;color:#94a3b8">GF: ${s.gnsGF.toFixed(3)}${s.gnsGF<1.90?' <span class="tag-low">↓ lav</span>':' <span style="color:var(--green)">✓</span>'}</div>`:''}
+        ${bar('KT', s.KT, tgt.KT, pctKT)}
+        ${bar('Samtaler', s.Samtaler, tgt.Samtaler, pctSam)}
+        ${bar('MiM', s.MiM, tgt.MIM, pctMiM)}
+        ${s.gnsGF!==null?`<div style="margin-top:8px;font-size:12px;font-weight:700;color:${s.gnsGF<1.90?'var(--yellow)':'var(--green)'}">GF ${s.gnsGF.toFixed(3)} ${s.gnsGF<1.90?'<span class="tag-low">↓ lav</span>':'✓'}</div>`:''}
       </div>
     </div>`;
   }).join('');
-
-  // ── Team donuts: KT, Samtaler, MiM ──
-  const tKT=NAMES.reduce((s,n)=>s+dayData[n].KT,0), tSS=NAMES.reduce((s,n)=>s+dayData[n].SS,0);
-  const tSam=NAMES.reduce((s,n)=>s+dayData[n].Samtaler,0), tMiM=NAMES.reduce((s,n)=>s+dayData[n].MiM,0);
-  const tBud={KT:dBud.KT*3,SS:dBud.SS*3,Sam:dBud.Sam*3,MiM:dBud.MiM*3};
+  // ── Team donuts: KT, Samtaler, MiM (3 only, no SS) ──
+  const tKT=NAMES.reduce((s,n)=>s+dayData[n].KT,0);
+  const tSam=NAMES.reduce((s,n)=>s+dayData[n].Samtaler,0);
+  const tMiM=NAMES.reduce((s,n)=>s+dayData[n].MiM,0);
+  // Team targets = sum of individual targets for this day
+  const tTgt={KT:0,Samtaler:0,MIM:0};
+  NAMES.forEach(n=>{const t=getTarget(n,d);tTgt.KT+=t.KT;tTgt.Samtaler+=t.Samtaler;tTgt.MIM+=t.MIM;});
   const teamMetrics=[
-    {l:'KT',v:tKT,m:tBud.KT},
-    {l:'Samtaler',v:tSam,m:tBud.Sam},
-    {l:'MiM',v:tMiM,m:tBud.MiM}
+    {l:'KT',v:tKT,m:tTgt.KT},
+    {l:'Samtaler',v:tSam,m:tTgt.Samtaler},
+    {l:'MiM',v:tMiM,m:tTgt.MIM}
   ];
   document.getElementById('daily-team-donuts').innerHTML=teamMetrics.map(k=>{
     const i=idx(k.v,k.m);
+    const rc=ringColor(i);
     return `<div class="daily-team-card">
-      <div class="daily-team-card-title">${k.l}</div>
-      <div class="ring-sm">
-        ${ringSVG(i, ringColor(i), 140, 10)}
-        <div class="ring-center">
-          <div class="ring-pct" style="color:${ringColor(i)}">${k.v}</div>
-          <div class="ring-label">AF ${k.m}</div>
+      <div class="ring-sm" style="position:relative;width:140px;height:140px;margin:0 auto 8px">
+        ${ringSVG(i, rc, 140, 10)}
+        <div style="position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+          <div style="font-size:32px;font-weight:900;color:${rc};font-variant-numeric:tabular-nums;text-shadow:0 0 15px ${rc}66">${k.v}</div>
+          <div style="font-size:11px;font-weight:600;color:var(--dim);margin-top:-2px">AF ${k.m}</div>
         </div>
       </div>
-      <div style="font-size:18px;font-weight:900;margin-top:8px;color:${ringColor(i)};font-variant-numeric:tabular-nums">${i}%</div>
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:2px;color:var(--dim)">${k.l}</div>
+      <div style="font-size:18px;font-weight:900;color:${rc};margin-top:2px">${i}%</div>
     </div>`;
   }).join('');
-
-  // ── Comparison table: scannable, clean ──
-  const headers=['<th>Metric</th>',...NAMES.map(n=>`<th style="color:${COLORS[n]}">${n}</th>`),'<th>Team</th>','<th>Mål</th>'].join('');
-  const metrics=[
-    {l:'KT',k:'KT',bk:'KT',tV:tKT,tM:tBud.KT},
-    {l:'SS',k:'SS',bk:'SS',tV:tSS,tM:tBud.SS},
-    {l:'Samtaler',k:'Samtaler',bk:'Sam',tV:tSam,tM:tBud.Sam},
-    {l:'MiM',k:'MiM',bk:'MiM',tV:tMiM,tM:tBud.MiM},
-  ];
-  const trows=metrics.map(m=>{
-    const tPct=idx(m.tV,m.tM);
-    const cells=NAMES.map(n=>{
-      const v=dayData[n][m.k];
-      const t=dBud[m.bk];
-      const p=idx(v,t);
-      const c=ringColor(p);
-      const bc=barColorClass(p);
-      return `<td>
-        <div class="compare-val" style="color:${c}">${v}</div>
-        <div class="compare-target">mål ${t} · ${p}%</div>
-        <div class="compare-bar-wrap"><div class="compare-bar-track"><div class="compare-bar-fill ${bc}" style="width:${Math.min(p,100)}%"></div></div></div>
-      </td>`;
-    }).join('');
-    const tc=ringColor(tPct);
-    const tbc=barColorClass(tPct);
-    return `<tr><td>${m.l}</td>${cells}
-      <td><div class="compare-val" style="color:${tc}">${m.tV}</div><div class="compare-target">mål ${m.tM} · ${tPct}%</div>
-      <div class="compare-bar-wrap"><div class="compare-bar-track"><div class="compare-bar-fill ${tbc}" style="width:${Math.min(tPct,100)}%"></div></div></div></td>
-      <td style="color:var(--dimmer);font-size:13px;font-weight:700">${m.tM}</td></tr>`;
-  });
-  // GF row
-  const allGF=NAMES.flatMap(n=>dayData[n].mimRows.filter(r=>!isNaN(r.gf)).map(r=>r.gf));
-  const teamGF=allGF.length?allGF.reduce((a,b)=>a+b,0)/allGF.length:null;
-  const gfCells=NAMES.map(n=>{
-    const g=dayData[n].gnsGF;
-    const low=dayData[n].lowGF;
-    const c=g!==null?(g<1.90?'var(--yellow)':'var(--green)'):'var(--dim)';
-    return `<td><div class="compare-val" style="color:${c};font-size:15px">${g!==null?g.toFixed(3):'—'}</div>${low>0?'<div class="compare-target" style="color:var(--yellow)">'+low+' lav</div>':''}</td>`;
-  }).join('');
-  trows.push(`<tr><td>GF gns</td>${gfCells}<td><div class="compare-val" style="font-size:15px;color:${teamGF!==null?(teamGF<1.90?'var(--yellow)':'var(--green)'):'var(--dim)'}">${teamGF!==null?teamGF.toFixed(3):'—'}</div></td><td style="color:var(--dimmer);font-size:11px">≥ 1,900</td></tr>`);
-
-  const compareEl = document.getElementById('daily-compare');
-  if (compareEl) compareEl.innerHTML=`<thead><tr>${headers}</tr></thead><tbody>${trows.join('')}</tbody>`;
-
 }
-
 // ═══════════════════════════════════════════════════════════
 // TALETID
 // ═══════════════════════════════════════════════════════════
-
 function renderTaletid() {
   const el = document.getElementById('taletid-bars');
   if (!_taletidData) {
     el.innerHTML = '<span style="color:var(--dim);font-size:12px">Henter taletid...</span>';
     return;
   }
-
   if (_taletidData.error) {
     el.innerHTML = '<span style="color:var(--yellow);font-size:12px">Fejl: ' + _taletidData.error + '</span>';
     return;
   }
-
   // Find max for scaling + who has crown
-  const sellers = ['Jonas', 'William', 'Andreas'];
+  const sellers = NAMES;
   let maxSecs = TALETID_TARGET_SECS; // minimum scale = target
   let crownName = '';
   let crownSecs = 0;
-
   sellers.forEach(n => {
     const secs = _taletidData[n] ? _taletidData[n].seconds : 0;
     if (secs > maxSecs) maxSecs = secs;
     if (secs > crownSecs) { crownSecs = secs; crownName = n; }
   });
-
   const scaleMax = maxSecs * 1.15; // 15% headroom
   const targetPct = (TALETID_TARGET_SECS / scaleMax) * 100;
-
   el.innerHTML = sellers.map(name => {
     const secs = _taletidData[name] ? _taletidData[name].seconds : 0;
     const formatted = _taletidData[name] ? _taletidData[name].formatted : '0t 00m 00s';
@@ -2034,20 +1947,18 @@ function renderTaletid() {
     const isOver = secs >= TALETID_TARGET_SECS;
     const isCrown = name === crownName && crownSecs > 0;
     const color = COLORS[name] || '#fff';
-
     return `<div class="taletid-row">
       <div class="taletid-name" style="color:${color}">${name}${isCrown ? ' <span class="taletid-crown">👑</span>' : ''}</div>
       <div class="taletid-bar-wrap">
         <div class="taletid-bar-track">
-          <div class="taletid-bar-fill ${isOver ? 'over-target' : 'under-target'}" style="width:${Math.min(pct, 100)}%"></div>
+          <div class="taletid-bar-fill" style="width:${Math.min(pct, 100)}%;background:linear-gradient(90deg, ${color}BB, ${color});box-shadow:0 0 10px ${color}66;border-radius:7px"></div>
           <div class="taletid-target-line" style="left:${targetPct}%"></div>
         </div>
       </div>
-      <div class="taletid-time" style="color:${isOver ? 'var(--cyan)' : 'var(--yellow)'}">${formatted}</div>
+      <div class="taletid-time" style="color:${isOver ? color : 'var(--dimmer)'}">${formatted}</div>
     </div>`;
   }).join('');
 }
-
 async function fetchTaletid() {
   try {
     const resp = await fetch(TALETID_URL + '?cb=' + Date.now());
@@ -2064,31 +1975,26 @@ async function fetchTaletid() {
   }
   renderTaletid();
 }
-
 // Hall of Fame renderer
 function renderMimLog(date) {
   const dateStr = fmtDate(date);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const isToday = fmtDate(today) === dateStr;
-
   const todaysLogs = _mimLog.filter(entry => {
     const entryDate = new Date(entry.time);
     entryDate.setHours(0, 0, 0, 0);
     return fmtDate(entryDate) === dateStr;
   });
-
   if (todaysLogs.length === 0) {
     return `<div class="mim-log-title">Dagens MiM Log 🏆</div>
       <div class="mim-log-empty"><span class="pulse-dot"></span>Ingen MiM endnu i dag</div>`;
   }
-
   const cards = todaysLogs.map(entry => {
     const timeStr = entry.time.toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' });
     const screenerTag = entry.screener
       ? `<span class="mim-log-tag" style="background:rgba(130,252,224,0.1); color:#82FCE0; border-color:rgba(130,252,224,0.25);">Screener: ${entry.screener}</span>`
       : '';
-
     return `<div class="mim-log-card">
       <div class="mim-log-seller" style="color:${COLORS[entry.seller]}">${entry.seller}</div>
       <div class="mim-log-candidate"><strong>${entry.candidate}</strong></div>
@@ -2099,14 +2005,12 @@ function renderMimLog(date) {
       </div>
     </div>`;
   }).join('');
-
   // Maks 4 synlige, roterer hvis flere
   const maxVisible = 4;
   if (todaysLogs.length <= maxVisible) {
     return `<div class="mim-log-title">Dagens MiM Log 🏆</div>
       <div class="mim-log-grid">${cards}</div>`;
   }
-
   // Rotation: vis 4 ad gangen, skift hvert 5. sekund
   if (!window._mimRotateIdx) window._mimRotateIdx = 0;
   const allCards = todaysLogs.map(entry => {
@@ -2124,13 +2028,11 @@ function renderMimLog(date) {
       </div>
     </div>`;
   });
-
   const start = window._mimRotateIdx % allCards.length;
   const visible = [];
   for (let i = 0; i < maxVisible; i++) {
     visible.push(allCards[(start + i) % allCards.length]);
   }
-
   // Auto-rotate timer
   clearInterval(window._mimRotateTimer);
   window._mimRotateTimer = setInterval(() => {
@@ -2138,23 +2040,20 @@ function renderMimLog(date) {
     const logEl = document.getElementById('mim-log-section');
     if (logEl) logEl.innerHTML = renderMimLog(date);
   }, 5000);
-
   return `<div class="mim-log-title">Dagens MiM Log 🏆 <span style="font-size:10px;color:var(--dim);font-weight:400">${todaysLogs.length} total</span></div>
     <div class="mim-log-grid">${visible.join('')}</div>`;
 }
-
 // ═══════════════════════════════════════════════════════════
 // SHARED RENDERERS
 // ═══════════════════════════════════════════════════════════
 function buildTeamKpis(w,bud,elId){
-  const t={KT:NAMES.reduce((s,n)=>s+w[n].KT,0),SS:NAMES.reduce((s,n)=>s+w[n].SS,0),Sam:NAMES.reduce((s,n)=>s+w[n].Samtaler,0),MiM:NAMES.reduce((s,n)=>s+w[n].MiM,0)};
+  const t={KT:NAMES.reduce((s,n)=>s+w[n].KT,0),Sam:NAMES.reduce((s,n)=>s+w[n].Samtaler,0),MiM:NAMES.reduce((s,n)=>s+w[n].MiM,0)};
   const aGF=NAMES.flatMap(n=>w[n].mimRows.filter(r=>!isNaN(r.gf)).map(r=>r.gf));
   const aKS=NAMES.flatMap(n=>w[n].mimRows.filter(r=>!isNaN(r.ks)).map(r=>r.ks));
   t.gnsGF=aGF.length?aGF.reduce((a,b)=>a+b,0)/aGF.length:null;
   t.lowGF=NAMES.reduce((s,n)=>s+w[n].lowGF,0);
   const data=[
     {l:'KT',v:t.KT,m:bud.team.KT,sub:`Mål: ${bud.team.KT}`},
-    {l:'SS',v:t.SS,m:bud.team.SS,sub:`Mål: ${bud.team.SS} · ${t.KT?Math.round(t.SS/t.KT*100):0}% af KT`},
     {l:'Samtaler',v:t.Sam,m:bud.team.Sam,sub:`Mål: ${bud.team.Sam}`},
     {l:'MiM',v:t.MiM,m:bud.team.MiM,sub:`Mål: ${bud.team.MiM}`},
     {l:'Gns GF',v:fmt(t.gnsGF,3),m:null,sub:`Lav: ${t.lowGF}/${aGF.length}`},
@@ -2165,11 +2064,10 @@ function buildTeamKpis(w,bud,elId){
     return `<div class="kpi-card"><div class="kpi-label">${k.l}</div><div class="kpi-val">${k.v}</div><div class="kpi-sub">${k.sub}</div>${ih}</div>`;
   }).join('');
 }
-
 function buildSellerCards(w,wp,bud,elId){
   document.getElementById(elId).innerHTML=NAMES.map(name=>{
     const s=w[name],sp=wp?wp[name]:null,bi=bud.indiv;
-    const kpis=[{l:'KT',v:s.KT,p:sp?.KT,m:bi.KT},{l:'SS',v:s.SS,p:sp?.SS,m:bi.SS},{l:'Samtaler',v:s.Samtaler,p:sp?.Samtaler,m:bi.Sam},{l:'MiM',v:s.MiM,p:sp?.MiM,m:bi.MiM}];
+    const kpis=[{l:'KT',v:s.KT,p:sp?.KT,m:bi.KT},{l:'Samtaler',v:s.Samtaler,p:sp?.Samtaler,m:bi.Sam},{l:'MiM',v:s.MiM,p:sp?.MiM,m:bi.MiM}];
     const rows=kpis.map(k=>`<div class="seller-kpi"><span class="seller-kpi-label">${k.l}</span><div class="seller-kpi-right"><span class="seller-kpi-val">${k.v}/${k.m}</span>${idxBadge(idx(k.v,k.m))}${k.p!==undefined?delta(k.v,k.p):''}</div></div>`).join('');
     const gf=s.gnsGF!==null?s.gnsGF.toFixed(3):'—';
     const gfD=sp?deltaF(s.gnsGF,sp.gnsGF):'';
@@ -2179,7 +2077,6 @@ function buildSellerCards(w,wp,bud,elId){
       <div class="seller-kpi"><span class="seller-kpi-label">Lav GF</span><div class="seller-kpi-right">${low}</div></div></div>`;
   }).join('');
 }
-
 function buildMimDetails(w,elId,title,tElId){
   if(tElId) document.getElementById(tElId).textContent=title;
   document.getElementById(elId).innerHTML=NAMES.filter(n=>w[n].MiM>0).map(name=>{
@@ -2190,7 +2087,6 @@ function buildMimDetails(w,elId,title,tElId){
     return `<div class="card"><div class="card-title" style="color:${COLORS[name]}">${name} · ${w[name].MiM} MiM</div><table class="mim-table"><thead><tr><th>Dato</th><th>Kandidat</th><th>Virksomhed</th><th>GF</th><th>KS</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   }).join('');
 }
-
 // ═══════════════════════════════════════════════════════════
 // UGE RENDERER
 // ═══════════════════════════════════════════════════════════
@@ -2198,37 +2094,31 @@ function renderUge(){
   const wn=parseInt(document.getElementById('week-select').value);
   const w=_trendData[wn], wp=_trendData[wn-1];
   if(!w) return;
-  const bud=_budgets[wn]||{indiv:{KT:15,SS:3,Sam:13,MiM:7},team:{KT:45,SS:9,Sam:39,MiM:21}};
+  const bud=_budgets[wn]||{indiv:{KT:15,Sam:13,MiM:7},team:{KT:75,Sam:65,MiM:35}};
   const wLabel=WEEK_LABELS[wn]||`Uge ${wn}`;
   document.getElementById('period-label').textContent=wLabel+' · Live';
   buildTeamKpis(w,bud,'team-kpis');
   buildSellerCards(w,wp,bud,'seller-cards');
   buildMimDetails(w,'mim-details',`MiM-detaljer – ${wLabel}`,'mim-details-title');
-
   const wks=ALL_WEEKS.filter(w=>_trendData[w]), labels=wks.map(w=>`U${w}`);
   // KT + SS combined stacked chart
   mkChart('ktChart',{type:'bar',data:{labels,datasets:[
-    ...NAMES.map(n=>({label:n+' KT',data:wks.map(w=>_trendData[w][n].KT),backgroundColor:COLORS[n]+'BB',borderRadius:4,stack:'KT-'+n})),
-    ...NAMES.map(n=>({label:n+' SS',data:wks.map(w=>_trendData[w][n].SS),backgroundColor:COLORS[n]+'44',borderRadius:4,stack:'KT-'+n})),
+    ...NAMES.map(n=>({label:n,data:wks.map(w=>_trendData[w][n].KT),backgroundColor:COLORS[n]+'BB',borderRadius:4})),
     {label:'Mål KT',type:'line',data:wks.map(w=>(_budgets[w]?.indiv.KT??15)),borderColor:COLORS.maal,borderDash:[6,3],pointRadius:3}
-  ]},options:{...COP,responsive:true,plugins:{legend:{labels:{color:'#94a3b8',font:{size:9},filter:item=>!item.text.includes('SS')}}},scales:{...COP.scales,x:{stacked:false,...COP.scales.x}}}});
-
+  ]},options:{...COP,responsive:true}});
   mkChart('mimChart',{type:'line',data:{labels,datasets:[
     ...NAMES.map(n=>({label:n,data:wks.map(w=>_trendData[w][n].MiM),borderColor:COLORS[n],backgroundColor:COLORS[n]+'22',tension:0.3,pointRadius:5,fill:true})),
     {label:'Mål',data:wks.map(w=>(_budgets[w]?.indiv.MiM??5)),borderColor:COLORS.maal,borderDash:[6,3],pointRadius:3,tension:0}
   ]},options:{...COP,responsive:true}});
-
   mkChart('samChart',{type:'bar',data:{labels,datasets:[
     ...NAMES.map(n=>({label:n,data:wks.map(w=>_trendData[w][n].Samtaler),backgroundColor:COLORS[n]+'BB',borderRadius:4})),
     {label:'Mål',type:'line',data:wks.map(w=>(_budgets[w]?.indiv.Sam??13)),borderColor:COLORS.maal,borderDash:[6,3],pointRadius:3}
   ]},options:{...COP,responsive:true}});
-
   mkChart('gfChart',{type:'line',data:{labels,datasets:[
     ...NAMES.filter(n=>wks.some(w=>_trendData[w][n].gnsGF)).map(n=>({label:n,data:wks.map(w=>_trendData[w][n].gnsGF),borderColor:COLORS[n],tension:0.3,pointRadius:5,spanGaps:true})),
     {label:'Floor 1,90',data:wks.map(()=>1.90),borderColor:COLORS.floor,borderDash:[6,3],pointRadius:0,borderWidth:1.5}
   ]},options:{...COP,responsive:true,scales:{x:{ticks:{color:'#64748b'},grid:{color:'#151825'}},y:{min:1.82,max:2.05,ticks:{color:'#64748b',callback:v=>v.toFixed(2)},grid:{color:'#151825'}}}}});
 }
-
 // ═══════════════════════════════════════════════════════════
 // MÅNED RENDERER
 // ═══════════════════════════════════════════════════════════
@@ -2239,27 +2129,24 @@ function renderMaaned(){
   const [mYr,mMo]=mk.split('-').map(Number);
   const ml=`${mNames[mMo]} ${mYr}`;
   document.getElementById('period-label').textContent=ml+' · Live';
-  const sheets=['Data Input - William','Data Input - Jonas','Data Input - Andreas'];
+  const sheets=NAMES.map(n=>'Data Input - '+n);
   const mw={};
   for(let i=0;i<NAMES.length;i++) mw[NAMES[i]]=calcSellerArr(_rawData[sheets[i]],ms,me);
-  const bI=wim.reduce((a,wn)=>{const b=_budgets[wn]?.indiv||{};a.KT+=b.KT||0;a.SS+=b.SS||0;a.Sam+=b.Sam||0;a.MiM+=b.MiM||0;return a;},{KT:0,SS:0,Sam:0,MiM:0});
-  const mBud={indiv:bI,team:Object.fromEntries(Object.entries(bI).map(([k,v])=>[k,v*3]))};
+  const bI=wim.reduce((a,wn)=>{const b=_budgets[wn]?.indiv||{};a.KT+=b.KT||0;a.Sam+=b.Sam||0;a.MiM+=b.MiM||0;return a;},{KT:0,Sam:0,MiM:0});
+  const mBud={indiv:bI,team:Object.fromEntries(Object.entries(bI).map(([k,v])=>[k,v*NAMES.length]))};
   buildTeamKpis(mw,mBud,'month-team-kpis');
   buildSellerCards(mw,null,mBud,'month-seller-cards');
   buildMimDetails(mw,'month-mim-details',`MiM-detaljer – ${ml}`,'month-mim-title');
-
   const wks=wim.filter(w=>_trendData[w]), labels=wks.map(w=>WEEK_LABELS[w]);
   mkChart('monthMimChart',{type:'line',data:{labels,datasets:[
     ...NAMES.map(n=>({label:n,data:wks.map(w=>_trendData[w][n].MiM),borderColor:COLORS[n],backgroundColor:COLORS[n]+'22',tension:0.3,pointRadius:5,fill:true})),
     {label:'Mål',data:wks.map(w=>(_budgets[w]?.indiv.MiM??5)),borderColor:COLORS.maal,borderDash:[6,3],pointRadius:3}
   ]},options:{...COP,responsive:true}});
   mkChart('monthKtChart',{type:'bar',data:{labels,datasets:[
-    ...NAMES.map(n=>({label:n+' KT',data:wks.map(w=>_trendData[w][n].KT),backgroundColor:COLORS[n]+'BB',borderRadius:4})),
-    ...NAMES.map(n=>({label:n+' SS',data:wks.map(w=>_trendData[w][n].SS),backgroundColor:COLORS[n]+'44',borderRadius:4})),
+    ...NAMES.map(n=>({label:n,data:wks.map(w=>_trendData[w][n].KT),backgroundColor:COLORS[n]+'BB',borderRadius:4})),
     {label:'Mål KT',type:'line',data:wks.map(w=>(_budgets[w]?.indiv.KT??15)),borderColor:COLORS.maal,borderDash:[6,3],pointRadius:3}
-  ]},options:{...COP,responsive:true,plugins:{legend:{labels:{color:'#94a3b8',font:{size:9},filter:item=>!item.text.includes('SS')}}}}});
+  ]},options:{...COP,responsive:true}});
 }
-
 // ═══════════════════════════════════════════════════════════
 // PERSON RENDERER
 // ═══════════════════════════════════════════════════════════
@@ -2268,18 +2155,16 @@ function renderPerson(){
   const sw=parseInt(document.getElementById('person-week-select').value);
   const color=COLORS[name];
   document.getElementById('period-label').textContent=`${name} · Personligt dashboard · Live`;
-
-  const wCur=_trendData[sw]?.[name], bud=_budgets[sw]?.indiv||{KT:15,SS:3,Sam:13,MiM:7};
+  const wCur=_trendData[sw]?.[name], bud=_budgets[sw]?.indiv||{KT:15,Sam:13,MiM:7};
   const heroIdx=wCur?Math.round((wCur.KT+wCur.MiM)/(bud.KT+bud.MiM)*100):0;
   document.getElementById('person-hero').innerHTML=`<div class="person-hero">
     <div class="person-avatar" style="background:${color}22;color:${color}">${name[0]}</div>
     <div><div class="person-hero-name" style="color:${color}">${name}</div>
     <div class="person-hero-sub">U${sw} samlet index: ${idxBadge(heroIdx)}</div>
-    <div class="person-hero-sub" style="margin-top:4px">${wCur?`MiM: ${wCur.MiM} · KT: ${wCur.KT} (SS: ${wCur.SS}) · Samtaler: ${wCur.Samtaler} · GF: ${wCur.gnsGF?.toFixed(3)||'—'}`:'Ingen data'}</div></div></div>`;
-
+    <div class="person-hero-sub" style="margin-top:4px">${wCur?`MiM: ${wCur.MiM} · KT: ${wCur.KT} · Samtaler: ${wCur.Samtaler} · GF: ${wCur.gnsGF?.toFixed(3)||'—'}`:'Ingen data'}</div></div></div>`;
   const wks=ALL_WEEKS.filter(w=>_trendData[w]?.[name]);
   const headers=['<th>KPI</th>',...wks.map(w=>`<th style="color:${w===sw?color:'var(--dim)'}">${w===sw?'▸ ':''}U${w}</th>`),'<th>Total</th>'].join('');
-  const metrics=[{k:'KT',l:'KT',b:'KT',f:false},{k:'SS',l:'SS',b:'SS',f:false},{k:'Samtaler',l:'Samtaler',b:'Sam',f:false},{k:'MiM',l:'MiM',b:'MiM',f:false},{k:'gnsGF',l:'Gns GF',b:null,f:true}];
+  const metrics=[{k:'KT',l:'KT',b:'KT',f:false},{k:'Samtaler',l:'Samtaler',b:'Sam',f:false},{k:'MiM',l:'MiM',b:'MiM',f:false},{k:'gnsGF',l:'Gns GF',b:null,f:true}];
   const trows=metrics.map(m=>{
     const vals=wks.map(w=>_trendData[w][name][m.k]);
     const total=m.f?(vals.filter(v=>v!==null).length?(vals.filter(v=>v!==null).reduce((a,b)=>a+b,0)/vals.filter(v=>v!==null).length).toFixed(3):'—'):vals.reduce((a,b)=>a+(b||0),0);
@@ -2292,7 +2177,6 @@ function renderPerson(){
     return `<tr><td>${m.l}</td>${cells}<td style="font-weight:800;color:${color}">${m.f?(total==='—'?'—':total):total}</td></tr>`;
   });
   document.getElementById('person-week-table').innerHTML=`<thead><tr>${headers}</tr></thead><tbody>${trows.join('')}</tbody>`;
-
   const labels=wks.map(w=>`U${w}`);
   mkChart('personMimChart',{type:'line',data:{labels,datasets:[
     {label:'MiM',data:wks.map(w=>_trendData[w][name].MiM),borderColor:color,backgroundColor:color+'22',tension:0.3,pointRadius:5,fill:true},
@@ -2300,14 +2184,12 @@ function renderPerson(){
   ]},options:{...COP,responsive:true}});
   mkChart('personKtChart',{type:'bar',data:{labels,datasets:[
     {label:'KT',data:wks.map(w=>_trendData[w][name].KT),backgroundColor:color+'BB',borderRadius:4},
-    {label:'SS',data:wks.map(w=>_trendData[w][name].SS),backgroundColor:color+'44',borderRadius:4},
     {label:'Mål',type:'line',data:wks.map(w=>_budgets[w]?.indiv.KT??15),borderColor:COLORS.maal,borderDash:[6,3],pointRadius:3}
   ]},options:{...COP,responsive:true}});
   mkChart('personGfChart',{type:'line',data:{labels,datasets:[
     {label:'GF',data:wks.map(w=>_trendData[w][name].gnsGF),borderColor:color,tension:0.3,pointRadius:5,spanGaps:true},
     {label:'Floor 1,90',data:wks.map(()=>1.90),borderColor:COLORS.floor,borderDash:[6,3],pointRadius:0,borderWidth:1.5}
   ]},options:{...COP,responsive:true,scales:{x:{ticks:{color:'#64748b'},grid:{color:'#151825'}},y:{min:1.82,max:2.05,ticks:{color:'#64748b',callback:v=>v.toFixed(2)},grid:{color:'#151825'}}}}});
-
   const wSel=_trendData[sw]?.[name];
   document.getElementById('person-mim-title').textContent=`MiM-detaljer – ${name} · Uge ${sw}`;
   if(wSel&&wSel.MiM>0){
@@ -2322,24 +2204,238 @@ function renderPerson(){
 }
 
 // ═══════════════════════════════════════════════════════════
+// F1 COMPETITION OVERLAY SYSTEM
+// ═══════════════════════════════════════════════════════════
+function carSVG(c){
+  return `<svg viewBox="-2 22 68 20" xmlns="http://www.w3.org/2000/svg">
+    <path d="M5 38 Q2 38 2 36 L2 34 Q2 32 5 32 L18 31 Q22 28 30 26 L42 25 Q50 25 54 27 L58 29 Q62 30 62 33 L62 36 Q62 38 59 38 Z" fill="${c}" opacity="0.9"/>
+    <path d="M20 31 Q24 28 30 27 L38 26 Q32 28 28 31 Z" fill="rgba(255,255,255,0.25)"/>
+    <ellipse cx="16" cy="38" rx="5" ry="5" fill="#222"/><ellipse cx="16" cy="38" rx="3" ry="3" fill="#555"/>
+    <ellipse cx="50" cy="38" rx="5" ry="5" fill="#222"/><ellipse cx="50" cy="38" rx="3" ry="3" fill="#555"/>
+    <rect x="54" y="30" width="6" height="2" rx="1" fill="${c}" opacity="0.7"/>
+    <rect x="4" y="33" width="3" height="1.5" rx="0.5" fill="rgba(255,255,255,0.4)"/>
+  </svg>`;
+}
+
+// Competition players: All sellers + screeners. Ali appears once with combined score.
+function getCompetitionPlayers() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const sheets = NAMES.map(n => 'Data Input - ' + n);
+  // Seller MiM counts for today
+  const sellerMiM = {};
+  for (let i = 0; i < NAMES.length; i++) {
+    const data = calcSellerArr(_rawData[sheets[i]], today, today);
+    sellerMiM[NAMES[i]] = data.MiM;
+  }
+  // Screener MiM counts (from _mimLog)
+  const screenerMiM = {};
+  SCREENER_NAMES.forEach(n => screenerMiM[n] = 0);
+  _mimLog.forEach(entry => {
+    if (entry.screener && SCREENER_NAMES.includes(entry.screener)) {
+      screenerMiM[entry.screener]++;
+    }
+  });
+  // Build player list: sellers get seller MiM, screeners (non-sellers) get screener MiM
+  // Ali gets BOTH (seller MiM + screener MiM)
+  const players = [];
+  const seen = new Set();
+  // Add all sellers
+  NAMES.forEach(n => {
+    let score = sellerMiM[n] || 0;
+    // If also a screener, add screener MiM
+    if (SCREENER_NAMES.includes(n)) score += (screenerMiM[n] || 0);
+    players.push({
+      id: n,
+      score,
+      color: COLORS[n] || '#fff',
+      photo: GITHUB_PHOTOS[n] || SCREENER_PHOTOS[n] || ''
+    });
+    seen.add(n);
+  });
+  // Add screeners who are NOT sellers
+  SCREENER_NAMES.forEach(n => {
+    if (seen.has(n)) return;
+    players.push({
+      id: n,
+      score: screenerMiM[n] || 0,
+      color: SCREENER_COLORS[n] || '#fff',
+      photo: SCREENER_PHOTOS[n] || ''
+    });
+  });
+  // Apply manual score offsets from admin panel
+  players.forEach(p => {
+    const offset = (_compScoreOffsets[p.id] || 0);
+    p.score = Math.max(0, p.score + offset);
+  });
+  // Sort by score desc
+  players.sort((a, b) => b.score - a.score);
+  return players;
+}
+
+function renderCompetition() {
+  const grid = document.getElementById('comp-grid');
+  if (!grid) return;
+  const players = getCompetitionPlayers();
+  const maxScore = Math.max(...players.map(p => p.score), 1);
+  // Day badge
+  const dow = new Date().getDay();
+  const dayNum = dow >= 1 && dow <= 5 ? dow : 1;
+  document.getElementById('comp-day-badge').textContent = 'DAG ' + dayNum;
+  // Clock
+  const now = new Date();
+  document.getElementById('comp-clock').textContent = now.toLocaleTimeString('da-DK', {hour:'2-digit',minute:'2-digit'});
+  grid.innerHTML = players.map((p, i) => {
+    const pos = i + 1;
+    const posClass = pos <= 3 ? 'comp-pos-' + pos : 'comp-pos-n';
+    const pct = maxScore > 0 ? Math.round((p.score / maxScore) * 100) : 0;
+    const barW = Math.max(pct * 0.85, 2); // 85% max width to leave room for car
+    const photoHtml = p.photo
+      ? `<img src="${p.photo}" onerror="this.parentElement.innerHTML='<div style=\'background:${p.color}33;color:${p.color};width:100%;height:100%;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900\'>${p.id[0]}</div>'">`
+      : `<div style="background:${p.color}33;color:${p.color};width:100%;height:100%;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900">${p.id[0]}</div>`;
+    return `<div class="comp-lane">
+      <div class="comp-pos ${posClass}">${pos}</div>
+      <div class="comp-photo">${photoHtml}</div>
+      <div class="comp-nm" style="color:${p.color}">${p.id}</div>
+      <div class="comp-sc">${p.score}</div>
+      <div class="comp-track-area">
+        <div class="comp-track-bg"></div>
+        <div class="comp-track-fill" style="width:${barW}%;background:${p.color}">
+          <div class="comp-car-wrap">${carSVG(p.color)}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Competition timer: show overlay during minutes 0-4, 15-19, 30-34, 45-49
+// Friday 14:00-15:00: ONLY competition
+let _compInterval = null;
+let _manualCompOverride = null; // null=auto, true=forced on, false=forced off
+
+function manualToggleCompetition() {
+  const overlay = document.getElementById('comp-overlay');
+  if (!overlay) return;
+  const isVisible = overlay.classList.contains('active');
+  if (isVisible) {
+    overlay.classList.remove('active');
+    _manualCompOverride = false;
+    // Auto-clear override after 5 min so timer takes back control
+    setTimeout(() => { if (_manualCompOverride === false) _manualCompOverride = null; }, 5 * 60 * 1000);
+  } else {
+    overlay.classList.add('active');
+    renderCompetition();
+    _manualCompOverride = true;
+    // Auto-clear override after 10 min so timer takes back control
+    setTimeout(() => { if (_manualCompOverride === true) _manualCompOverride = null; }, 10 * 60 * 1000);
+  }
+}
+
+function checkCompetitionTimer() {
+  const now = new Date();
+  const min = now.getMinutes();
+  const hour = now.getHours();
+  const dow = now.getDay(); // 0=Sun, 5=Fri
+  const overlay = document.getElementById('comp-overlay');
+  if (!overlay) return;
+  // If manual override is active, respect it
+  if (_manualCompOverride !== null) return;
+  let showComp = false;
+  // Friday 14:00-15:00 → always show competition
+  if (dow === 5 && hour >= 14 && hour < 15) {
+    showComp = true;
+  } else {
+    // Every 15 min for 5 min
+    const inWindow = (min >= 0 && min <= 4) || (min >= 15 && min <= 19) || (min >= 30 && min <= 34) || (min >= 45 && min <= 49);
+    showComp = inWindow;
+  }
+  // Don't show during celebration
+  if (_celebrationRunning) showComp = false;
+  if (showComp) {
+    overlay.classList.add('active');
+    renderCompetition();
+  } else {
+    overlay.classList.remove('active');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// COMPETITION ADMIN — manual score adjustments
+// ═══════════════════════════════════════════════════════════
+let _compScoreOffsets = {};
+try { _compScoreOffsets = JSON.parse(localStorage.getItem('mim_gp_offsets') || '{}'); } catch(e) {}
+
+function saveCompOffsets() {
+  try { localStorage.setItem('mim_gp_offsets', JSON.stringify(_compScoreOffsets)); } catch(e) {}
+}
+
+function adjustCompScore(playerId, delta) {
+  if (!_compScoreOffsets[playerId]) _compScoreOffsets[playerId] = 0;
+  _compScoreOffsets[playerId] += delta;
+  if (_compScoreOffsets[playerId] === 0) delete _compScoreOffsets[playerId];
+  saveCompOffsets();
+  renderCompetition();
+  renderCompAdmin();
+}
+
+function resetCompScores() {
+  _compScoreOffsets = {};
+  saveCompOffsets();
+  renderCompetition();
+  renderCompAdmin();
+}
+
+function renderCompAdmin() {
+  const rows = document.getElementById('comp-admin-rows');
+  if (!rows) return;
+  const players = getCompetitionPlayers();
+  rows.innerHTML = players.map(p => {
+    const offset = _compScoreOffsets[p.id] || 0;
+    const offsetStr = offset > 0 ? `+${offset}` : offset < 0 ? `${offset}` : '';
+    return `<div style="display:flex;align-items:center;gap:10px">
+      <span style="color:${p.color};font-weight:800;width:100px;font-size:14px">${p.id}</span>
+      <span style="color:#ffd700;font-size:18px;font-weight:900;width:40px;text-align:center">${p.score}</span>
+      <button onclick="adjustCompScore('${p.id}',-1)" style="background:rgba(167,36,68,0.4);border:1px solid rgba(167,36,68,0.5);border-radius:6px;color:#ff6b6b;font-size:18px;font-weight:900;width:36px;height:36px;cursor:pointer;line-height:1">−</button>
+      <button onclick="adjustCompScore('${p.id}',1)" style="background:rgba(52,211,153,0.2);border:1px solid rgba(52,211,153,0.4);border-radius:6px;color:#34D399;font-size:18px;font-weight:900;width:36px;height:36px;cursor:pointer;line-height:1">+</button>
+      ${offsetStr ? `<span style="font-size:11px;color:var(--dim)">(manuelt: ${offsetStr})</span>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function toggleCompAdmin() {
+  const el = document.getElementById('comp-admin');
+  if (!el) return;
+  const visible = el.style.display !== 'none';
+  el.style.display = visible ? 'none' : 'block';
+  if (!visible) renderCompAdmin();
+}
+
+// Keyboard: 'A' toggles admin panel when competition is visible
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'a' || e.key === 'A') {
+    const overlay = document.getElementById('comp-overlay');
+    if (overlay && overlay.classList.contains('active')) {
+      toggleCompAdmin();
+    }
+  }
+});
+
+// ═══════════════════════════════════════════════════════════
 // BOOT
 // ═══════════════════════════════════════════════════════════
 let _firstLoad = true;
-
 // Video celebration background loads on demand (celebration_final.mp4)
-
 // Load data and start auto-refresh
 loadAll();
-
 // Silent background refresh every 60 seconds (no UI flicker)
 _autoRefreshInterval = setInterval(() => {
   silentRefresh();
   fetchTaletid(); // Opdater taletid
 }, 60000);
-
 // Verify GitHub-hosted photos
 verifyGitHubPhotos();
-
+// Start F1 Competition timer (check every 10 seconds)
+checkCompetitionTimer();
+_compInterval = setInterval(checkCompetitionTimer, 10000);
 // ═══════════════════════════════════════════════════════════
 // CYCLING DEEP SPACE BACKGROUNDS (crossfade every 30s)
 // ═══════════════════════════════════════════════════════════
@@ -2349,10 +2445,8 @@ verifyGitHubPhotos();
   let showingA = true;
   const elA = document.getElementById('bg-a');
   const elB = document.getElementById('bg-b');
-
   // Preload all images so transitions are smooth on TV stick
   bgImages.forEach(src => { const img = new Image(); img.src = src; });
-
   function cycleBg(){
     bgIdx = (bgIdx + 1) % bgImages.length;
     const nextSrc = "url('" + bgImages[bgIdx] + "')";
@@ -2367,10 +2461,42 @@ verifyGitHubPhotos();
     }
     showingA = !showingA;
   }
-
   setInterval(cycleBg, 30000); // Switch every 30 seconds
 })();
 </script>
+
+<!-- ══ F1 COMPETITION OVERLAY ═══════════════════════════════ -->
+<div id="comp-overlay">
+  <video class="bg-video" autoplay loop muted playsinline poster="stage_poster.jpg">
+    <source src="stage_bg.mp4" type="video/mp4">
+  </video>
+  <div class="bg-gradient"></div>
+  <div class="comp-content">
+    <div class="comp-hdr">
+      <div>
+        <div class="comp-logo-mim">MiM GRAND PRIX</div>
+        <div class="comp-logo-gp">POWERMATCH CHAMPIONSHIP</div>
+      </div>
+      <div class="comp-day-badge" id="comp-day-badge">DAG 1</div>
+      <div class="comp-clock" id="comp-clock">--:--</div>
+      <div style="position:absolute;top:16px;right:16px;display:flex;gap:8px;z-index:12">
+        <button onclick="manualToggleCompetition()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:#fff;font-size:13px;font-weight:700;padding:6px 14px;cursor:pointer;opacity:0.5;transition:opacity 0.3s;letter-spacing:1px" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0.5'" title="Tilbage til dashboard">← DASHBOARD</button>
+        <button onclick="toggleCompAdmin()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,215,0,0.3);border-radius:8px;color:#ffd700;font-size:16px;padding:6px 12px;cursor:pointer;opacity:0.5;transition:opacity 0.3s" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0.5'" title="Admin panel (eller tryk A)">⚙️</button>
+      </div>
+    </div>
+    <div class="comp-grid" id="comp-grid"></div>
+    <!-- Admin panel — toggle with 'A' key -->
+    <div id="comp-admin" style="display:none;position:absolute;bottom:20px;left:50%;transform:translateX(-50%);z-index:10;background:rgba(0,0,0,0.9);border:1px solid rgba(255,215,0,0.4);border-radius:14px;padding:16px 24px;min-width:500px">
+      <div style="font-family:'Cinzel',serif;font-size:16px;color:#ffd700;margin-bottom:12px;text-align:center;letter-spacing:2px">ADMIN — MANUEL SCORE</div>
+      <div id="comp-admin-rows" style="display:flex;flex-direction:column;gap:8px"></div>
+      <div style="margin-top:12px;text-align:center">
+        <button onclick="resetCompScores()" style="background:rgba(167,36,68,0.4);border:1px solid rgba(167,36,68,0.6);border-radius:8px;color:#ff6b6b;font-size:12px;font-weight:700;padding:6px 16px;cursor:pointer">NULSTIL ALLE</button>
+        <span style="font-size:10px;color:rgba(255,255,255,0.3);margin-left:12px">Tryk 'A' for at lukke</span>
+      </div>
+    </div>
+  </div>
+</div>
+
 </div><!-- /app -->
 </body>
 </html>
