@@ -196,7 +196,7 @@
   .daily-card {
     background: linear-gradient(160deg, #1B1A30 0%, #272745 50%, #1B1A30 100%);
     border: 1px solid var(--card-border); border-radius: 16px;
-    padding: 18px 16px 16px; text-align: center; position: relative; overflow: hidden; min-width: 0;
+    padding: 22px 16px 18px; text-align: center; position: relative; overflow: hidden; min-width: 0;
     transition: border-color 0.3s, box-shadow 0.3s;
     box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 40px rgba(108,43,247,0.08);
     border-top: 2px solid rgba(99,174,250,0.25);
@@ -214,7 +214,7 @@
   @keyframes goldShimmer { 0%,100%{opacity:.5} 50%{opacity:1} }
   .daily-card > * { position: relative; z-index: 1; }
   .daily-name {
-    font-size: 17px; font-weight: 900; color: #fff; margin-bottom: 6px; letter-spacing: 1px;
+    font-size: 19px; font-weight: 900; color: #fff; margin-bottom: 8px; letter-spacing: 1px;
     text-shadow: 0 0 20px currentColor, 0 0 40px rgba(255,255,255,0.1);
   }
   /* Big ring — compact for TV */
@@ -242,12 +242,12 @@
   .ring-sm .ring-label { font-size: 12px; font-weight: 700; letter-spacing: 1px; }
   /* Progress bars — bolder for TV readability */
   .daily-bars { text-align: left; margin-top: 4px; }
-  .bar-row { margin-bottom: 12px; }
+  .bar-row { margin-bottom: 14px; }
   .bar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
   .bar-label { font-size: 14px; font-weight: 800; color: #E8E5F8; }
   .bar-val { font-size: 14px; font-weight: 900; color: #fff; font-variant-numeric: tabular-nums; }
   .bar-pct { font-size: 13px; font-weight: 900; margin-left: 4px; }
-  .bar-track { height: 14px; background: #3a3a5c; border-radius: 7px; overflow: hidden; position: relative; }
+  .bar-track { height: 16px; background: #3a3a5c; border-radius: 8px; overflow: hidden; position: relative; }
   .bar-fill { height: 100%; border-radius: 6px; transition: width 0.8s ease; min-width: 2px; }
   .bar-fill.c-red    { background: linear-gradient(90deg, #dc2626, #ef4444); box-shadow: 0 0 14px rgba(239,68,68,0.5); }
   .bar-fill.c-yellow { background: linear-gradient(90deg, #d97706, #fbbf24); box-shadow: 0 0 14px rgba(251,191,36,0.5); }
@@ -635,7 +635,7 @@
      COMPACT DAILY CARD — Index number (no ring)
      ════════════════════════════════════════════════════════ */
   .daily-index-num {
-    font-size: 48px; font-weight: 900; line-height: 1; margin-bottom: 4px;
+    font-size: 52px; font-weight: 900; line-height: 1; margin-bottom: 4px;
     font-variant-numeric: tabular-nums;
     text-shadow: 0 0 20px currentColor, 0 0 40px rgba(255,255,255,0.1);
   }
@@ -646,59 +646,71 @@
   #comp-overlay {
     position: fixed; inset: 0; z-index: 8000;
     display: none; flex-direction: column;
-    background: #000;
+    background: #0D0D17;
     overflow: hidden;
   }
   #comp-overlay.active { display: flex; }
-  #comp-overlay .bg-video {
-    position: absolute; inset: 0; width: 100%; height: 100%;
-    object-fit: cover; z-index: 0;
-    background: url('stage_poster.jpg') center/cover no-repeat;
+  /* Cycling bg layers inside comp overlay */
+  .overlay-bg-layer {
+    position: absolute; inset: 0; z-index: 0;
+    background-size: cover; background-position: center;
+    transition: opacity 3s ease-in-out; will-change: opacity;
   }
+  .overlay-bg-layer.active { opacity: 1; }
+  .overlay-bg-layer.inactive { opacity: 0; }
+  /* Dark overlay — same as dashboard body::before */
   #comp-overlay .bg-gradient {
     position: absolute; inset: 0; z-index: 1;
-    background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.4) 40%, rgba(0,0,0,0.7) 100%);
+    background: rgba(13,13,23,0.58);
   }
-  .comp-content { position: relative; z-index: 2; display: flex; flex-direction: column; height: 100vh; padding: 24px 40px; }
+  /* HUD grid on overlays */
+  .overlay-hud-grid {
+    position: absolute; inset: 0; z-index: 1;
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(130,252,224,0.03) 60px),
+      repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(130,252,224,0.03) 60px);
+    pointer-events: none;
+  }
+  .comp-content { position: relative; z-index: 2; display: flex; flex-direction: column; height: 100vh; padding: 10px 36px; }
   /* Header */
   .comp-hdr {
     display: flex; align-items: center; justify-content: space-between;
-    padding-bottom: 16px; border-bottom: 2px solid rgba(255,215,0,0.3);
+    padding-bottom: 8px; border-bottom: 2px solid rgba(255,215,0,0.3);
     flex-shrink: 0;
   }
   .comp-logo-mim {
-    font-family: 'Cinzel', serif; font-size: 36px; font-weight: 900; color: #ffd700;
+    font-family: 'Cinzel', serif; font-size: 28px; font-weight: 900; color: #ffd700;
     text-shadow: 0 0 20px rgba(255,215,0,0.6); letter-spacing: 5px;
   }
   .comp-logo-gp {
-    font-family: 'Cinzel', serif; font-size: 16px; font-weight: 700; color: rgba(255,215,0,0.7);
+    font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; color: rgba(255,215,0,0.7);
     letter-spacing: 6px; margin-top: 2px;
   }
   .comp-day-badge {
     background: rgba(255,215,0,0.15); border: 1px solid rgba(255,215,0,0.4);
-    border-radius: 10px; padding: 8px 20px;
-    font-family: 'Cinzel', serif; font-size: 18px; font-weight: 700; color: #ffd700;
+    border-radius: 10px; padding: 5px 14px;
+    font-family: 'Cinzel', serif; font-size: 14px; font-weight: 700; color: #ffd700;
     letter-spacing: 3px;
   }
   .comp-clock {
-    font-family: 'Inter', monospace; font-size: 28px; font-weight: 800; color: rgba(255,255,255,0.9);
+    font-family: 'Inter', monospace; font-size: 22px; font-weight: 800; color: rgba(255,255,255,0.9);
     letter-spacing: 3px; font-variant-numeric: tabular-nums;
   }
   /* Race grid — fills ALL remaining vertical space */
   .comp-grid {
     flex: 1; display: flex; flex-direction: column;
-    justify-content: space-evenly; /* even distribution! */
-    padding: 10px 0;
+    justify-content: space-evenly;
+    padding: 4px 0;
   }
   .comp-lane {
-    display: flex; align-items: center; gap: 16px; padding: 8px 14px;
+    display: flex; align-items: center; gap: 14px; padding: 2px 14px;
     border-radius: 12px; transition: all 0.5s ease;
-    background: rgba(0,0,0,0.15);
+    background: rgba(0,0,0,0.25);
   }
   .comp-lane:hover { background: rgba(255,215,0,0.05); }
   .comp-pos {
-    width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-    font-weight: 900; font-size: 22px; flex-shrink: 0;
+    width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 20px; flex-shrink: 0;
     box-shadow: 0 2px 10px rgba(0,0,0,0.3);
   }
   .comp-pos-1 { background: linear-gradient(135deg, #ffd700, #ffed4a); color: #000; box-shadow: 0 0 20px rgba(255,215,0,0.4); }
@@ -706,13 +718,13 @@
   .comp-pos-3 { background: linear-gradient(135deg, #cd7f32, #e0a060); color: #000; }
   .comp-pos-n { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7); }
   .comp-photo {
-    width: 60px; height: 60px; border-radius: 50%; overflow: hidden; flex-shrink: 0;
+    width: 120px; height: 120px; border-radius: 50%; overflow: hidden; flex-shrink: 0;
     border: 3px solid rgba(255,215,0,0.3);
   }
   .comp-photo img { width: 100%; height: 100%; object-fit: cover; }
-  .comp-nm { font-size: 22px; font-weight: 800; width: 120px; }
-  .comp-sc { font-size: 32px; font-weight: 900; width: 60px; text-align: center; color: #ffd700; font-variant-numeric: tabular-nums; }
-  .comp-track-area { flex: 1; position: relative; height: 44px; }
+  .comp-nm { font-size: 26px; font-weight: 800; width: 150px; }
+  .comp-sc { font-size: 36px; font-weight: 900; width: 70px; text-align: center; color: #ffd700; font-variant-numeric: tabular-nums; }
+  .comp-track-area { flex: 1; position: relative; height: 36px; }
   .comp-track-bg { position: absolute; inset: 0; background: rgba(255,255,255,0.06); border-radius: 8px; }
   .comp-track-fill {
     position: absolute; top: 0; bottom: 0; left: 0; border-radius: 8px;
@@ -733,6 +745,107 @@
   /* Flash effect for score increase */
   .comp-flash { animation: comp-flash-anim 0.3s ease-out; }
   @keyframes comp-flash-anim { 0%{transform:scale(1.3);text-shadow:0 0 20px #ffd700} 100%{transform:scale(1);text-shadow:none} }
+
+  /* ════════════════════════════════════════════════════════
+     WEEKLY STATUS OVERLAY — 3 ranked columns
+     ════════════════════════════════════════════════════════ */
+  #weekly-overlay {
+    position: fixed; inset: 0; z-index: 7000;
+    display: none;
+    background: #0D0D17;
+  }
+  #weekly-overlay.active { display: block; }
+  .weekly-content {
+    height: 100vh; padding: 32px 40px; display: flex; flex-direction: column;
+  }
+  .weekly-hdr {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 18px; flex-shrink: 0;
+  }
+  .weekly-title {
+    font-family: 'Cinzel', serif; font-size: 34px; font-weight: 900;
+    letter-spacing: 4px;
+    background: linear-gradient(135deg, #82FCE0 0%, #63AEFA 40%, #6C2BF7 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .weekly-subtitle {
+    font-size: 13px; color: var(--dim); letter-spacing: 2px;
+    text-transform: uppercase; margin-top: 4px;
+  }
+  .weekly-cols {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px;
+    flex: 1;
+  }
+  .weekly-col {
+    display: flex; flex-direction: column;
+  }
+  .weekly-col-title {
+    font-family: 'Cinzel', serif; font-size: 26px; font-weight: 900;
+    letter-spacing: 4px; text-align: center;
+    padding-bottom: 14px; margin-bottom: 8px;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #82FCE0 0%, #63AEFA 50%, #6C2BF7 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    border-bottom: 2px solid rgba(130,252,224,0.15);
+    text-shadow: none;
+  }
+  .weekly-col-list {
+    display: flex; flex-direction: column; gap: 8px; flex: 1;
+    justify-content: space-evenly;
+  }
+  .weekly-item {
+    display: flex; align-items: center; gap: 16px;
+    padding: 18px 22px; border-radius: 14px;
+    background: linear-gradient(160deg, rgba(27,26,48,0.85) 0%, rgba(39,39,69,0.7) 100%);
+    border: 1px solid rgba(130,252,224,0.08);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 0 20px rgba(108,43,247,0.05);
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .weekly-item-1 {
+    border: 1px solid rgba(255,215,0,0.25);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 0 30px rgba(255,215,0,0.08);
+    border-top: 2px solid rgba(255,215,0,0.4);
+  }
+  .weekly-item-2 {
+    border: 1px solid rgba(192,192,192,0.2);
+    border-top: 2px solid rgba(192,192,192,0.3);
+  }
+  .weekly-item-3 {
+    border: 1px solid rgba(205,127,50,0.2);
+    border-top: 2px solid rgba(205,127,50,0.3);
+  }
+  .weekly-rank {
+    font-size: 26px; font-weight: 900; width: 36px; text-align: center;
+    color: rgba(255,255,255,0.25); flex-shrink: 0;
+  }
+  .weekly-rank-1 {
+    color: #ffd700;
+    text-shadow: 0 0 12px rgba(255,215,0,0.6), 0 0 24px rgba(255,215,0,0.2);
+  }
+  .weekly-rank-2 {
+    color: #d0d0d0;
+    text-shadow: 0 0 8px rgba(192,192,192,0.4);
+  }
+  .weekly-rank-3 {
+    color: #cd7f32;
+    text-shadow: 0 0 8px rgba(205,127,50,0.4);
+  }
+  .weekly-avatar {
+    width: 72px; height: 72px; border-radius: 50%; overflow: hidden;
+    flex-shrink: 0; border: 2px solid rgba(130,252,224,0.15);
+    box-shadow: 0 0 12px rgba(0,0,0,0.4);
+  }
+  .weekly-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .weekly-avatar-1 { border-color: rgba(255,215,0,0.4); box-shadow: 0 0 16px rgba(255,215,0,0.2); }
+  .weekly-name {
+    font-size: 22px; font-weight: 800; flex: 1;
+    text-shadow: 0 0 15px currentColor;
+  }
+  .weekly-val {
+    font-size: 40px; font-weight: 900; font-variant-numeric: tabular-nums;
+    text-align: right;
+    text-shadow: 0 0 20px currentColor, 0 0 40px rgba(255,255,255,0.1);
+  }
 
 </style>
 </head>
@@ -756,6 +869,7 @@
     <button class="refresh-btn" onclick="testCelebration()">🎉 Test</button>
     <button class="refresh-btn" id="sound-toggle" onclick="toggleSoundMuted()">🔊</button>
     <button class="refresh-btn" id="comp-toggle-btn" onclick="manualToggleCompetition()" title="Vis/skjul konkurrence">🏁</button>
+    <button class="refresh-btn" onclick="manualToggleWeekly()" title="Vis/skjul uge-status">📊</button>
     <button class="refresh-btn" onclick="loadAll()">↻ Opdater</button>
     <div class="last-updated" id="last-updated"></div>
   </div>
@@ -876,7 +990,7 @@ document.body.classList.add('tv-mode');
 // ═══════════════════════════════════════════════════════════
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxTb_Qpuo-mTBTxXdKydQqDUGmJ_VBq7f0r_QHmvJ7B1cXmDiXHG_Kp1jFHHzcs0SSK/exec';
 const NAMES = ['William','Jonas','Andreas','Flora','Ali'];
-const COLORS = { William:'#63AEFA', Jonas:'#DC7243', Andreas:'#82FCE0', Flora:'#f472b6', Ali:'#fb923c', floor:'#A72444', maal:'#3B3B61' };
+const COLORS = { William:'#63AEFA', Jonas:'#DC7243', Andreas:'#82FCE0', Flora:'#f472b6', Ali:'#a3e635', floor:'#A72444', maal:'#3B3B61' };
 // Seller photo configuration – GitHub-hosted + localStorage fallback
 const PHOTO_BASE_URL = 'https://raw.githubusercontent.com/sebpirad/DashboardPM/main/photos/';
 const GITHUB_PHOTOS = {};
@@ -885,7 +999,7 @@ NAMES.forEach(n => GITHUB_PHOTOS[n] = PHOTO_BASE_URL + n.toLowerCase() + '.jpg')
 const SCREENER_NAMES = ['Amalie', 'Ali', 'Josefine'];
 const SCREENER_PHOTOS = {};
 SCREENER_NAMES.forEach(n => SCREENER_PHOTOS[n] = PHOTO_BASE_URL + n.toLowerCase() + '.jpg');
-const SCREENER_COLORS = { Amalie: '#c084fc', Ali: '#fb923c', Josefine: '#f9a8d4' };
+const SCREENER_COLORS = { Amalie: '#c084fc', Ali: '#a3e635', Josefine: '#f9a8d4' };
 // HR Dashboard Apps Script endpoint for screener lookup
 const HR_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwNgVLagf3MT5_JeJSWySpkbIEBquFOOHyr0WplT66cf6l3eWgImS0BO7RUYV4TaCp2/exec';
 // Look up screener via HR Dashboard API (async)
@@ -942,16 +1056,24 @@ let _targets = {}; // { William: { Mandag: {KT:3,Samtaler:5,MIM:2}, ... }, ... }
 const DAY_MAP = { 1:'Mandag', 2:'Tirsdag', 3:'Onsdag', 4:'Torsdag', 5:'Fredag' };
 const DAY_MAP_REV = { Mandag:1, Tirsdag:2, Onsdag:3, Torsdag:4, Fredag:5 };
 
+// Default daily targets per seller if nothing is configured
+const DEFAULT_DAY_TARGET = {KT: 3, Samtaler: 3, MIM: 2};
+
 function getTarget(sellerName, date) {
   const dayNum = date.getDay();
   const dayName = DAY_MAP[dayNum];
   if (!dayName) return {KT:0, Samtaler:0, MIM:0};
+  // 1. Individual target from sheet columns Y-AB
   const t = _targets[sellerName]?.[dayName];
-  if (t) return t;
-  // Fallback to budgets
+  if (t && (t.KT > 0 || t.Samtaler > 0 || t.MIM > 0)) return t;
+  // 2. Fallback to budgets
   const wn = weekForDate(date);
   const bud = _budgets[wn]?.indiv || {};
-  return {KT: Math.ceil((bud.KT||0)/5), Samtaler: Math.ceil((bud.Sam||0)/5), MIM: Math.ceil((bud.MiM||0)/5)};
+  if (bud.KT || bud.Sam || bud.MiM) {
+    return {KT: Math.ceil((bud.KT||0)/5), Samtaler: Math.ceil((bud.Sam||0)/5), MIM: Math.ceil((bud.MiM||0)/5)};
+  }
+  // 3. Hard default — always show a target, never leave blank
+  return DEFAULT_DAY_TARGET;
 }
 
 function getWeekTarget(sellerName, weekNum) {
@@ -2290,8 +2412,8 @@ function renderCompetition() {
     const pct = maxScore > 0 ? Math.round((p.score / maxScore) * 100) : 0;
     const barW = Math.max(pct * 0.85, 2); // 85% max width to leave room for car
     const photoHtml = p.photo
-      ? `<img src="${p.photo}" onerror="this.parentElement.innerHTML='<div style=\'background:${p.color}33;color:${p.color};width:100%;height:100%;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900\'>${p.id[0]}</div>'">`
-      : `<div style="background:${p.color}33;color:${p.color};width:100%;height:100%;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900">${p.id[0]}</div>`;
+      ? `<img src="${p.photo}" onerror="this.parentElement.innerHTML='<div style=\'background:${p.color}33;color:${p.color};width:100%;height:100%;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:900\'>${p.id[0]}</div>'">`
+      : `<div style="background:${p.color}33;color:${p.color};width:100%;height:100%;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:900">${p.id[0]}</div>`;
     return `<div class="comp-lane">
       <div class="comp-pos ${posClass}">${pos}</div>
       <div class="comp-photo">${photoHtml}</div>
@@ -2307,54 +2429,78 @@ function renderCompetition() {
   }).join('');
 }
 
-// Competition timer: show overlay during minutes 0-4, 15-19, 30-34, 45-49
+// ═══════════════════════════════════════════════════════════
+// UNIFIED ROTATION SCHEDULE — per 60-min cycle (12 × 5min blocks)
+// 35min dashboard (7×5), 15min competition (3×5), 10min weekly (2×5)
+// Schedule: D D C D D W D C D D C W  (minutes 0-4, 5-9, 10-14, ...)
 // Friday 14:00-15:00: ONLY competition
+// ═══════════════════════════════════════════════════════════
+const ROTATION_SCHEDULE = ['D','D','C','D','D','W','D','C','D','D','C','W'];
 let _compInterval = null;
-let _manualCompOverride = null; // null=auto, true=forced on, false=forced off
+let _manualOverride = null; // null=auto, 'comp'=forced comp, 'weekly'=forced weekly, 'dash'=forced dashboard
+let _manualOverrideTimer = null;
 
 function manualToggleCompetition() {
-  const overlay = document.getElementById('comp-overlay');
-  if (!overlay) return;
-  const isVisible = overlay.classList.contains('active');
-  if (isVisible) {
-    overlay.classList.remove('active');
-    _manualCompOverride = false;
-    // Auto-clear override after 5 min so timer takes back control
-    setTimeout(() => { if (_manualCompOverride === false) _manualCompOverride = null; }, 5 * 60 * 1000);
+  const compOverlay = document.getElementById('comp-overlay');
+  const weeklyOverlay = document.getElementById('weekly-overlay');
+  if (compOverlay && compOverlay.classList.contains('active')) {
+    compOverlay.classList.remove('active');
+    _manualOverride = 'dash';
   } else {
-    overlay.classList.add('active');
-    renderCompetition();
-    _manualCompOverride = true;
-    // Auto-clear override after 10 min so timer takes back control
-    setTimeout(() => { if (_manualCompOverride === true) _manualCompOverride = null; }, 10 * 60 * 1000);
+    if (weeklyOverlay) weeklyOverlay.classList.remove('active');
+    if (compOverlay) { compOverlay.classList.add('active'); renderCompetition(); }
+    _manualOverride = 'comp';
   }
+  clearTimeout(_manualOverrideTimer);
+  _manualOverrideTimer = setTimeout(() => { _manualOverride = null; }, 5 * 60 * 1000);
 }
 
-function checkCompetitionTimer() {
+function manualToggleWeekly() {
+  const compOverlay = document.getElementById('comp-overlay');
+  const weeklyOverlay = document.getElementById('weekly-overlay');
+  if (weeklyOverlay && weeklyOverlay.classList.contains('active')) {
+    weeklyOverlay.classList.remove('active');
+    _manualOverride = 'dash';
+  } else {
+    if (compOverlay) compOverlay.classList.remove('active');
+    if (weeklyOverlay) { weeklyOverlay.classList.add('active'); renderWeekly(); }
+    _manualOverride = 'weekly';
+  }
+  clearTimeout(_manualOverrideTimer);
+  _manualOverrideTimer = setTimeout(() => { _manualOverride = null; }, 5 * 60 * 1000);
+}
+
+function checkRotationTimer() {
+  if (_manualOverride !== null) return;
+  if (_celebrationRunning) return;
   const now = new Date();
   const min = now.getMinutes();
   const hour = now.getHours();
-  const dow = now.getDay(); // 0=Sun, 5=Fri
-  const overlay = document.getElementById('comp-overlay');
-  if (!overlay) return;
-  // If manual override is active, respect it
-  if (_manualCompOverride !== null) return;
-  let showComp = false;
-  // Friday 14:00-15:00 → always show competition
+  const dow = now.getDay();
+  const compOverlay = document.getElementById('comp-overlay');
+  const weeklyOverlay = document.getElementById('weekly-overlay');
+  if (!compOverlay || !weeklyOverlay) return;
+  // Friday 14:00-15:00 → always competition
   if (dow === 5 && hour >= 14 && hour < 15) {
-    showComp = true;
-  } else {
-    // Every 15 min for 5 min
-    const inWindow = (min >= 0 && min <= 4) || (min >= 15 && min <= 19) || (min >= 30 && min <= 34) || (min >= 45 && min <= 49);
-    showComp = inWindow;
-  }
-  // Don't show during celebration
-  if (_celebrationRunning) showComp = false;
-  if (showComp) {
-    overlay.classList.add('active');
+    weeklyOverlay.classList.remove('active');
+    compOverlay.classList.add('active');
     renderCompetition();
+    return;
+  }
+  // Determine current 5-min block (0-11)
+  const block = Math.floor(min / 5);
+  const mode = ROTATION_SCHEDULE[block] || 'D';
+  if (mode === 'C') {
+    weeklyOverlay.classList.remove('active');
+    compOverlay.classList.add('active');
+    renderCompetition();
+  } else if (mode === 'W') {
+    compOverlay.classList.remove('active');
+    weeklyOverlay.classList.add('active');
+    renderWeekly();
   } else {
-    overlay.classList.remove('active');
+    compOverlay.classList.remove('active');
+    weeklyOverlay.classList.remove('active');
   }
 }
 
@@ -2420,6 +2566,58 @@ document.addEventListener('keydown', function(e) {
 });
 
 // ═══════════════════════════════════════════════════════════
+// WEEKLY STATUS VIEW — shows once per hour for 5 min (minutes 10-14)
+// ═══════════════════════════════════════════════════════════
+function renderWeekly() {
+  const cols = document.getElementById('weekly-cols');
+  if (!cols) return;
+  const now = new Date();
+  let wn = weekForDate(now);
+  // If no week (e.g. Sunday), use last week or current week number
+  if (!wn && ALL_WEEKS.length > 0) wn = ALL_WEEKS[ALL_WEEKS.length - 1];
+  if (!wn) { const d = new Date(now); d.setDate(d.getDate() - d.getDay()); wn = weekForDate(d) || 1; }
+  document.getElementById('weekly-week-label').textContent = 'UGE ' + wn + ' · ' + now.getFullYear();
+  const wr = WEEK_RANGES[wn];
+  const ws = wr ? wr[0] : mondayOfWeek(wn, now.getFullYear());
+  const we = wr ? wr[1] : (function(){ const d = new Date(ws); d.setDate(d.getDate()+6); return d; })();
+  const sheets = NAMES.map(n => 'Data Input - ' + n);
+  // Build seller data — always show all sellers, default 0
+  const sellers = NAMES.map((name, i) => {
+    const data = _rawData[sheets[i]] ? calcSellerArr(_rawData[sheets[i]], ws, we) : {KT:0, Samtaler:0, MiM:0};
+    return { name, KT: data.KT||0, Samtaler: data.Samtaler||0, MiM: data.MiM||0, color: COLORS[name] || '#fff', photo: getSellerPhoto(name) };
+  });
+  // Rank by each KPI (highest first)
+  const kpis = [
+    { key: 'KT', label: 'KT' },
+    { key: 'Samtaler', label: 'SAMTALER' },
+    { key: 'MiM', label: 'MIM' }
+  ];
+  function avatarHtml(s) {
+    if (s.photo) return '<img src="' + s.photo + '" onerror="this.parentElement.innerHTML=\'<div style=\\\'background:' + s.color + '33;color:' + s.color + ';width:100%;height:100%;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900\\\'>' + s.name[0] + '</div>\'">';
+    return '<div style="background:' + s.color + '33;color:' + s.color + ';width:100%;height:100%;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900">' + s.name[0] + '</div>';
+  }
+  cols.innerHTML = kpis.map(kpi => {
+    const ranked = [...sellers].sort((a, b) => b[kpi.key] - a[kpi.key]);
+    const items = ranked.map((s, i) => {
+      const rank = i + 1;
+      const rankClass = rank <= 3 ? ' weekly-rank-' + rank : '';
+      const val = s[kpi.key];
+      const valColor = val > 0 ? s.color : 'rgba(255,255,255,0.25)';
+      const itemClass = rank <= 3 ? ' weekly-item-' + rank : '';
+      const avatarClass = rank === 1 ? ' weekly-avatar-1' : '';
+      return '<div class="weekly-item' + itemClass + '">' +
+        '<div class="weekly-rank' + rankClass + '">' + rank + '</div>' +
+        '<div class="weekly-avatar' + avatarClass + '">' + avatarHtml(s) + '</div>' +
+        '<div class="weekly-name" style="color:' + s.color + '">' + s.name + '</div>' +
+        '<div class="weekly-val" style="color:' + valColor + '">' + val + '</div>' +
+        '</div>';
+    }).join('');
+    return '<div class="weekly-col"><div class="weekly-col-title">' + kpi.label + '</div><div class="weekly-col-list">' + items + '</div></div>';
+  }).join('');
+}
+
+
+// ═══════════════════════════════════════════════════════════
 // BOOT
 // ═══════════════════════════════════════════════════════════
 let _firstLoad = true;
@@ -2433,9 +2631,9 @@ _autoRefreshInterval = setInterval(() => {
 }, 60000);
 // Verify GitHub-hosted photos
 verifyGitHubPhotos();
-// Start F1 Competition timer (check every 10 seconds)
-checkCompetitionTimer();
-_compInterval = setInterval(checkCompetitionTimer, 10000);
+// Start unified rotation timer (check every 10 seconds)
+checkRotationTimer();
+_compInterval = setInterval(checkRotationTimer, 10000);
 // ═══════════════════════════════════════════════════════════
 // CYCLING DEEP SPACE BACKGROUNDS (crossfade every 30s)
 // ═══════════════════════════════════════════════════════════
@@ -2443,34 +2641,59 @@ _compInterval = setInterval(checkCompetitionTimer, 10000);
   const bgImages = ['bg/5.jpg','bg/2.jpg','bg/1.jpg','bg/8.jpg','bg/4.jpg','bg/10.jpg','bg/12.jpg','bg/3.jpg','bg/6.jpg','bg/7.jpg','bg/9.jpg','bg/11.jpg'];
   let bgIdx = 0;
   let showingA = true;
-  const elA = document.getElementById('bg-a');
-  const elB = document.getElementById('bg-b');
+  // All 3 pairs: dashboard, competition, weekly
+  const pairs = [
+    [document.getElementById('bg-a'), document.getElementById('bg-b')],
+    [document.getElementById('comp-bg-a'), document.getElementById('comp-bg-b')],
+    [document.getElementById('weekly-bg-a'), document.getElementById('weekly-bg-b')]
+  ];
   // Preload all images so transitions are smooth on TV stick
   bgImages.forEach(src => { const img = new Image(); img.src = src; });
   function cycleBg(){
     bgIdx = (bgIdx + 1) % bgImages.length;
     const nextSrc = "url('" + bgImages[bgIdx] + "')";
-    if(showingA){
-      elB.style.backgroundImage = nextSrc;
-      elA.classList.replace('active','inactive');
-      elB.classList.replace('inactive','active');
-    } else {
-      elA.style.backgroundImage = nextSrc;
-      elB.classList.replace('active','inactive');
-      elA.classList.replace('inactive','active');
-    }
+    pairs.forEach(([elA, elB]) => {
+      if (!elA || !elB) return;
+      if(showingA){
+        elB.style.backgroundImage = nextSrc;
+        elA.classList.replace('active','inactive');
+        elB.classList.replace('inactive','active');
+      } else {
+        elA.style.backgroundImage = nextSrc;
+        elB.classList.replace('active','inactive');
+        elA.classList.replace('inactive','active');
+      }
+    });
     showingA = !showingA;
   }
   setInterval(cycleBg, 30000); // Switch every 30 seconds
 })();
 </script>
 
+<!-- ══ WEEKLY STATUS OVERLAY ═══════════════════════════════ -->
+<div id="weekly-overlay">
+  <div id="weekly-bg-a" class="overlay-bg-layer active" style="background-image:url('bg/5.jpg')"></div>
+  <div id="weekly-bg-b" class="overlay-bg-layer inactive"></div>
+  <div class="bg-gradient" style="position:absolute;inset:0;z-index:1;background:rgba(13,13,23,0.62);pointer-events:none"></div>
+  <div class="overlay-hud-grid"></div>
+  <div class="weekly-content" style="position:relative;z-index:2">
+    <div class="weekly-hdr">
+      <div>
+        <div class="weekly-title">UGENTLIG STATUS</div>
+        <div class="weekly-subtitle" id="weekly-week-label">UGE --</div>
+      </div>
+      <button onclick="manualToggleWeekly()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:#fff;font-size:13px;font-weight:700;padding:6px 14px;cursor:pointer;opacity:0.5;transition:opacity 0.3s;letter-spacing:1px" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0.5'">← DASHBOARD</button>
+    </div>
+    <div class="weekly-cols" id="weekly-cols"></div>
+  </div>
+</div>
+
 <!-- ══ F1 COMPETITION OVERLAY ═══════════════════════════════ -->
 <div id="comp-overlay">
-  <video class="bg-video" autoplay loop muted playsinline poster="stage_poster.jpg">
-    <source src="stage_bg.mp4" type="video/mp4">
-  </video>
+  <div id="comp-bg-a" class="overlay-bg-layer active" style="background-image:url('bg/5.jpg')"></div>
+  <div id="comp-bg-b" class="overlay-bg-layer inactive"></div>
   <div class="bg-gradient"></div>
+  <div class="overlay-hud-grid"></div>
   <div class="comp-content">
     <div class="comp-hdr">
       <div>
