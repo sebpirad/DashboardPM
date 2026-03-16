@@ -988,7 +988,7 @@ document.body.classList.add('tv-mode');
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxTb_Qpuo-mTBTxXdKydQqDUGmJ_VBq7f0r_QHmvJ7B1cXmDiXHG_Kp1jFHHzcs0SSK/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwkFWxa_PH9BSFo1aO_YTyF097UGJcNwsJfxeWRhXQODK0isFIZyOWE03s1RrpDv-YW/exec';
 const NAMES = ['William','Jonas','Andreas','Flora','Ali'];
 const COLORS = { William:'#63AEFA', Jonas:'#DC7243', Andreas:'#82FCE0', Flora:'#f472b6', Ali:'#a3e635', floor:'#A72444', maal:'#3B3B61' };
 // Seller photo configuration – GitHub-hosted + localStorage fallback
@@ -1065,14 +1065,20 @@ function getTarget(sellerName, date) {
   if (!dayName) return {KT:0, Samtaler:0, MIM:0};
   // 1. Individual target from sheet columns Y-AB
   const t = _targets[sellerName]?.[dayName];
-  if (t && (t.KT > 0 || t.Samtaler > 0 || t.MIM > 0)) return t;
+  if (t && (t.KT > 0 || t.Samtaler > 0 || t.MIM > 0)) {
+    console.log(`[TARGET] ${sellerName} ${dayName}: INDIVIDUEL →`, t);
+    return t;
+  }
   // 2. Fallback to budgets
   const wn = weekForDate(date);
   const bud = _budgets[wn]?.indiv || {};
   if (bud.KT || bud.Sam || bud.MiM) {
-    return {KT: Math.ceil((bud.KT||0)/5), Samtaler: Math.ceil((bud.Sam||0)/5), MIM: Math.ceil((bud.MiM||0)/5)};
+    const fallback = {KT: Math.ceil((bud.KT||0)/5), Samtaler: Math.ceil((bud.Sam||0)/5), MIM: Math.ceil((bud.MiM||0)/5)};
+    console.warn(`[TARGET] ${sellerName} ${dayName}: ⚠️ BUDGET FALLBACK →`, fallback, '(individuel var:', t, ')');
+    return fallback;
   }
   // 3. Hard default — always show a target, never leave blank
+  console.warn(`[TARGET] ${sellerName} ${dayName}: ⚠️ HARD DEFAULT → KT:3, Sam:3, MIM:2`);
   return DEFAULT_DAY_TARGET;
 }
 
@@ -1763,7 +1769,12 @@ async function loadAll(){
     const json=await r.json();
     NAMES.map(n=>'Data Input - '+n).concat(['Budgetter']).forEach(n=>_rawData[n]=json[n]||[]);
     // Load individual targets from API response
-    if (json['Targets']) _targets = json['Targets'];
+    if (json['Targets']) {
+      _targets = json['Targets'];
+      console.log('[TARGETS] Loaded:', JSON.stringify(_targets));
+    } else {
+      console.warn('[TARGETS] ⚠️ Ingen Targets i API response! Apps Script returnerer ikke individuelle mål. Er den nye version deployet?');
+    }
     // Screener lookup now handled via HR Dashboard API (findScreenerAsync)
     // 1) Build dynamic week ranges from data
     buildWeekRanges();
