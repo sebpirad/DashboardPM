@@ -815,21 +815,50 @@
     border-top: 2px solid rgba(205,127,50,0.3);
   }
   .weekly-rank {
-    font-size: 26px; font-weight: 900; width: 36px; text-align: center;
-    color: rgba(255,255,255,0.25); flex-shrink: 0;
+    font-size: 26px; font-weight: 900; width: 44px; text-align: center;
+    color: rgba(255,255,255,0.25); flex-shrink: 0; position: relative;
   }
   .weekly-rank-1 {
-    color: #ffd700;
+    color: #ffd700; font-size: 28px;
     text-shadow: 0 0 12px rgba(255,215,0,0.6), 0 0 24px rgba(255,215,0,0.2);
+  }
+  .weekly-rank-1::before {
+    content: '\1F451'; position: absolute; top: -18px; left: 50%; transform: translateX(-50%);
+    font-size: 20px; filter: drop-shadow(0 0 6px rgba(255,215,0,0.6));
   }
   .weekly-rank-2 {
     color: #d0d0d0;
     text-shadow: 0 0 8px rgba(192,192,192,0.4);
   }
+  .weekly-rank-2::before {
+    content: '\1F948'; position: absolute; top: -16px; left: 50%; transform: translateX(-50%);
+    font-size: 16px; filter: drop-shadow(0 0 4px rgba(192,192,192,0.4));
+  }
   .weekly-rank-3 {
     color: #cd7f32;
     text-shadow: 0 0 8px rgba(205,127,50,0.4);
   }
+  .weekly-rank-3::before {
+    content: '\1F949'; position: absolute; top: -16px; left: 50%; transform: translateX(-50%);
+    font-size: 16px; filter: drop-shadow(0 0 4px rgba(205,127,50,0.4));
+  }
+  .weekly-rank-bottom {
+    color: #ef4444;
+    text-shadow: 0 0 8px rgba(239,68,68,0.4);
+  }
+  .weekly-item-bottom {
+    border: 1px solid rgba(239,68,68,0.2);
+    border-top: 2px solid rgba(239,68,68,0.3);
+    opacity: 0.75;
+  }
+  .weekly-total {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 22px; border-radius: 12px; margin-top: 8px;
+    background: linear-gradient(160deg, rgba(130,252,224,0.06) 0%, rgba(108,43,247,0.08) 100%);
+    border: 1px solid rgba(130,252,224,0.15);
+  }
+  .weekly-total-label { font-size: 16px; font-weight: 800; color: rgba(130,252,224,0.7); letter-spacing: 2px; }
+  .weekly-total-val { font-size: 34px; font-weight: 900; color: #82FCE0; text-shadow: 0 0 20px rgba(130,252,224,0.4); }
   .weekly-avatar {
     width: 72px; height: 72px; border-radius: 50%; overflow: hidden;
     flex-shrink: 0; border: 2px solid rgba(130,252,224,0.15);
@@ -2351,15 +2380,15 @@ function carSVG(c){
 }
 
 // Competition players: All sellers + screeners. Ali appears once with combined score.
+// Bruger PRÆCIS SAMME _trendData som det ugentlige dashboard
 function getCompetitionPlayers() {
-  const today = new Date(); today.setHours(0,0,0,0);
-  const sheets = NAMES.map(n => 'Data Input - ' + n);
-  // Seller MiM counts for today
+  const wn = isoWeek(new Date());
+  const weekData = _trendData[wn] || {};
+  // Seller MiM from weekly trend data (same source as Uge-tab)
   const sellerMiM = {};
-  for (let i = 0; i < NAMES.length; i++) {
-    const data = calcSellerArr(_rawData[sheets[i]], today, today);
-    sellerMiM[NAMES[i]] = data.MiM;
-  }
+  NAMES.forEach(n => {
+    sellerMiM[n] = weekData[n] ? weekData[n].MiM : 0;
+  });
   // Screener MiM counts (from _mimLog)
   const screenerMiM = {};
   SCREENER_NAMES.forEach(n => screenerMiM[n] = 0);
@@ -2410,10 +2439,11 @@ function renderCompetition() {
   if (!grid) return;
   const players = getCompetitionPlayers();
   const maxScore = Math.max(...players.map(p => p.score), 1);
-  // Day badge
+  // Day badge — viser uge + dag
   const dow = new Date().getDay();
   const dayNum = dow >= 1 && dow <= 5 ? dow : 1;
-  document.getElementById('comp-day-badge').textContent = 'DAG ' + dayNum;
+  const _compWn = isoWeek(new Date());
+  document.getElementById('comp-day-badge').textContent = 'UGE ' + _compWn + ' \u00b7 DAG ' + dayNum + ' / 5';
   // Clock
   const now = new Date();
   document.getElementById('comp-clock').textContent = now.toLocaleTimeString('da-DK', {hour:'2-digit',minute:'2-digit'});
@@ -2609,21 +2639,25 @@ function renderWeekly() {
   }
   cols.innerHTML = kpis.map(kpi => {
     const ranked = [...sellers].sort((a, b) => b[kpi.key] - a[kpi.key]);
+    const total = ranked.reduce((sum, s) => sum + s[kpi.key], 0);
+    const bottomStart = ranked.length - 2; // bottom 2
     const items = ranked.map((s, i) => {
       const rank = i + 1;
-      const rankClass = rank <= 3 ? ' weekly-rank-' + rank : '';
+      const isBottom = i >= bottomStart;
+      const rankClass = rank <= 3 ? ' weekly-rank-' + rank : (isBottom ? ' weekly-rank-bottom' : '');
       const val = s[kpi.key];
-      const valColor = val > 0 ? s.color : 'rgba(255,255,255,0.25)';
-      const itemClass = rank <= 3 ? ' weekly-item-' + rank : '';
+      const valColor = isBottom ? '#ef4444' : (val > 0 ? s.color : 'rgba(255,255,255,0.25)');
+      const itemClass = rank <= 3 ? ' weekly-item-' + rank : (isBottom ? ' weekly-item-bottom' : '');
       const avatarClass = rank === 1 ? ' weekly-avatar-1' : '';
       return '<div class="weekly-item' + itemClass + '">' +
         '<div class="weekly-rank' + rankClass + '">' + rank + '</div>' +
         '<div class="weekly-avatar' + avatarClass + '">' + avatarHtml(s) + '</div>' +
-        '<div class="weekly-name" style="color:' + s.color + '">' + s.name + '</div>' +
+        '<div class="weekly-name" style="color:' + (isBottom ? '#ef4444' : s.color) + '">' + s.name + '</div>' +
         '<div class="weekly-val" style="color:' + valColor + '">' + val + '</div>' +
         '</div>';
     }).join('');
-    return '<div class="weekly-col"><div class="weekly-col-title">' + kpi.label + '</div><div class="weekly-col-list">' + items + '</div></div>';
+    const totalHtml = '<div class="weekly-total"><span class="weekly-total-label">TOTAL</span><span class="weekly-total-val">' + total + '</span></div>';
+    return '<div class="weekly-col"><div class="weekly-col-title">' + kpi.label + '</div><div class="weekly-col-list">' + items + '</div>' + totalHtml + '</div>';
   }).join('');
 }
 
