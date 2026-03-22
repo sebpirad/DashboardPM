@@ -1078,6 +1078,7 @@ let _taletidData = null;
 const TALETID_URL = 'https://script.google.com/macros/s/AKfycbyG5fM6vaBvjrnSw2DtF3X8-VwLBToDrWJbqVVuwSG0dkQE5-Sv0-fo7CkNhLK4quAb/exec';
 const TALETID_TARGET_SECS = 3 * 3600; // 3 timer dagligt mål
 
+
 // ═══════════════════════════════════════════════════════════
 // INDIVIDUAL TARGET SYSTEM (from sheet columns Y-AB)
 // ═══════════════════════════════════════════════════════════
@@ -1808,6 +1809,9 @@ async function loadAll(){
     if(!r.ok) throw new Error('HTTP '+r.status);
     const json=await r.json();
     NAMES.map(n=>'Data Input - '+n).concat(['Budgetter']).forEach(n=>_rawData[n]=json[n]||[]);
+    // Screener konkurrence-points fra "Ugentlige Konkurrence" sheet
+    _rawData['ScreenerMiM'] = json['ScreenerMiM'] || {};
+    console.log('[SCREENER MiM]', JSON.stringify(_rawData['ScreenerMiM']));
     // Load individual targets from API response
     if (json['Targets']) {
       _targets = json['Targets'];
@@ -2402,7 +2406,7 @@ function getCompetitionPlayers() {
   NAMES.forEach(n => {
     sellerMiM[n] = weekData[n] ? weekData[n].MiM : 0;
   });
-  // Screener MiM — pre-beregnet i backend (krydstjek sælger-MiM mod screener-sheets)
+  // Screener MiM — hentes fra "Ugentlige Konkurrence" sheet via backend (manuelt udfyldt kolonne D)
   const screenerMiM = {};
   SCREENER_NAMES.forEach(n => screenerMiM[n] = 0);
   const backendScreener = _rawData['ScreenerMiM'] || {};
