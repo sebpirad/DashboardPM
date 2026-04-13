@@ -1013,33 +1013,6 @@
 const TV_MODE = true;
 document.body.classList.add('tv-mode');
 // ═══════════════════════════════════════════════════════════
-// ONE-TIME MIGRATION: Ali → Amalie (run once, then no-op)
-// ═══════════════════════════════════════════════════════════
-(function migrateAliToAmalie(){
-  try {
-    if (localStorage.getItem('pm_migrated_ali_to_amalie') === '1') return;
-    // 1) Photo key
-    const oldPhoto = localStorage.getItem('pm_photo_Ali');
-    if (oldPhoto && !localStorage.getItem('pm_photo_Amalie')) {
-      localStorage.setItem('pm_photo_Amalie', oldPhoto);
-    }
-    localStorage.removeItem('pm_photo_Ali');
-    // 2) Competition score offsets
-    const offRaw = localStorage.getItem('mim_gp_offsets');
-    if (offRaw) {
-      try {
-        const off = JSON.parse(offRaw);
-        if (off && Object.prototype.hasOwnProperty.call(off, 'Ali')) {
-          off.Amalie = (off.Amalie || 0) + (off.Ali || 0);
-          delete off.Ali;
-          localStorage.setItem('mim_gp_offsets', JSON.stringify(off));
-        }
-      } catch(_){}
-    }
-    localStorage.setItem('pm_migrated_ali_to_amalie', '1');
-  } catch(e) { console.warn('Ali→Amalie migration skipped:', e); }
-})();
-// ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfXPt5fy2E7PP8JX5mYXeYbkU-KNTn9wlffC9T7PXUbsjRdNvmlcvCxMvxpkLZKq2V/exec';
@@ -1050,10 +1023,10 @@ const PHOTO_BASE_URL = 'https://raw.githubusercontent.com/sebpirad/DashboardPM/m
 const GITHUB_PHOTOS = {};
 NAMES.forEach(n => GITHUB_PHOTOS[n] = PHOTO_BASE_URL + n.toLowerCase() + '.jpg');
 // Screener photo configuration
-const SCREENER_NAMES = ['Amalie', 'Josefine'];
+const SCREENER_NAMES = ['Amalie', 'Ali', 'Josefine'];
 const SCREENER_PHOTOS = {};
 SCREENER_NAMES.forEach(n => SCREENER_PHOTOS[n] = PHOTO_BASE_URL + n.toLowerCase() + '.jpg');
-const SCREENER_COLORS = { Amalie: '#a3e635', Josefine: '#f9a8d4' };
+const SCREENER_COLORS = { Amalie: '#c084fc', Ali: '#a3e635', Josefine: '#f9a8d4' };
 // HR Dashboard Apps Script endpoint for screener lookup
 const HR_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwNgVLagf3MT5_JeJSWySpkbIEBquFOOHyr0WplT66cf6l3eWgImS0BO7RUYV4TaCp2/exec';
 // Look up screener via HR Dashboard API (async)
