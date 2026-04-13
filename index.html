@@ -745,7 +745,6 @@
   /* Flash effect for score increase */
   .comp-flash { animation: comp-flash-anim 0.3s ease-out; }
   @keyframes comp-flash-anim { 0%{transform:scale(1.3);text-shadow:0 0 20px #ffd700} 100%{transform:scale(1);text-shadow:none} }
-
   /* ════════════════════════════════════════════════════════
      WEEKLY STATUS OVERLAY — 3 ranked columns
      ════════════════════════════════════════════════════════ */
@@ -875,7 +874,6 @@
     text-align: right;
     text-shadow: 0 0 20px currentColor, 0 0 40px rgba(255,255,255,0.1);
   }
-
 </style>
 </head>
 <body>
@@ -988,7 +986,7 @@
       <option value="Jonas">Jonas</option>
       <option value="Andreas">Andreas</option>
       <option value="Flora">Flora</option>
-      <option value="Ali">Ali</option>
+      <option value="Amalie">Amalie</option>
     </select>
     <label style="margin-left:14px">Uge:</label>
     <select id="person-week-select" onchange="renderPerson()"></select>
@@ -1015,20 +1013,47 @@
 const TV_MODE = true;
 document.body.classList.add('tv-mode');
 // ═══════════════════════════════════════════════════════════
+// ONE-TIME MIGRATION: Ali → Amalie (run once, then no-op)
+// ═══════════════════════════════════════════════════════════
+(function migrateAliToAmalie(){
+  try {
+    if (localStorage.getItem('pm_migrated_ali_to_amalie') === '1') return;
+    // 1) Photo key
+    const oldPhoto = localStorage.getItem('pm_photo_Ali');
+    if (oldPhoto && !localStorage.getItem('pm_photo_Amalie')) {
+      localStorage.setItem('pm_photo_Amalie', oldPhoto);
+    }
+    localStorage.removeItem('pm_photo_Ali');
+    // 2) Competition score offsets
+    const offRaw = localStorage.getItem('mim_gp_offsets');
+    if (offRaw) {
+      try {
+        const off = JSON.parse(offRaw);
+        if (off && Object.prototype.hasOwnProperty.call(off, 'Ali')) {
+          off.Amalie = (off.Amalie || 0) + (off.Ali || 0);
+          delete off.Ali;
+          localStorage.setItem('mim_gp_offsets', JSON.stringify(off));
+        }
+      } catch(_){}
+    }
+    localStorage.setItem('pm_migrated_ali_to_amalie', '1');
+  } catch(e) { console.warn('Ali→Amalie migration skipped:', e); }
+})();
+// ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfXPt5fy2E7PP8JX5mYXeYbkU-KNTn9wlffC9T7PXUbsjRdNvmlcvCxMvxpkLZKq2V/exec';
-const NAMES = ['William','Jonas','Andreas','Flora','Ali'];
-const COLORS = { William:'#63AEFA', Jonas:'#DC7243', Andreas:'#82FCE0', Flora:'#f472b6', Ali:'#a3e635', floor:'#A72444', maal:'#3B3B61' };
+const NAMES = ['William','Jonas','Andreas','Flora','Amalie'];
+const COLORS = { William:'#63AEFA', Jonas:'#DC7243', Andreas:'#82FCE0', Flora:'#f472b6', Amalie:'#a3e635', floor:'#A72444', maal:'#3B3B61' };
 // Seller photo configuration – GitHub-hosted + localStorage fallback
 const PHOTO_BASE_URL = 'https://raw.githubusercontent.com/sebpirad/DashboardPM/main/photos/';
 const GITHUB_PHOTOS = {};
 NAMES.forEach(n => GITHUB_PHOTOS[n] = PHOTO_BASE_URL + n.toLowerCase() + '.jpg');
 // Screener photo configuration
-const SCREENER_NAMES = ['Amalie', 'Ali', 'Josefine'];
+const SCREENER_NAMES = ['Amalie', 'Josefine'];
 const SCREENER_PHOTOS = {};
 SCREENER_NAMES.forEach(n => SCREENER_PHOTOS[n] = PHOTO_BASE_URL + n.toLowerCase() + '.jpg');
-const SCREENER_COLORS = { Amalie: '#c084fc', Ali: '#a3e635', Josefine: '#f9a8d4' };
+const SCREENER_COLORS = { Amalie: '#a3e635', Josefine: '#f9a8d4' };
 // HR Dashboard Apps Script endpoint for screener lookup
 const HR_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwNgVLagf3MT5_JeJSWySpkbIEBquFOOHyr0WplT66cf6l3eWgImS0BO7RUYV4TaCp2/exec';
 // Look up screener via HR Dashboard API (async)
@@ -1077,18 +1102,14 @@ let _rawData={}, _trendData={}, _budgets={}, _charts={}, _currentTab='daglig';
 let _taletidData = null;
 const TALETID_URL = 'https://script.google.com/macros/s/AKfycbyG5fM6vaBvjrnSw2DtF3X8-VwLBToDrWJbqVVuwSG0dkQE5-Sv0-fo7CkNhLK4quAb/exec';
 const TALETID_TARGET_SECS = 3 * 3600; // 3 timer dagligt mål
-
-
 // ═══════════════════════════════════════════════════════════
 // INDIVIDUAL TARGET SYSTEM (from sheet columns Y-AB)
 // ═══════════════════════════════════════════════════════════
 let _targets = {}; // { William: { Mandag: {KT:3,Samtaler:5,MIM:2}, ... }, ... }
 const DAY_MAP = { 1:'Mandag', 2:'Tirsdag', 3:'Onsdag', 4:'Torsdag', 5:'Fredag' };
 const DAY_MAP_REV = { Mandag:1, Tirsdag:2, Onsdag:3, Torsdag:4, Fredag:5 };
-
 // Default daily targets per seller if nothing is configured
 const DEFAULT_DAY_TARGET = {KT: 3, Samtaler: 3, MIM: 2};
-
 function getTarget(sellerName, date) {
   const dayNum = date.getDay();
   const dayName = DAY_MAP[dayNum];
@@ -1111,7 +1132,6 @@ function getTarget(sellerName, date) {
   console.warn(`[TARGET] ${sellerName} ${dayName}: ⚠️ HARD DEFAULT → KT:3, Sam:3, MIM:2`);
   return DEFAULT_DAY_TARGET;
 }
-
 function getWeekTarget(sellerName, weekNum) {
   const days = ['Mandag','Tirsdag','Onsdag','Torsdag','Fredag'];
   const t = {KT:0, Samtaler:0, MIM:0};
@@ -1126,7 +1146,6 @@ function getWeekTarget(sellerName, weekNum) {
   const bud = _budgets[weekNum]?.indiv || {KT:15, Sam:13, MiM:7};
   return {KT: bud.KT||15, Samtaler: bud.Sam||13, MIM: bud.MiM||7};
 }
-
 // MiM tracking
 let _seenMiM = new Set();
 let _mimLog = [];
@@ -2381,7 +2400,6 @@ function renderPerson(){
     document.getElementById('person-mim-details').innerHTML=`<div class="card no-data">Ingen MiM i Uge ${sw}</div>`;
   }
 }
-
 // ═══════════════════════════════════════════════════════════
 // F1 COMPETITION OVERLAY SYSTEM
 // ═══════════════════════════════════════════════════════════
@@ -2395,8 +2413,7 @@ function carSVG(c){
     <rect x="4" y="33" width="3" height="1.5" rx="0.5" fill="rgba(255,255,255,0.4)"/>
   </svg>`;
 }
-
-// Competition players: All sellers + screeners. Ali appears once with combined score.
+// Competition players: All sellers + screeners. Amalie appears once with combined score.
 // Bruger PRÆCIS SAMME _trendData som det ugentlige dashboard
 function getCompetitionPlayers() {
   const wn = isoWeek(new Date());
@@ -2414,7 +2431,7 @@ function getCompetitionPlayers() {
     if (SCREENER_NAMES.includes(name)) screenerMiM[name] = backendScreener[name];
   });
   // Build player list: sellers get seller MiM, screeners (non-sellers) get screener MiM
-  // Ali gets BOTH (seller MiM + screener MiM)
+  // Amalie gets BOTH (seller MiM + screener MiM)
   const players = [];
   const seen = new Set();
   // Add all sellers
@@ -2449,7 +2466,6 @@ function getCompetitionPlayers() {
   players.sort((a, b) => b.score - a.score);
   return players;
 }
-
 function renderCompetition() {
   const grid = document.getElementById('comp-grid');
   if (!grid) return;
@@ -2485,7 +2501,6 @@ function renderCompetition() {
     </div>`;
   }).join('');
 }
-
 // ═══════════════════════════════════════════════════════════
 // UNIFIED ROTATION SCHEDULE — per 60-min cycle (12 × 5min blocks)
 // 35min dashboard (7×5), 15min competition (3×5), 10min weekly (2×5)
@@ -2496,7 +2511,6 @@ const ROTATION_SCHEDULE = ['D','D','C','D','D','W','D','C','D','D','C','W'];
 let _compInterval = null;
 let _manualOverride = null; // null=auto, 'comp'=forced comp, 'weekly'=forced weekly, 'dash'=forced dashboard
 let _manualOverrideTimer = null;
-
 function manualToggleCompetition() {
   const compOverlay = document.getElementById('comp-overlay');
   const weeklyOverlay = document.getElementById('weekly-overlay');
@@ -2511,7 +2525,6 @@ function manualToggleCompetition() {
   clearTimeout(_manualOverrideTimer);
   _manualOverrideTimer = setTimeout(() => { _manualOverride = null; }, 5 * 60 * 1000);
 }
-
 function manualToggleWeekly() {
   const compOverlay = document.getElementById('comp-overlay');
   const weeklyOverlay = document.getElementById('weekly-overlay');
@@ -2526,7 +2539,6 @@ function manualToggleWeekly() {
   clearTimeout(_manualOverrideTimer);
   _manualOverrideTimer = setTimeout(() => { _manualOverride = null; }, 5 * 60 * 1000);
 }
-
 function checkRotationTimer() {
   if (_manualOverride !== null) return;
   if (_celebrationRunning) return;
@@ -2560,17 +2572,14 @@ function checkRotationTimer() {
     weeklyOverlay.classList.remove('active');
   }
 }
-
 // ═══════════════════════════════════════════════════════════
 // COMPETITION ADMIN — manual score adjustments
 // ═══════════════════════════════════════════════════════════
 let _compScoreOffsets = {};
 try { _compScoreOffsets = JSON.parse(localStorage.getItem('mim_gp_offsets') || '{}'); } catch(e) {}
-
 function saveCompOffsets() {
   try { localStorage.setItem('mim_gp_offsets', JSON.stringify(_compScoreOffsets)); } catch(e) {}
 }
-
 function adjustCompScore(playerId, delta) {
   if (!_compScoreOffsets[playerId]) _compScoreOffsets[playerId] = 0;
   _compScoreOffsets[playerId] += delta;
@@ -2579,14 +2588,12 @@ function adjustCompScore(playerId, delta) {
   renderCompetition();
   renderCompAdmin();
 }
-
 function resetCompScores() {
   _compScoreOffsets = {};
   saveCompOffsets();
   renderCompetition();
   renderCompAdmin();
 }
-
 function renderCompAdmin() {
   const rows = document.getElementById('comp-admin-rows');
   if (!rows) return;
@@ -2603,7 +2610,6 @@ function renderCompAdmin() {
     </div>`;
   }).join('');
 }
-
 function toggleCompAdmin() {
   const el = document.getElementById('comp-admin');
   if (!el) return;
@@ -2611,7 +2617,6 @@ function toggleCompAdmin() {
   el.style.display = visible ? 'none' : 'block';
   if (!visible) renderCompAdmin();
 }
-
 // Keyboard: 'A' toggles admin panel when competition is visible
 document.addEventListener('keydown', function(e) {
   if (e.key === 'a' || e.key === 'A') {
@@ -2621,7 +2626,6 @@ document.addEventListener('keydown', function(e) {
     }
   }
 });
-
 // ═══════════════════════════════════════════════════════════
 // WEEKLY STATUS VIEW — shows once per hour for 5 min (minutes 10-14)
 // ═══════════════════════════════════════════════════════════
@@ -2676,8 +2680,6 @@ function renderWeekly() {
     return '<div class="weekly-col"><div class="weekly-col-title">' + kpi.label + '</div><div class="weekly-col-list">' + items + '</div>' + totalHtml + '</div>';
   }).join('');
 }
-
-
 // ═══════════════════════════════════════════════════════════
 // BOOT
 // ═══════════════════════════════════════════════════════════
@@ -2730,7 +2732,6 @@ _compInterval = setInterval(checkRotationTimer, 10000);
   setInterval(cycleBg, 30000); // Switch every 30 seconds
 })();
 </script>
-
 <!-- ══ WEEKLY STATUS OVERLAY ═══════════════════════════════ -->
 <div id="weekly-overlay">
   <div id="weekly-bg-a" class="overlay-bg-layer active" style="background-image:url('bg/5.jpg')"></div>
@@ -2748,7 +2749,6 @@ _compInterval = setInterval(checkRotationTimer, 10000);
     <div class="weekly-cols" id="weekly-cols"></div>
   </div>
 </div>
-
 <!-- ══ F1 COMPETITION OVERLAY ═══════════════════════════════ -->
 <div id="comp-overlay">
   <div id="comp-bg-a" class="overlay-bg-layer active" style="background-image:url('bg/5.jpg')"></div>
@@ -2780,7 +2780,6 @@ _compInterval = setInterval(checkRotationTimer, 10000);
     </div>
   </div>
 </div>
-
 </div><!-- /app -->
 </body>
 </html>
