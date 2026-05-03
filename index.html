@@ -831,6 +831,652 @@
     text-align: right;
     text-shadow: 0 0 20px currentColor, 0 0 40px rgba(255,255,255,0.1);
   }
+
+  /* ════════════════════════════════════════════════════════
+     GLASS DESIGN SYSTEM - from new design
+     ════════════════════════════════════════════════════════ */
+  
+  /* Glass card base */
+  .glass {
+    background: linear-gradient(160deg, rgba(27, 26, 48, 0.78) 0%, rgba(39, 39, 69, 0.62) 100%);
+    border: 1px solid rgba(130, 252, 224, 0.14);
+    border-radius: 18px;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow:
+      0 10px 32px rgba(0, 0, 0, 0.5),
+      0 0 40px rgba(108, 43, 247, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    position: relative;
+    overflow: hidden;
+  }
+  .glass::before {
+    content: ''; position: absolute; left: 0; right: 0; top: 0; height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(130, 252, 224, 0.45) 50%, transparent 100%);
+  }
+  .glass.gold-glow {
+    border-color: rgba(255, 216, 107, 0.35);
+    box-shadow:
+      0 10px 32px rgba(0,0,0,0.5),
+      0 0 40px rgba(255, 216, 107, 0.18),
+      0 0 80px rgba(255, 216, 107, 0.08),
+      inset 0 1px 0 rgba(255,255,255,0.06);
+  }
+  .glass.gold-glow::before {
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 216, 107, 0.7) 50%, transparent 100%);
+  }
+
+  /* Main grid layout — 3x3 */
+  .grid-main {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 10px;
+    flex: 0 0 auto;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .grid-main > * { min-height: 0; min-width: 0; }
+
+  /* Seller card redesign */
+  .seller-card {
+    padding: 14px 18px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 0;
+    justify-content: space-between;
+    overflow: hidden;
+  }
+  .seller-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .seller-name-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .seller-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 900;
+    color: var(--bg);
+    flex-shrink: 0;
+    position: relative;
+  }
+  .seller-avatar::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    border: 1.5px solid currentColor;
+    opacity: 0.35;
+  }
+  .seller-name {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    line-height: 1;
+  }
+  .seller-role {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: var(--dim);
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+  .seller-idx {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+  }
+  .seller-idx-val {
+    font-size: 36px;
+    font-weight: 900;
+    line-height: 0.95;
+    letter-spacing: -1px;
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 0 24px currentColor;
+  }
+  .seller-idx-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    color: var(--dim);
+    text-transform: uppercase;
+  }
+
+  /* Progress bars — new style */
+  .bars {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .bar-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .bar-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .bar-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--dim);
+    text-transform: uppercase;
+  }
+  .bar-vals {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-variant-numeric: tabular-nums;
+  }
+  .bar-actual {
+    font-size: 18px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1;
+  }
+  .bar-target {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--dimmer);
+  }
+  .bar-pct {
+    font-size: 13px;
+    font-weight: 800;
+  }
+  .bar-track {
+    height: 11px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 6px;
+    position: relative;
+    transition: width 1s ease;
+  }
+  .bar-fill::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 6px;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.25) 50%, transparent 100%);
+    animation: shimmer 2.5s ease-in-out infinite;
+  }
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+  
+  /* Bar status colors */
+  .bar-fill.s-red    { background: linear-gradient(90deg, #b91c1c, #ef4444); box-shadow: 0 0 12px rgba(239,68,68,0.45); }
+  .bar-fill.s-yellow { background: linear-gradient(90deg, #d97706, #fbbf24); box-shadow: 0 0 12px rgba(251,191,36,0.45); }
+  .bar-fill.s-green  { background: linear-gradient(90deg, #059669, #34D399); box-shadow: 0 0 12px rgba(52,211,153,0.45); }
+  .bar-fill.s-gold   {
+    background: linear-gradient(90deg, #82FCE0, #FFD86B);
+    box-shadow: 0 0 16px rgba(255,216,107,0.55);
+  }
+  .pct-red { color: #ef4444; }
+  .pct-yellow { color: #fbbf24; }
+  .pct-green { color: #34D399; }
+  .pct-gold { color: #FFD86B; }
+
+  /* GF flag row */
+  .gf-flag {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 6px;
+    gap: 8px;
+  }
+  .gf-flag-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: var(--dim);
+    text-transform: uppercase;
+  }
+  .gf-flag-val {
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .gf-flag-val.gf-ok { color: #34D399; }
+  .gf-flag-val.gf-low { color: #DC7243; }
+
+  /* Team rings section */
+  .team-rings {
+    padding: 14px 18px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    gap: 10px;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .ring-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+  }
+  .ring-svg-wrap {
+    position: relative;
+    width: 110px;
+    height: 110px;
+  }
+  .ring-svg-wrap svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+  }
+  .ring-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .ring-val {
+    font-size: 28px;
+    font-weight: 900;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .ring-tgt {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: var(--dim);
+    margin-top: 1px;
+  }
+  .ring-label-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .ring-label {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    color: #fff;
+    text-transform: uppercase;
+  }
+  .ring-pct {
+    font-size: 13px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* MiM Log redesign */
+  .mim-log {
+    padding: 14px 18px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .mim-log-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .mim-log-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .mim-log-title {
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    color: var(--cyan);
+    text-transform: uppercase;
+    text-shadow: 0 0 12px rgba(130, 252, 224, 0.4);
+    white-space: nowrap;
+  }
+  .mim-trophy {
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+    filter: drop-shadow(0 0 8px rgba(255, 216, 107, 0.6));
+  }
+  .mim-count {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--dim);
+    letter-spacing: 1.5px;
+    background: rgba(130, 252, 224, 0.08);
+    border: 1px solid rgba(130, 252, 224, 0.2);
+    border-radius: 999px;
+    padding: 3px 10px;
+    white-space: nowrap;
+  }
+  .mim-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 8px;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .mim-item {
+    background: rgba(13, 13, 23, 0.4);
+    border: 1px solid rgba(130, 252, 224, 0.10);
+    border-radius: 10px;
+    padding: 8px 10px 8px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    position: relative;
+    overflow: hidden;
+    min-width: 0;
+  }
+  .mim-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--accent-color, var(--cyan));
+    box-shadow: 0 0 10px var(--accent-color, var(--cyan));
+  }
+  .mim-time-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .mim-seller {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+  }
+  .mim-time {
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--dimmer);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.5px;
+  }
+  .mim-cand {
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .mim-co {
+    font-size: 10px;
+    color: var(--dim);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+  }
+  .mim-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 2px;
+  }
+  .mim-gf {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    background: rgba(52, 211, 153, 0.12);
+    color: var(--green);
+    border: 1px solid rgba(52, 211, 153, 0.25);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .mim-gf.low {
+    background: rgba(220, 114, 67, 0.14);
+    color: var(--orange);
+    border-color: rgba(220, 114, 67, 0.3);
+  }
+  .mim-screener {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--dim);
+    border: 1px solid rgba(164, 153, 226, 0.2);
+    border-radius: 4px;
+    padding: 2px 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .mim-screener strong {
+    color: var(--cyan);
+    font-weight: 800;
+  }
+
+  /* Activity feed */
+  .activity-log {
+    padding: 14px 18px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .activity-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .activity-title {
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    color: var(--cyan);
+    text-transform: uppercase;
+    text-shadow: 0 0 12px rgba(130, 252, 224, 0.4);
+  }
+  .activity-pulse {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--dim);
+    letter-spacing: 1.5px;
+    background: rgba(130, 252, 224, 0.08);
+    border: 1px solid rgba(130, 252, 224, 0.2);
+    border-radius: 999px;
+    padding: 3px 10px;
+    text-transform: uppercase;
+  }
+  .activity-pulse-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+    animation: pulse-dot 1.6s ease-in-out infinite;
+  }
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
+  }
+  .activity-list {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 70%, transparent 100%);
+    mask-image: linear-gradient(180deg, #000 0%, #000 70%, transparent 100%);
+  }
+  .activity-row {
+    display: grid;
+    grid-template-columns: 124px 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 2px;
+    border-bottom: 1px solid rgba(164, 153, 226, 0.06);
+    font-size: 12px;
+  }
+  .activity-row:last-child {
+    border-bottom: 0;
+  }
+  .activity-tag {
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+  .activity-tag.kt {
+    background: rgba(99, 174, 250, 0.15);
+    color: #63AEFA;
+  }
+  .activity-tag.samtale {
+    background: rgba(130, 252, 224, 0.15);
+    color: #82FCE0;
+  }
+  .activity-tag.mim {
+    background: rgba(255, 216, 107, 0.15);
+    color: #FFD86B;
+  }
+  .activity-seller {
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+  .activity-time {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--dimmer);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  /* Live and day pills */
+  .live-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(52, 211, 153, 0.10);
+    border: 1px solid rgba(52, 211, 153, 0.35);
+    border-radius: 999px;
+    padding: 7px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--green);
+  }
+  .day-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(27, 26, 48, 0.65);
+    border: 1px solid rgba(130, 252, 224, 0.14);
+    border-radius: 12px;
+    padding: 7px 14px;
+    color: var(--dim);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  .day-pill .sep {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 8px var(--cyan);
+  }
+  .day-pill .day-name {
+    color: #fff;
+    font-weight: 700;
+  }
+
+  /* Header action buttons */
+  .hdr-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 30px;
+    padding: 0 10px;
+    background: rgba(27, 26, 48, 0.55);
+    border: 1px solid rgba(130, 252, 224, 0.14);
+    border-radius: 7px;
+    color: var(--dim);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    cursor: pointer;
+    transition: all .15s ease;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+  .hdr-btn:hover {
+    background: rgba(39, 39, 69, 0.75);
+    border-color: rgba(130, 252, 224, 0.35);
+    color: #fff;
+  }
+  .hdr-btn.icon-only {
+    padding: 0;
+    width: 30px;
+    justify-content: center;
+  }
+  .hdr-btn .btn-ic {
+    width: 13px;
+    height: 13px;
+    opacity: 0.85;
+  }
+  .hdr-btn.accent {
+    background: linear-gradient(160deg, rgba(108, 43, 247, 0.22), rgba(99, 174, 250, 0.16));
+    border-color: rgba(164, 153, 226, 0.35);
+  }
+  .hdr-btn.accent:hover {
+    border-color: rgba(164, 153, 226, 0.6);
+  }
 </style>
 </head>
 <body>
@@ -1973,9 +2619,65 @@ function renderDaglig(){
   const sheets=NAMES.map(n=>'Data Input - '+n);
   const dayData={};
   for(let i=0;i<NAMES.length;i++) dayData[NAMES[i]]=calcSellerArr(_rawData[sheets[i]],d,d);
-  // Hall of Fame / MiM Log
-  document.getElementById('mim-log-section').innerHTML = renderMimLog(d);
-  // ── Individual cards: compact bar cards with index number (NO rings) ──
+
+  // Helper functions for status/coloring
+  function statusFor(pct) { return pct >= 126 ? 'gold' : pct >= 100 ? 'green' : pct >= 66 ? 'yellow' : 'red'; }
+  function statusColor(pct) { return { red:'#ef4444', yellow:'#fbbf24', green:'#34D399', gold:'#FFD86B' }[statusFor(pct)]; }
+  function barClass(pct) { return 'bar-fill s-' + statusFor(pct); }
+  function pctClass(pct) { return 'pct-' + statusFor(pct); }
+
+  // Ring SVG helper
+  function ringSVG(pct, color, size=110, stroke=11) {
+    const r = (size - stroke) / 2;
+    const c = 2 * Math.PI * r;
+    const dash = c * Math.min(pct, 100) / 100;
+    const id = 'g' + Math.round(Math.random()*1e6);
+    return `<svg viewBox="0 0 ${size} ${size}" style="width:100%;height:100%;transform:rotate(-90deg)">
+      <defs><filter id="glow-${id}" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="${stroke}"/>
+      <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${color}" stroke-width="${stroke}" stroke-linecap="round" stroke-dasharray="${dash} ${c}" filter="url(#glow-${id})"/>
+    </svg>`;
+  }
+
+  // Build activity feed for today
+  function buildActivityFeed(date) {
+    const dateStr = fmtDate(date);
+    const entries = [];
+    for (let i = 0; i < NAMES.length; i++) {
+      const seller = NAMES[i];
+      const sheet = sheets[i];
+      const rows = _rawData[sheet] || [];
+      for (let j = 1; j < rows.length; j++) {
+        const r = rows[j];
+        const g = v => v instanceof Date ? fmtDate(v) : String(v || '');
+        // KT entries
+        const r0 = g(r[0]), r1 = g(r[1]);
+        if (inRange(r0, date, date) && r1.trim()) {
+          const timestamp = typeof r[0] === 'object' ? r[0] : parseDate(r0);
+          entries.push({ type: 'KT', seller, timestamp, time: timestamp ? timestamp.toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' }) : '—' });
+        }
+        // Samtaler entries
+        const r6 = g(r[6]), r7 = g(r[7]);
+        if (inRange(r6, date, date) && r7.trim()) {
+          const timestamp = typeof r[6] === 'object' ? r[6] : parseDate(r6);
+          entries.push({ type: 'Samtale', seller, timestamp, time: timestamp ? timestamp.toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' }) : '—' });
+        }
+        // MiM entries
+        const r13 = g(r[13]), r14 = g(r[14]), r15 = g(r[15]), r21 = g(r[21]);
+        if (inRange(r13, date, date) && r15.trim()) {
+          if (!/startede aldrig/i.test(r21) && !/opsagt samme uge/i.test(r21)) {
+            const timestamp = typeof r[13] === 'object' ? r[13] : parseDate(r13);
+            entries.push({ type: 'MiM', seller, timestamp, time: timestamp ? timestamp.toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' }) : '—' });
+          }
+        }
+      }
+    }
+    // Sort by timestamp descending, return top 8
+    entries.sort((a, b) => (b.timestamp || new Date()) - (a.timestamp || new Date()));
+    return entries.slice(0, 8);
+  }
+
+  // Render 6 seller cards in grid
   document.getElementById('daily-cards').innerHTML=NAMES.map(name=>{
     const s=dayData[name];
     const tgt=getTarget(name, d);
@@ -1983,59 +2685,149 @@ function renderDaglig(){
     const avgPct=weightedIdx(pctKT, pctSam, pctMiM);
     const color=COLORS[name];
     const isGold=avgPct>=126;
-    function bar(label,actual,target,pct){
-      if(pct===null) return `<div class="bar-row"><div class="bar-header"><span class="bar-label">${label}</span><span class="bar-val" style="color:var(--dim)">—</span></div><div class="bar-track"></div></div>`;
-      const cc=barColorClass(pct);
-      const rc=ringColor(pct);
+    const avgColor = statusColor(avgPct);
+
+    // KPI bars
+    const barHtml = [
+      {label:'KT', val: s.KT, tgt: tgt.KT, pct: pctKT},
+      {label:'Samtaler', val: s.Samtaler, tgt: tgt.Samtaler, pct: pctSam},
+      {label:'MiM', val: s.MiM, tgt: tgt.MIM, pct: pctMiM}
+    ].map(m => {
+      if (m.pct === null) return `<div class="bar-row"><div class="bar-head"><span class="bar-label">${m.label}</span><span style="color:var(--dim)">—</span></div></div>`;
+      const capPct = Math.min(m.pct, 130);
       return `<div class="bar-row">
-        <div class="bar-header">
-          <span class="bar-label">${label}</span>
-          <span class="bar-val">${actual}/${target} <span class="bar-pct" style="color:${rc}">${pct}%</span></span>
+        <div class="bar-head">
+          <span class="bar-label">${m.label}</span>
+          <div class="bar-vals">
+            <span class="bar-actual">${m.val}</span>
+            <span class="bar-target">/ ${m.tgt}</span>
+            <span class="${pctClass(m.pct)}">${m.pct}%</span>
+          </div>
         </div>
-        <div class="bar-track"><div class="bar-fill ${cc}" style="width:${Math.min(pct,100)}%"></div></div>
+        <div class="bar-track"><div class="${barClass(m.pct)}" style="width:${(capPct/130)*100}%"></div></div>
       </div>`;
-    }
-    return `<div class="${isGold?'daily-card state-gold':'daily-card'}">
-      <div class="daily-name" style="color:${color}">${name}</div>
-      <div class="daily-index-num" style="color:${ringColor(avgPct)}">${avgPct}%</div>
-      <div class="daily-index-label">Samlet index</div>
-      <div class="daily-bars">
-        ${bar('KT', s.KT, tgt.KT, pctKT)}
-        ${bar('Samtaler', s.Samtaler, tgt.Samtaler, pctSam)}
-        ${bar('MiM', s.MiM, tgt.MIM, pctMiM)}
-        ${s.gnsGF!==null?`<div style="margin-top:8px;font-size:12px;font-weight:700;color:${s.gnsGF<1.90?'var(--yellow)':'var(--green)'}">GF ${s.gnsGF.toFixed(3)} ${s.gnsGF<1.90?'<span class="tag-low">↓ lav</span>':'✓'}</div>`:''}
+    }).join('');
+
+    return `<div class="glass seller-card ${isGold ? 'gold-glow' : ''}">
+      <div class="seller-head">
+        <div class="seller-name-wrap">
+          <div class="seller-avatar" style="background:${color}; color:#0D0D17">${name[0]}</div>
+          <div>
+            <div class="seller-name" style="color:${color};text-shadow:0 0 18px ${color}80">${name}</div>
+          </div>
+        </div>
+        <div class="seller-idx">
+          <div class="seller-idx-val" style="color:${avgColor}">${avgPct}%</div>
+          <div class="seller-idx-label">Index</div>
+        </div>
+      </div>
+      <div class="bars">${barHtml}</div>
+      <div class="gf-flag">
+        <span class="gf-flag-label">GF gennemsnit</span>
+        <span class="gf-flag-val ${s.gnsGF === null ? '' : (s.gnsGF < 1.90 ? 'gf-low' : 'gf-ok')}">
+          ${s.gnsGF === null ? '—' : s.gnsGF.toFixed(2)}
+          ${s.gnsGF !== null && s.gnsGF >= 1.90 ? '<span style="margin-left:4px;font-size:11px">✓</span>' : (s.gnsGF !== null && s.gnsGF < 1.90 ? '<span style="margin-left:4px;font-size:11px">↓</span>' : '')}
+        </span>
       </div>
     </div>`;
   }).join('');
-  // ── Team donuts: KT, Samtaler, MiM (3 only, no SS) ──
+
+  // Team rings row
   const tKT=NAMES.reduce((s,n)=>s+dayData[n].KT,0);
   const tSam=NAMES.reduce((s,n)=>s+dayData[n].Samtaler,0);
   const tMiM=NAMES.reduce((s,n)=>s+dayData[n].MiM,0);
-  // Team targets = sum of individual targets for this day
   const tTgt={KT:0,Samtaler:0,MIM:0};
   NAMES.forEach(n=>{const t=getTarget(n,d);tTgt.KT+=t.KT;tTgt.Samtaler+=t.Samtaler;tTgt.MIM+=t.MIM;});
-  const teamMetrics=[
-    {l:'KT',v:tKT,m:tTgt.KT},
-    {l:'Samtaler',v:tSam,m:tTgt.Samtaler},
-    {l:'MiM',v:tMiM,m:tTgt.MIM}
+  
+  const teamRings = [
+    {l:'KT', v:tKT, m:tTgt.KT},
+    {l:'Samtaler', v:tSam, m:tTgt.Samtaler},
+    {l:'MiM', v:tMiM, m:tTgt.MIM}
   ];
-  document.getElementById('daily-team-donuts').innerHTML=teamMetrics.map(k=>{
-    const i=idx(k.v,k.m);
-    const iSafe=i===null?0:i;
-    const rc=ringColor(i);
-    return `<div class="daily-team-card">
-      <div class="ring-sm" style="position:relative;width:155px;height:155px;margin:0 auto 8px">
-        ${ringSVG(iSafe, rc, 155, 10)}
-        <div style="position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
-          <div style="font-size:34px;font-weight:900;color:${rc};font-variant-numeric:tabular-nums;text-shadow:0 0 15px ${rc}66">${k.v}</div>
-          <div style="font-size:11px;font-weight:600;color:var(--dim);margin-top:-2px">AF ${k.m}</div>
+
+  // MiM Log
+  const activityFeed = buildActivityFeed(d);
+  const mimEntries = dayData['William'].mimRows || [];
+  NAMES.forEach(n => {
+    const entries = (dayData[n].mimRows || []).slice(0, 4);
+  });
+  const mimCardsList = NAMES.flatMap(n => (dayData[n].mimRows || []).slice(0, 1).map(entry => ({
+    seller: n,
+    cand: entry.kandidat,
+    co: entry.virk,
+    gf: entry.gf,
+    time: entry.dato.substring(0, 5)
+  }))).slice(0, 4);
+
+  document.getElementById('daily-team-donuts').innerHTML = `
+    <div class="glass team-rings">
+      ${teamRings.map(k => {
+        const i = idx(k.v, k.m);
+        const iSafe = i === null ? 0 : i;
+        const rc = statusColor(iSafe);
+        return `<div class="ring-wrap">
+          <div class="ring-svg-wrap">
+            ${ringSVG(iSafe, rc, 110, 11)}
+            <div class="ring-center">
+              <div class="ring-val" style="color:${rc};text-shadow:0 0 16px ${rc}80">${k.v}</div>
+              <div class="ring-tgt">/ ${k.m}</div>
+            </div>
+          </div>
+          <div class="ring-label-row">
+            <span class="ring-label">${k.l}</span>
+            <span class="ring-pct" style="color:${rc}">${i === null ? '—' : i + '%'}</span>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="glass mim-log">
+      <div class="mim-log-head">
+        <div class="mim-log-title-wrap">
+          <div class="mim-trophy">🏆</div>
+          <div class="mim-log-title">Dagens MiM Log</div>
+        </div>
+        <div class="mim-count">${mimCardsList.length} closes</div>
+      </div>
+      <div class="mim-list">
+        ${mimCardsList.map((e, i) => `
+          <div class="mim-item" style="--accent-color:${COLORS[e.seller]}">
+            <div class="mim-time-row">
+              <div class="mim-seller" style="color:${COLORS[e.seller]}">${e.seller}</div>
+              <div class="mim-time">${e.time}</div>
+            </div>
+            <div class="mim-cand">${e.cand}</div>
+            <div class="mim-co">${e.co}</div>
+            <div class="mim-meta">
+              <span class="mim-gf ${!isNaN(e.gf) && e.gf < 1.90 ? 'low' : ''}">GF ${isNaN(e.gf) ? '—' : e.gf.toFixed(2)}</span>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    <div class="glass activity-log">
+      <div class="activity-head">
+        <div class="activity-title">Seneste aktivitet</div>
+        <div class="activity-pulse">
+          <span class="activity-pulse-dot"></span>
+          <span>Live</span>
         </div>
       </div>
-      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:2px;color:var(--dim)">${k.l}</div>
-      <div style="font-size:18px;font-weight:900;color:${rc};margin-top:2px">${i===null?'—':i+'%'}</div>
-    </div>`;
-  }).join('');
+      <div class="activity-list">
+        ${activityFeed.map(e => {
+          const sellerColor = COLORS[e.seller] || '#fff';
+          const actTypeLabel = {KT:'KT', Samtale:'Samtale', MiM:'Mand i Marken'}[e.type] || e.type;
+          const actTypeClass = {KT:'kt', Samtale:'samtale', MiM:'mim'}[e.type] || 'other';
+          return `<div class="activity-row">
+            <span class="activity-tag ${actTypeClass}">${e.type}</span>
+            <span class="activity-seller" style="color:${sellerColor}">${e.seller}</span>
+            <span class="activity-time">${e.time}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  `;
 }
+
 // Hall of Fame renderer
 function renderMimLog(date) {
   const dateStr = fmtDate(date);
