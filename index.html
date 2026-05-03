@@ -16,31 +16,50 @@
     --cyan: #82FCE0; --purple: #6C2BF7; --lightblue: #78D0F7;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; overflow: hidden; }
   body {
-    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; background: #0D0D17; color: var(--text);
-    padding: 10px 14px; min-height: 100vh; position: relative; overflow-x: hidden;
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; background: #000; color: var(--text);
+    margin: 0; padding: 0;
   }
-  /* ── Cycling background system ── */
-  .bg-cycle-layer {
-    position: fixed; inset: 0; z-index: -3;
+  /* Stage: scales 1920x1080 to fit viewport, letterboxed */
+  #stage {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: #000;
+  }
+  #frame {
+    width: 1920px; height: 1080px;
+    transform-origin: center center;
+    position: relative; flex-shrink: 0;
+    background: var(--bg);
+    overflow: hidden;
+  }
+  /* Background layers inside frame */
+  .bg-img {
+    position: absolute; inset: 0; z-index: 0;
     background-size: cover; background-position: center;
     transition: opacity 3s ease-in-out;
     will-change: opacity;
   }
-  .bg-cycle-layer.active { opacity: 1; }
-  .bg-cycle-layer.inactive { opacity: 0; }
-  /* Dark overlay on bg image — lower opacity so background SHOWS */
-  body::before {
-    content: ''; position: fixed; inset: 0; z-index: -2;
-    background: rgba(13,13,23,0.62);
+  .bg-overlay {
+    position: absolute; inset: 0; z-index: 1;
+    background:
+      radial-gradient(ellipse at 20% 10%, rgba(108, 43, 247, 0.18) 0%, transparent 55%),
+      radial-gradient(ellipse at 90% 95%, rgba(130, 252, 224, 0.10) 0%, transparent 50%),
+      linear-gradient(180deg, rgba(13, 13, 23, 0.55) 0%, rgba(13, 13, 23, 0.78) 100%);
     pointer-events: none;
   }
-  /* HUD grid overlay — subtle futuristic scanline feel */
-  body::after {
-    content: ''; position: fixed; inset: 0; z-index: -1;
+  .bg-grid {
+    position: absolute; inset: 0; z-index: 2;
     background:
-      repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(130,252,224,0.03) 60px),
-      repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(130,252,224,0.03) 60px);
+      repeating-linear-gradient(0deg, transparent, transparent 79px, rgba(130, 252, 224, 0.035) 80px),
+      repeating-linear-gradient(90deg, transparent, transparent 79px, rgba(130, 252, 224, 0.035) 80px);
+    pointer-events: none;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 90%);
+  }
+  .bg-vignette {
+    position: absolute; inset: 0; z-index: 3;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.55) 100%);
     pointer-events: none;
   }
   /* ── Splash preloader (prevents glitch on TV stick) ── */
@@ -63,8 +82,38 @@
   #splash-preloader.fade-out {
     opacity: 0; transition: opacity 0.5s ease; pointer-events: none;
   }
-  #app { position: relative; z-index: 1; }
+  #app { position: relative; z-index: 5; width: 100%; height: 100%; padding: 24px 32px 24px; display: flex; flex-direction: column; gap: 14px; overflow: hidden; }
   /* ── Header ── */
+  .hdr { display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+  .hdr-left { display: flex; align-items: center; gap: 22px; }
+  .logo-mark {
+    width: 48px; height: 48px; border-radius: 14px; position: relative;
+    background: linear-gradient(135deg, #82FCE0 0%, #63AEFA 50%, #6C2BF7 100%);
+    box-shadow: 0 0 32px rgba(108, 43, 247, 0.45), 0 0 64px rgba(130, 252, 224, 0.18);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .logo-mark::before {
+    content: ''; position: absolute; inset: 3px; border-radius: 11px; background: var(--bg);
+  }
+  .logo-mark svg { position: relative; z-index: 1; }
+  .logo-text {
+    font-size: 28px; font-weight: 900; letter-spacing: 6px; line-height: 1;
+    background: linear-gradient(135deg, #82FCE0 0%, #63AEFA 45%, #6C2BF7 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .logo-sub {
+    margin-top: 3px; font-size: 10px; letter-spacing: 4px; font-weight: 600;
+    color: var(--dim); text-transform: uppercase;
+  }
+  .hdr-right { display: flex; align-items: center; gap: 8px; }
+  .hdr-divider { width: 1px; height: 20px; background: rgba(130,252,224,0.14); margin: 0 4px; }
+  .clock-block { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+  .clock-time {
+    font-family: 'JetBrains Mono', monospace; font-size: 38px; font-weight: 800;
+    letter-spacing: 2px; color: #fff; line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .clock-meta { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); }
   .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
   h1 {
     font-size: 22px; font-weight: 900; letter-spacing: 2px;
@@ -92,23 +141,53 @@
   }
   .refresh-btn:hover { background: #292948; color: #fff; }
   .last-updated { font-size: 10px; color: var(--dimmer); margin-top: 4px; text-align: right; }
+  .hdr-btn {
+    background: transparent; border: 1px solid rgba(130, 252, 224, 0.2);
+    border-radius: 8px; color: var(--text); font-size: 14px; padding: 6px 10px;
+    cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center;
+  }
+  .hdr-btn:hover { background: rgba(130, 252, 224, 0.08); border-color: rgba(130, 252, 224, 0.4); }
+  .hdr-btn.accent { background: linear-gradient(135deg, #6C2BF7, #63AEFA); border-color: transparent; }
+  .hdr-btn.accent:hover { box-shadow: 0 0 16px rgba(99, 174, 250, 0.4); }
+  .live-pill {
+    display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700;
+    color: #34D399; text-transform: uppercase; letter-spacing: 1px;
+  }
+  .day-pill {
+    display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--dim);
+    background: rgba(27, 26, 48, 0.5); border: 1px solid rgba(130, 252, 224, 0.12);
+    border-radius: 12px; padding: 6px 14px;
+  }
+  .day-pill .sep { width: 1px; height: 14px; background: rgba(130, 252, 224, 0.2); }
+  .day-pill .day-name { font-weight: 700; color: #fff; }
   /* ── Tabs ── */
+  .tabs-row { display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
   .tab-nav {
-    display: flex; gap: 3px; margin-bottom: 8px;
-    background: rgba(27,26,48,0.9); border: 1px solid var(--card-border); border-radius: 10px; padding: 4px;
-    width: fit-content;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 0 20px rgba(108,43,247,0.06);
+    display: inline-flex; align-items: center; gap: 4px;
+    background: rgba(27, 26, 48, 0.65);
+    border: 1px solid rgba(130, 252, 224, 0.14);
+    border-radius: 14px; padding: 5px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 6px 24px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.04);
   }
   .tab-btn {
-    background: transparent; border: none; border-radius: 7px;
-    color: var(--dim); font-size: 12px; font-weight: 700; padding: 7px 20px; cursor: pointer;
-    transition: all 0.15s; letter-spacing: 0.5px; text-transform: uppercase;
+    background: transparent; border: none; border-radius: 10px;
+    color: var(--dim); font-size: 13px; font-weight: 700; padding: 10px 26px; cursor: pointer;
+    transition: all 0.2s; letter-spacing: 2.5px; text-transform: uppercase;
+    font-family: inherit;
   }
-  .tab-btn:hover { color: var(--text); background: #292948; }
+  .tab-btn:hover { color: #fff; background: rgba(130, 252, 224, 0.06); }
   .tab-btn.active {
-    background: linear-gradient(135deg, #6C2BF7, #63AEFA); color: #fff;
-    box-shadow: 0 0 20px rgba(99,174,250,0.4), 0 0 40px rgba(108,43,247,0.2);
+    color: #fff;
+    background: linear-gradient(135deg, #6C2BF7 0%, #63AEFA 100%);
+    box-shadow: 0 0 24px rgba(99, 174, 250, 0.45), 0 0 48px rgba(108, 43, 247, 0.2), inset 0 1px 0 rgba(255,255,255,0.18);
   }
+  /* ── View containers ── */
+  #view-daglig, #view-uge, #view-maaned, #view-person {
+    flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden;
+  }
+  #view-daglig { display: flex; flex-direction: column; gap: 6px; overflow: hidden; }
   /* ── Pickers ── */
   .picker-row { display: flex; gap: 8px; margin-bottom: 6px; align-items: center; flex-wrap: wrap; }
   .picker-row label { font-size: 12px; color: var(--dim); font-weight: 600; }
@@ -167,21 +246,21 @@
   .divider { border: none; border-top: 1px solid var(--card-border); margin: 10px 0; }
   /* ── Seller cards ── */
   .seller-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
-  .seller-card {
+  .seller-grid .seller-card {
     background: linear-gradient(160deg, #1B1A30 0%, #272745 100%);
     border: 1px solid var(--card-border); border-radius: 12px; padding: 16px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.4), 0 0 20px rgba(108,43,247,0.06);
     border-top: 2px solid rgba(130,252,224,0.2);
   }
-  .seller-name {
+  .seller-grid .seller-name {
     font-size: 14px; font-weight: 800; color: #fff; margin-bottom: 10px; padding-bottom: 8px;
     border-bottom: 1px solid rgba(130,252,224,0.12);
     text-shadow: 0 0 15px currentColor;
   }
-  .seller-kpi { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-  .seller-kpi-label { font-size: 11px; color: var(--dim); }
-  .seller-kpi-right { display: flex; align-items: center; gap: 6px; }
-  .seller-kpi-val { font-size: 12px; font-weight: 700; color: #fff; }
+  .seller-grid .seller-kpi { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .seller-grid .seller-kpi-label { font-size: 11px; color: var(--dim); }
+  .seller-grid .seller-kpi-right { display: flex; align-items: center; gap: 6px; }
+  .seller-grid .seller-kpi-val { font-size: 12px; font-weight: 700; color: #fff; }
   /* ── MiM table ── */
   .mim-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
   .mim-table { width: 100%; border-collapse: collapse; font-size: 11px; }
@@ -218,41 +297,41 @@
     text-shadow: 0 0 20px currentColor, 0 0 40px rgba(255,255,255,0.1);
   }
   /* Big ring — scaled for TV fullscreen */
-  .ring-wrap { position: relative; width: 200px; height: 200px; margin: 0 auto 12px; }
-  .ring-wrap svg { width: 200px; height: 200px; transform: rotate(-90deg); }
+  .daily-card .ring-wrap { position: relative; width: 200px; height: 200px; margin: 0 auto 12px; }
+  .daily-card .ring-wrap svg { width: 200px; height: 200px; transform: rotate(-90deg); }
   .ring-bg { fill: none; stroke: #3a3a5c; stroke-width: 10; }
   .ring-fg {
     fill: none; stroke-width: 12; stroke-linecap: round;
     transition: stroke-dashoffset 1s ease, stroke 0.5s;
     /* Glow moved to inline SVG filter — CSS drop-shadow creates rectangular artifacts on Mali-G31 */
   }
-  .ring-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; }
-  .ring-pct {
+  .daily-card .ring-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; }
+  .daily-card .ring-pct {
     font-size: 46px; font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums;
     text-shadow: 0 0 20px currentColor, 0 0 40px rgba(255,255,255,0.15);
   }
-  .ring-label { font-size: 11px; color: var(--dim); margin-top: 4px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; }
+  .daily-card .ring-label { font-size: 11px; color: var(--dim); margin-top: 4px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; }
   /* Small ring for team donuts */
-  .ring-sm { position: relative; width: 155px; height: 155px; margin: 0 auto 8px; }
-  .ring-sm svg { width: 155px; height: 155px; transform: rotate(-90deg); }
-  .ring-sm .ring-pct {
+  .daily-team-card .ring-sm { position: relative; width: 155px; height: 155px; margin: 0 auto 8px; }
+  .daily-team-card .ring-sm svg { width: 155px; height: 155px; transform: rotate(-90deg); }
+  .daily-team-card .ring-sm .ring-pct {
     font-size: 38px; font-weight: 900; font-variant-numeric: tabular-nums;
     text-shadow: 0 0 15px currentColor;
   }
-  .ring-sm .ring-label { font-size: 12px; font-weight: 700; letter-spacing: 1px; }
+  .daily-team-card .ring-sm .ring-label { font-size: 12px; font-weight: 700; letter-spacing: 1px; }
   /* Progress bars — bolder for TV readability */
   .daily-bars { text-align: left; margin-top: 4px; }
-  .bar-row { margin-bottom: 16px; }
+  .daily-bars .bar-row { margin-bottom: 16px; }
   .bar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-  .bar-label { font-size: 14px; font-weight: 800; color: #E8E5F8; }
+  .daily-bars .bar-label { font-size: 14px; font-weight: 800; color: #E8E5F8; }
   .bar-val { font-size: 14px; font-weight: 900; color: #fff; font-variant-numeric: tabular-nums; }
   .bar-pct { font-size: 13px; font-weight: 900; margin-left: 4px; }
-  .bar-track { height: 16px; background: #3a3a5c; border-radius: 8px; overflow: hidden; position: relative; }
-  .bar-fill { height: 100%; border-radius: 6px; transition: width 0.8s ease; min-width: 2px; }
-  .bar-fill.c-red    { background: linear-gradient(90deg, #dc2626, #ef4444); box-shadow: 0 0 14px rgba(239,68,68,0.5); }
-  .bar-fill.c-yellow { background: linear-gradient(90deg, #d97706, #fbbf24); box-shadow: 0 0 14px rgba(251,191,36,0.5); }
-  .bar-fill.c-green  { background: linear-gradient(90deg, #059669, #34D399); box-shadow: 0 0 14px rgba(52,211,153,0.5); }
-  .bar-fill.c-gold   {
+  .daily-bars .bar-track { height: 16px; background: #3a3a5c; border-radius: 8px; overflow: hidden; position: relative; }
+  .daily-bars .bar-fill { height: 100%; border-radius: 6px; transition: width 0.8s ease; min-width: 2px; }
+  .daily-bars .bar-fill.c-red    { background: linear-gradient(90deg, #dc2626, #ef4444); box-shadow: 0 0 14px rgba(239,68,68,0.5); }
+  .daily-bars .bar-fill.c-yellow { background: linear-gradient(90deg, #d97706, #fbbf24); box-shadow: 0 0 14px rgba(251,191,36,0.5); }
+  .daily-bars .bar-fill.c-green  { background: linear-gradient(90deg, #059669, #34D399); box-shadow: 0 0 14px rgba(52,211,153,0.5); }
+  .daily-bars .bar-fill.c-gold   {
     background: linear-gradient(90deg, #34D399, #82FCE0);
     box-shadow: 0 0 20px rgba(130,252,224,0.6), 0 0 40px rgba(130,252,224,0.2);
     animation: barGoldPulse 2s ease-in-out infinite;
@@ -870,9 +949,9 @@
   .grid-main {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: auto auto auto;
+    grid-template-rows: 290px 290px 290px;
     gap: 10px;
-    flex: 0 0 auto;
+    flex: 1;
     min-height: 0;
     overflow: hidden;
   }
@@ -942,10 +1021,10 @@
     gap: 2px;
   }
   .seller-idx-val {
-    font-size: 36px;
-    font-weight: 900;
+    font-size: 56px;
+    font-weight: 800;
     line-height: 0.95;
-    letter-spacing: -1px;
+    letter-spacing: -1.5px;
     font-variant-numeric: tabular-nums;
     text-shadow: 0 0 24px currentColor;
   }
@@ -983,23 +1062,24 @@
   .bar-vals {
     display: flex;
     align-items: baseline;
-    gap: 8px;
+    gap: 10px;
     font-variant-numeric: tabular-nums;
   }
   .bar-actual {
-    font-size: 18px;
+    font-size: 28px;
     font-weight: 800;
-    color: #fff;
+    color: #FFFFFF;
     line-height: 1;
   }
   .bar-target {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--dimmer);
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--dim);
   }
   .bar-pct {
-    font-size: 13px;
+    font-size: 19px;
     font-weight: 800;
+    font-variant-numeric: tabular-nums;
   }
   .bar-track {
     height: 11px;
@@ -1044,30 +1124,29 @@
   /* GF flag row */
   .gf-flag {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 10px;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.04);
-    border-radius: 6px;
-    gap: 8px;
+    align-items: baseline;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 6px 4px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    margin-top: 4px;
   }
   .gf-flag-label {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
-    letter-spacing: 1.5px;
+    letter-spacing: 2.5px;
     color: var(--dim);
     text-transform: uppercase;
   }
   .gf-flag-val {
-    font-size: 13px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    font-size: 18px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    color: #FFFFFF !important;
+    line-height: 1;
   }
-  .gf-flag-val.gf-ok { color: #34D399; }
-  .gf-flag-val.gf-low { color: #DC7243; }
+  .gf-low { color: #FFFFFF !important; }
+  .gf-ok  { color: #FFFFFF !important; }
 
   /* Team rings section */
   .team-rings {
@@ -1075,7 +1154,7 @@
     display: flex;
     align-items: center;
     justify-content: space-around;
-    gap: 10px;
+    gap: 8px;
     min-height: 0;
     overflow: hidden;
   }
@@ -1083,14 +1162,15 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     flex: 1;
     min-width: 0;
   }
   .ring-svg-wrap {
     position: relative;
-    width: 110px;
-    height: 110px;
+    width: 100%;
+    max-width: 200px;
+    aspect-ratio: 1 / 1;
   }
   .ring-svg-wrap svg {
     width: 100%;
@@ -1106,32 +1186,36 @@
     justify-content: center;
   }
   .ring-val {
-    font-size: 28px;
-    font-weight: 900;
+    font-size: 60px;
+    font-weight: 800;
     line-height: 1;
     font-variant-numeric: tabular-nums;
+    color: #FFFFFF !important;
+    text-shadow: none !important;
+    letter-spacing: -1px;
   }
   .ring-tgt {
-    font-size: 10px;
-    font-weight: 600;
+    font-size: 16px;
+    font-weight: 700;
     letter-spacing: 1px;
     color: var(--dim);
-    margin-top: 1px;
+    margin-top: 4px;
+    font-variant-numeric: tabular-nums;
   }
   .ring-label-row {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
   }
   .ring-label {
-    font-size: 11px;
+    font-size: 15px;
     font-weight: 800;
     letter-spacing: 3px;
     color: #fff;
     text-transform: uppercase;
   }
   .ring-pct {
-    font-size: 13px;
+    font-size: 20px;
     font-weight: 800;
     font-variant-numeric: tabular-nums;
   }
@@ -1221,21 +1305,21 @@
     align-items: center;
   }
   .mim-seller {
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 800;
     letter-spacing: 0.5px;
   }
   .mim-time {
-    font-size: 9px;
-    font-weight: 600;
-    color: var(--dimmer);
+    font-size: 13px;
+    font-weight: 700;
+    color: #FFFFFF;
     font-variant-numeric: tabular-nums;
     letter-spacing: 0.5px;
   }
   .mim-cand {
-    font-size: 11px;
-    font-weight: 700;
-    color: #fff;
+    font-size: 14px;
+    font-weight: 800;
+    color: #FFFFFF;
     line-height: 1.2;
     white-space: nowrap;
     overflow: hidden;
@@ -1256,14 +1340,14 @@
     margin-top: 2px;
   }
   .mim-gf {
-    font-size: 9px;
+    font-size: 13px;
     font-weight: 800;
     letter-spacing: 1px;
     background: rgba(52, 211, 153, 0.12);
     color: var(--green);
     border: 1px solid rgba(52, 211, 153, 0.25);
     border-radius: 4px;
-    padding: 2px 6px;
+    padding: 3px 8px;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
   }
@@ -1359,37 +1443,31 @@
     border-bottom: 0;
   }
   .activity-tag {
-    font-weight: 700;
-    letter-spacing: 0.5px;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1.4px;
     text-transform: uppercase;
-    font-size: 10px;
-    padding: 2px 6px;
+    padding: 3px 7px;
     border-radius: 4px;
+    text-align: center;
     white-space: nowrap;
+    border: 1px solid currentColor;
+    background: color-mix(in oklab, currentColor 12%, transparent);
   }
-  .activity-tag.kt {
-    background: rgba(99, 174, 250, 0.15);
-    color: #63AEFA;
-  }
-  .activity-tag.samtale {
-    background: rgba(130, 252, 224, 0.15);
-    color: #82FCE0;
-  }
-  .activity-tag.mim {
-    background: rgba(255, 216, 107, 0.15);
-    color: #FFD86B;
-  }
+  .activity-tag.kt { color: var(--blue); }
+  .activity-tag.samtale { color: var(--orange); }
+  .activity-tag.mim { color: var(--green); }
   .activity-seller {
     font-weight: 800;
     letter-spacing: 0.5px;
     white-space: nowrap;
   }
   .activity-time {
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--dimmer);
+    font-size: 17px;
+    font-weight: 800;
+    color: #FFFFFF;
     font-variant-numeric: tabular-nums;
-    white-space: nowrap;
+    letter-spacing: 0.5px;
   }
 
   /* Live and day pills */
@@ -1480,129 +1558,169 @@
 </style>
 </head>
 <body>
-<!-- Cycling Deep Space backgrounds — two layers for crossfade -->
-<div id="bg-a" class="bg-cycle-layer active" style="background-image:url('bg/5.jpg')"></div>
-<div id="bg-b" class="bg-cycle-layer inactive"></div>
 <!-- Splash preloader: covers screen until data is ready -->
 <div id="splash-preloader">
   <div class="splash-logo">PowerMatch</div>
   <div class="splash-spinner"></div>
 </div>
-<div id="app">
-<div class="header">
-  <div>
-    <h1>POWERMATCH — SALES DASHBOARD</h1>
-    <div class="subtitle"><span class="live-dot"></span><span id="period-label"></span></div>
-  </div>
-  <div style="text-align:right;display:flex;align-items:center;gap:4px">
-    <button class="photo-settings-btn" onclick="togglePhotoMgr()">📷 Fotos</button>
-    <button class="refresh-btn" onclick="testCelebration()">🎉 Test</button>
-    <button class="refresh-btn" id="sound-toggle" onclick="toggleSoundMuted()">🔊</button>
-    <button class="refresh-btn" id="comp-toggle-btn" onclick="manualToggleCompetition()" title="Vis/skjul konkurrence">🏁</button>
-    <button class="refresh-btn" onclick="manualToggleWeekly()" title="Vis/skjul uge-status">📊</button>
-    <button class="refresh-btn" onclick="loadAll()">↻ Opdater</button>
-    <div class="last-updated" id="last-updated"></div>
-  </div>
-</div>
-<!-- Hidden file input for photo upload -->
-<input type="file" id="photo-upload-input" accept="image/*" style="display:none" onchange="handlePhotoUpload(event)">
-<!-- Photo Manager Panel -->
-<div class="photo-mgr" id="photo-mgr">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-    <div style="font-size:13px;font-weight:700;color:#fff">Sælger-fotos</div>
-    <div style="font-size:10px;color:var(--dim)">Klik på avatar for at uploade · Gemmes i browseren</div>
-  </div>
-  <div class="photo-mgr-grid" id="photo-mgr-grid"></div>
-</div>
-<div class="tab-nav">
-  <button class="tab-btn active" id="tab-daglig" onclick="switchTab('daglig')">Daglig</button>
-  <button class="tab-btn"        id="tab-uge"    onclick="switchTab('uge')">Uge</button>
-  <button class="tab-btn"        id="tab-maaned" onclick="switchTab('maaned')">Måned</button>
-  <button class="tab-btn"        id="tab-person" onclick="switchTab('person')">Person</button>
-</div>
+<div id="stage">
+  <div id="frame">
+    <!-- Background layers inside frame -->
+    <div id="bg-a" class="bg-img" style="background-image:url('bg/5.jpg');opacity:1"></div>
+    <div id="bg-b" class="bg-img" style="opacity:0"></div>
+    <div class="bg-overlay"></div>
+    <div class="bg-grid"></div>
+    <div class="bg-vignette"></div>
+    <div id="app">
+      <!-- Header -->
+      <div class="hdr">
+        <div class="hdr-left">
+          <div class="logo-mark">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#82FCE0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13 16 8 11 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+          </div>
+          <div>
+            <div class="logo-text">POWERMATCH</div>
+            <div class="logo-sub">Live Sales Dashboard</div>
+          </div>
+        </div>
+        <div class="hdr-right">
+          <div class="hdr-actions" style="display:flex;align-items:center;gap:6px">
+            <button class="hdr-btn" onclick="togglePhotoMgr()" title="Fotos">
+              <svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"></polyline></svg>
+              <span>Fotos</span>
+            </button>
+            <button class="hdr-btn" onclick="testCelebration()" title="Test">
+              <svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+              <span>Test</span>
+            </button>
+            <button class="hdr-btn icon-only" id="sound-toggle" onclick="toggleSoundMuted()" title="Lyd">
+              <svg class="btn-ic" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.26 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+            </button>
+            <button class="hdr-btn icon-only" id="comp-toggle-btn" onclick="manualToggleCompetition()" title="Konkurrence">
+              <svg class="btn-ic" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg>
+            </button>
+            <button class="hdr-btn icon-only" onclick="manualToggleWeekly()" title="Statistik">
+              <svg class="btn-ic" viewBox="0 0 24 24" fill="currentColor"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
+            </button>
+            <button class="hdr-btn accent" onclick="loadAll()" title="Opdater">
+              <svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0114.85-3.36M20.49 15a9 9 0 01-14.85 3.36"/></svg>
+              <span>Opdater</span>
+            </button>
+          </div>
+          <div class="hdr-divider"></div>
+          <div class="live-pill"><span class="live-dot"></span> LIVE</div>
+          <div class="hdr-divider"></div>
+          <div class="clock-block">
+            <div class="clock-time" id="hdr-clock">00:00</div>
+            <div class="clock-meta" id="hdr-date">—</div>
+          </div>
+        </div>
+      </div>
+      <!-- Hidden file input for photo upload -->
+      <input type="file" id="photo-upload-input" accept="image/*" style="display:none" onchange="handlePhotoUpload(event)">
+      <!-- Photo Manager Panel -->
+      <div class="photo-mgr" id="photo-mgr">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <div style="font-size:13px;font-weight:700;color:#fff">Sælger-fotos</div>
+          <div style="font-size:10px;color:var(--dim)">Klik på avatar for at uploade · Gemmes i browseren</div>
+        </div>
+        <div class="photo-mgr-grid" id="photo-mgr-grid"></div>
+      </div>
+      <!-- Tabs row with day pill -->
+      <div class="tabs-row">
+        <div class="tab-nav">
+          <button class="tab-btn active" id="tab-daglig" onclick="switchTab('daglig')">Daglig</button>
+          <button class="tab-btn"        id="tab-uge"    onclick="switchTab('uge')">Uge</button>
+          <button class="tab-btn"        id="tab-maaned" onclick="switchTab('maaned')">Måned</button>
+          <button class="tab-btn"        id="tab-person" onclick="switchTab('person')">Person</button>
+        </div>
+        <div class="day-pill" id="day-pill">
+          <span class="day-name" id="period-label">—</span>
+          <span class="sep"></span>
+          <span id="last-updated">—</span>
+        </div>
+      </div>
 <div id="loading" style="display:none"></div>
 <div id="error-msg"></div>
-<!-- ══ DAGLIG VIEW ═══════════════════════════════════════════════ -->
-<div id="view-daglig" style="display:none">
-  <div class="picker-row">
-    <label>Dato:</label>
-    <select id="day-select" onchange="renderDaglig()"></select>
-  </div>
-  <!-- Individual seller cards with big rings -->
-  <div class="daily-grid" id="daily-cards"></div>
-  <!-- Team donuts: KT, Samtaler, MiM -->
-  <div class="daily-team-row" id="daily-team-donuts"></div>
-  <div class="bottom-panels">
-    <div class="mim-log-section" id="mim-log-section"></div>
-  </div>
-</div>
-<!-- ══ UGE VIEW ══════════════════════════════════════════════════ -->
-<div id="view-uge" style="display:none">
-  <div class="picker-row">
-    <label>Uge:</label>
-    <select id="week-select" onchange="renderUge()"></select>
-  </div>
-  <div class="section-title">Team KPI'er</div>
-  <div class="kpi-row" id="team-kpis"></div>
-  <div class="section-title">Individuelle Scoreboards</div>
-  <div class="seller-grid" id="seller-cards"></div>
-  <div class="section-title">Trend – Alle uger</div>
-  <div class="grid-2" style="margin-bottom:14px">
-    <div class="card"><div class="card-title">MiM pr. sælger</div><canvas id="mimChart" height="200"></canvas></div>
-    <div class="card"><div class="card-title">KT pr. sælger</div><canvas id="ktChart" height="200"></canvas></div>
-  </div>
-  <div class="grid-2">
-    <div class="card"><div class="card-title">Samtaler pr. sælger</div><canvas id="samChart" height="200"></canvas></div>
-    <div class="card"><div class="card-title">GF pr. sælger (floor 1,90)</div><canvas id="gfChart" height="200"></canvas></div>
-  </div>
-  <div class="section-title" id="mim-details-title">MiM-detaljer</div>
-  <div class="mim-grid" id="mim-details"></div>
-</div>
-<!-- ══ MÅNED VIEW ════════════════════════════════════════════════ -->
-<div id="view-maaned" style="display:none">
-  <div class="picker-row">
-    <label>Måned:</label>
-    <select id="month-select" onchange="renderMaaned()"></select>
-  </div>
-  <div class="section-title">Team KPI'er – Månedsoverblik</div>
-  <div class="kpi-row" id="month-team-kpis"></div>
-  <div class="section-title">Individuelle Scoreboards – Månedstotaler</div>
-  <div class="seller-grid" id="month-seller-cards"></div>
-  <div class="section-title">Ugentlig progression</div>
-  <div class="grid-2">
-    <div class="card"><div class="card-title">MiM pr. uge</div><canvas id="monthMimChart" height="200"></canvas></div>
-    <div class="card"><div class="card-title">KT pr. uge</div><canvas id="monthKtChart" height="200"></canvas></div>
-  </div>
-  <div class="section-title" id="month-mim-title">MiM-detaljer</div>
-  <div class="mim-grid" id="month-mim-details"></div>
-</div>
-<!-- ══ PERSON VIEW ═══════════════════════════════════════════════ -->
-<div id="view-person" style="display:none">
-  <div class="picker-row">
-    <label>Sælger:</label>
-    <select id="person-select" onchange="renderPerson()">
-      <option value="William">William</option>
-      <option value="Jonas">Jonas</option>
-      <option value="Andreas">Andreas</option>
-      <option value="Nick">Nick</option>
-      <option value="Mathias">Mathias</option>
-      <option value="Amalie">Amalie</option>
-    </select>
-    <label style="margin-left:14px">Uge:</label>
-    <select id="person-week-select" onchange="renderPerson()"></select>
-  </div>
-  <div id="person-hero"></div>
-  <div class="section-title">Ugentlig performance</div>
-  <div class="card" style="margin-bottom:16px"><table class="week-table" id="person-week-table"></table></div>
-  <div class="section-title">Trend</div>
-  <div class="grid-3" style="margin-bottom:16px">
-    <div class="card"><div class="card-title">MiM</div><canvas id="personMimChart" height="200"></canvas></div>
-    <div class="card"><div class="card-title">KT</div><canvas id="personKtChart" height="200"></canvas></div>
-    <div class="card"><div class="card-title">GF gennemsnit</div><canvas id="personGfChart" height="200"></canvas></div>
-  </div>
-  <div class="section-title" id="person-mim-title">MiM-detaljer</div>
-  <div id="person-mim-details"></div>
-</div>
+      <!-- ══ DAGLIG VIEW ═══════════════════════════════════════════════ -->
+      <div id="view-daglig" style="display:none">
+        <div class="picker-row" style="display:none">
+          <label>Dato:</label>
+          <select id="day-select" onchange="renderDaglig()"></select>
+        </div>
+        <!-- Single 3x3 grid: 6 seller cards (rows 1-2) + 3 bottom panels (row 3) -->
+        <div class="grid-main" id="daglig-grid"></div>
+      </div>
+      <!-- ══ UGE VIEW ══════════════════════════════════════════════════ -->
+      <div id="view-uge" style="display:none">
+        <div class="picker-row">
+          <label>Uge:</label>
+          <select id="week-select" onchange="renderUge()"></select>
+        </div>
+        <div class="section-title">Team KPI'er</div>
+        <div class="kpi-row" id="team-kpis"></div>
+        <div class="section-title">Individuelle Scoreboards</div>
+        <div class="seller-grid" id="seller-cards"></div>
+        <div class="section-title">Trend – Alle uger</div>
+        <div class="grid-2" style="margin-bottom:14px">
+          <div class="card"><div class="card-title">MiM pr. sælger</div><canvas id="mimChart" height="200"></canvas></div>
+          <div class="card"><div class="card-title">KT pr. sælger</div><canvas id="ktChart" height="200"></canvas></div>
+        </div>
+        <div class="grid-2">
+          <div class="card"><div class="card-title">Samtaler pr. sælger</div><canvas id="samChart" height="200"></canvas></div>
+          <div class="card"><div class="card-title">GF pr. sælger (floor 1,90)</div><canvas id="gfChart" height="200"></canvas></div>
+        </div>
+        <div class="section-title" id="mim-details-title">MiM-detaljer</div>
+        <div class="mim-grid" id="mim-details"></div>
+      </div>
+      <!-- ══ MÅNED VIEW ════════════════════════════════════════════════ -->
+      <div id="view-maaned" style="display:none">
+        <div class="picker-row">
+          <label>Måned:</label>
+          <select id="month-select" onchange="renderMaaned()"></select>
+        </div>
+        <div class="section-title">Team KPI'er – Månedsoverblik</div>
+        <div class="kpi-row" id="month-team-kpis"></div>
+        <div class="section-title">Individuelle Scoreboards – Månedstotaler</div>
+        <div class="seller-grid" id="month-seller-cards"></div>
+        <div class="section-title">Ugentlig progression</div>
+        <div class="grid-2">
+          <div class="card"><div class="card-title">MiM pr. uge</div><canvas id="monthMimChart" height="200"></canvas></div>
+          <div class="card"><div class="card-title">KT pr. uge</div><canvas id="monthKtChart" height="200"></canvas></div>
+        </div>
+        <div class="section-title" id="month-mim-title">MiM-detaljer</div>
+        <div class="mim-grid" id="month-mim-details"></div>
+      </div>
+      <!-- ══ PERSON VIEW ═══════════════════════════════════════════════ -->
+      <div id="view-person" style="display:none">
+        <div class="picker-row">
+          <label>Sælger:</label>
+          <select id="person-select" onchange="renderPerson()">
+            <option value="William">William</option>
+            <option value="Jonas">Jonas</option>
+            <option value="Andreas">Andreas</option>
+            <option value="Nick">Nick</option>
+            <option value="Mathias">Mathias</option>
+            <option value="Amalie">Amalie</option>
+          </select>
+          <label style="margin-left:14px">Uge:</label>
+          <select id="person-week-select" onchange="renderPerson()"></select>
+        </div>
+        <div id="person-hero"></div>
+        <div class="section-title">Ugentlig performance</div>
+        <div class="card" style="margin-bottom:16px"><table class="week-table" id="person-week-table"></table></div>
+        <div class="section-title">Trend</div>
+        <div class="grid-3" style="margin-bottom:16px">
+          <div class="card"><div class="card-title">MiM</div><canvas id="personMimChart" height="200"></canvas></div>
+          <div class="card"><div class="card-title">KT</div><canvas id="personKtChart" height="200"></canvas></div>
+          <div class="card"><div class="card-title">GF gennemsnit</div><canvas id="personGfChart" height="200"></canvas></div>
+        </div>
+        <div class="section-title" id="person-mim-title">MiM-detaljer</div>
+        <div id="person-mim-details"></div>
+      </div>
+    </div><!-- /app -->
+  </div><!-- /frame -->
+</div><!-- /stage -->
 <!-- Celebration overlay — animated WebP background, Samsung TV compatible -->
 <div id="mim-celebration-overlay">
   <div id="celebration-bg"></div>
@@ -1612,6 +1730,39 @@
 // TV MODE – always on (optimized for Samsung Smart TV)
 const TV_MODE = true;
 document.body.classList.add('tv-mode');
+// ═══════════════════════════════════════════════════════════
+// SCALE 1920x1080 frame to fit viewport
+// ═══════════════════════════════════════════════════════════
+function fitStage() {
+  const frame = document.getElementById('frame');
+  if (!frame) return;
+  const w = window.innerWidth || 1920;
+  const h = window.innerHeight || 1080;
+  const s = Math.max(0.1, Math.min(w / 1920, h / 1080));
+  frame.style.transform = 'scale(' + s + ')';
+}
+window.addEventListener('resize', fitStage);
+window.addEventListener('load', fitStage);
+document.addEventListener('DOMContentLoaded', fitStage);
+setTimeout(fitStage, 0);
+setTimeout(fitStage, 100);
+setTimeout(fitStage, 500);
+// ═══════════════════════════════════════════════════════════
+// Header clock
+// ═══════════════════════════════════════════════════════════
+function updateHeaderClock() {
+  const now = new Date();
+  const el = document.getElementById('hdr-clock');
+  const del = document.getElementById('hdr-date');
+  if (el) el.textContent = now.toLocaleTimeString('da-DK', {hour:'2-digit', minute:'2-digit'});
+  if (del) {
+    const days = ['Søndag','Mandag','Tirsdag','Onsdag','Torsdag','Fredag','Lørdag'];
+    const months = ['jan','feb','mar','apr','maj','jun','jul','aug','sep','okt','nov','dec'];
+    del.textContent = days[now.getDay()] + ' ' + now.getDate() + ' ' + months[now.getMonth()];
+  }
+}
+setInterval(updateHeaderClock, 1000);
+updateHeaderClock();
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
@@ -1787,7 +1938,11 @@ function calcSellerArr(rows,ws,we){
   let KT=0,Samtaler=0,mimRows=[];
   for(let i=1;i<rows.length;i++){
     const r=rows[i];
-    const g=v=>v instanceof Date?fmtDate(v):String(v||'');
+    const g=v=>{
+      if(v instanceof Date) return fmtDate(v);
+      if(typeof v==='string'&&v.includes('T')){ const dt=new Date(v); return isNaN(dt)?String(v||''):fmtDate(dt); }
+      return String(v||'');
+    };
     const r0=g(r[0]),r1=g(r[1]),r6=g(r[6]),r7=g(r[7]);
     const r13=g(r[13]),r14=g(r[14]),r15=g(r[15]),r16=g(r[16]),r17=g(r[17]),r18=g(r[18]),r21=g(r[21]);
     if(inRange(r0,ws,we)&&r1.trim()) KT++;
@@ -2565,7 +2720,12 @@ function switchTab(tab){
   _currentTab=tab;
   ['daglig','uge','maaned','person'].forEach(t=>{
     document.getElementById('tab-'+t).classList.toggle('active',t===tab);
-    document.getElementById('view-'+t).style.display=t===tab?'block':'none';
+    const view = document.getElementById('view-'+t);
+    if(t===tab) {
+      view.style.display = (t === 'daglig') ? 'flex' : 'block';
+    } else {
+      view.style.display = 'none';
+    }
   });
   if(tab==='daglig') renderDaglig();
   if(tab==='uge') renderUge();
@@ -2627,7 +2787,7 @@ function renderDaglig(){
   function pctClass(pct) { return 'pct-' + statusFor(pct); }
 
   // Ring SVG helper
-  function ringSVG(pct, color, size=110, stroke=11) {
+  function ringSVG(pct, color, size=200, stroke=18) {
     const r = (size - stroke) / 2;
     const c = 2 * Math.PI * r;
     const dash = c * Math.min(pct, 100) / 100;
@@ -2641,44 +2801,59 @@ function renderDaglig(){
 
   // Build activity feed for today
   function buildActivityFeed(date) {
-    const dateStr = fmtDate(date);
     const entries = [];
+    // Helper: parse raw value to full Date (preserving time from ISO strings)
+    function fullDate(v) {
+      if (v instanceof Date) return v;
+      if (typeof v === 'string' && v.includes('T')) { const dt = new Date(v); return isNaN(dt) ? null : dt; }
+      return null; // DD/MM/YYYY entries have no time info
+    }
+    // Helper: convert raw value to local date string for range comparison
+    function toLocalDateStr(v) {
+      if (v instanceof Date) return fmtDate(v);
+      if (typeof v === 'string' && v.includes('T')) { const dt = new Date(v); return isNaN(dt) ? String(v||'') : fmtDate(dt); }
+      return String(v || '');
+    }
     for (let i = 0; i < NAMES.length; i++) {
       const seller = NAMES[i];
       const sheet = sheets[i];
       const rows = _rawData[sheet] || [];
       for (let j = 1; j < rows.length; j++) {
         const r = rows[j];
-        const g = v => v instanceof Date ? fmtDate(v) : String(v || '');
-        // KT entries
-        const r0 = g(r[0]), r1 = g(r[1]);
-        if (inRange(r0, date, date) && r1.trim()) {
-          const timestamp = typeof r[0] === 'object' ? r[0] : parseDate(r0);
-          entries.push({ type: 'KT', seller, timestamp, time: timestamp ? timestamp.toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' }) : '—' });
+        // KT entries (col A=date, col B=company)
+        const r0ds = toLocalDateStr(r[0]), r1 = String(r[1]||'').trim();
+        if (inRange(r0ds, date, date) && r1) {
+          const ts = fullDate(r[0]);
+          entries.push({ type: 'KT', seller, timestamp: ts, time: ts ? ts.toLocaleTimeString('da-DK',{hour:'2-digit',minute:'2-digit'}) : '—' });
         }
-        // Samtaler entries
-        const r6 = g(r[6]), r7 = g(r[7]);
-        if (inRange(r6, date, date) && r7.trim()) {
-          const timestamp = typeof r[6] === 'object' ? r[6] : parseDate(r6);
-          entries.push({ type: 'Samtale', seller, timestamp, time: timestamp ? timestamp.toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' }) : '—' });
+        // Samtaler entries (col G=date, col H=company)
+        const r6ds = toLocalDateStr(r[6]), r7 = String(r[7]||'').trim();
+        if (inRange(r6ds, date, date) && r7) {
+          const ts = fullDate(r[6]);
+          entries.push({ type: 'Samtale', seller, timestamp: ts, time: ts ? ts.toLocaleTimeString('da-DK',{hour:'2-digit',minute:'2-digit'}) : '—' });
         }
-        // MiM entries
-        const r13 = g(r[13]), r14 = g(r[14]), r15 = g(r[15]), r21 = g(r[21]);
-        if (inRange(r13, date, date) && r15.trim()) {
+        // MiM entries (col N=date, col P=company, col V=status)
+        const r13ds = toLocalDateStr(r[13]), r15 = String(r[15]||'').trim(), r21 = String(r[21]||'');
+        if (inRange(r13ds, date, date) && r15) {
           if (!/startede aldrig/i.test(r21) && !/opsagt samme uge/i.test(r21)) {
-            const timestamp = typeof r[13] === 'object' ? r[13] : parseDate(r13);
-            entries.push({ type: 'MiM', seller, timestamp, time: timestamp ? timestamp.toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' }) : '—' });
+            const ts = fullDate(r[13]);
+            entries.push({ type: 'MiM', seller, timestamp: ts, time: ts ? ts.toLocaleTimeString('da-DK',{hour:'2-digit',minute:'2-digit'}) : '—' });
           }
         }
       }
     }
-    // Sort by timestamp descending, return top 8
-    entries.sort((a, b) => (b.timestamp || new Date()) - (a.timestamp || new Date()));
+    // Sort by timestamp descending (entries without timestamp last), return top 8
+    entries.sort((a, b) => {
+      if (!a.timestamp && !b.timestamp) return 0;
+      if (!a.timestamp) return 1;
+      if (!b.timestamp) return -1;
+      return b.timestamp - a.timestamp;
+    });
     return entries.slice(0, 8);
   }
 
-  // Render 6 seller cards in grid
-  document.getElementById('daily-cards').innerHTML=NAMES.map(name=>{
+  // Render ALL 9 cells into single grid
+  const sellerCardsHtml = NAMES.map(name=>{
     const s=dayData[name];
     const tgt=getTarget(name, d);
     const pctKT=idx(s.KT,tgt.KT), pctSam=idx(s.Samtaler,tgt.Samtaler), pctMiM=idx(s.MiM,tgt.MIM);
@@ -2717,7 +2892,7 @@ function renderDaglig(){
           </div>
         </div>
         <div class="seller-idx">
-          <div class="seller-idx-val" style="color:${avgColor}">${avgPct}%</div>
+          <div class="seller-idx-val" style="color:${avgColor}">${avgPct}<span style="font-size:28px;margin-left:4px;font-weight:700">%</span></div>
           <div class="seller-idx-label">Index</div>
         </div>
       </div>
@@ -2732,7 +2907,8 @@ function renderDaglig(){
     </div>`;
   }).join('');
 
-  // Team rings row
+  // Build bottom 3 panels, then combine everything into one grid
+  // Team rings
   const tKT=NAMES.reduce((s,n)=>s+dayData[n].KT,0);
   const tSam=NAMES.reduce((s,n)=>s+dayData[n].Samtaler,0);
   const tMiM=NAMES.reduce((s,n)=>s+dayData[n].MiM,0);
@@ -2747,19 +2923,21 @@ function renderDaglig(){
 
   // MiM Log
   const activityFeed = buildActivityFeed(d);
-  const mimEntries = dayData['William'].mimRows || [];
-  NAMES.forEach(n => {
-    const entries = (dayData[n].mimRows || []).slice(0, 4);
-  });
-  const mimCardsList = NAMES.flatMap(n => (dayData[n].mimRows || []).slice(0, 1).map(entry => ({
+  const mimCardsList = NAMES.flatMap(n => (dayData[n].mimRows || []).map(entry => ({
     seller: n,
     cand: entry.kandidat,
     co: entry.virk,
     gf: entry.gf,
-    time: entry.dato.substring(0, 5)
-  }))).slice(0, 4);
+    time: entry.dato.substring(0, 5),
+    timestamp: entry.dato
+  }))).sort((a, b) => {
+    // Sort by timestamp descending (most recent first)
+    const aTime = new Date(a.timestamp);
+    const bTime = new Date(b.timestamp);
+    return bTime - aTime;
+  }).slice(0, 4);
 
-  document.getElementById('daily-team-donuts').innerHTML = `
+  const bottomPanelsHtml = `
     <div class="glass team-rings">
       ${teamRings.map(k => {
         const i = idx(k.v, k.m);
@@ -2767,9 +2945,9 @@ function renderDaglig(){
         const rc = statusColor(iSafe);
         return `<div class="ring-wrap">
           <div class="ring-svg-wrap">
-            ${ringSVG(iSafe, rc, 110, 11)}
+            ${ringSVG(iSafe, rc, 200, 18)}
             <div class="ring-center">
-              <div class="ring-val" style="color:${rc};text-shadow:0 0 16px ${rc}80">${k.v}</div>
+              <div class="ring-val">${k.v}</div>
               <div class="ring-tgt">/ ${k.m}</div>
             </div>
           </div>
@@ -2826,6 +3004,9 @@ function renderDaglig(){
       </div>
     </div>
   `;
+
+  // Write everything into the single 3x3 grid
+  document.getElementById('daglig-grid').innerHTML = sellerCardsHtml + bottomPanelsHtml;
 }
 
 // Hall of Fame renderer
@@ -3373,12 +3554,24 @@ _compInterval = setInterval(checkRotationTimer, 10000);
       if (!elA || !elB) return;
       if(showingA){
         elB.style.backgroundImage = nextSrc;
-        elA.classList.replace('active','inactive');
-        elB.classList.replace('inactive','active');
+        // New system: use opacity for .bg-img elements
+        if (elA.classList.contains('bg-img')) {
+          elA.style.opacity = '0';
+          elB.style.opacity = '1';
+        } else {
+          // Old overlay system: use active/inactive classes
+          elA.classList.replace('active','inactive');
+          elB.classList.replace('inactive','active');
+        }
       } else {
         elA.style.backgroundImage = nextSrc;
-        elB.classList.replace('active','inactive');
-        elA.classList.replace('inactive','active');
+        if (elA.classList.contains('bg-img')) {
+          elB.style.opacity = '0';
+          elA.style.opacity = '1';
+        } else {
+          elB.classList.replace('active','inactive');
+          elA.classList.replace('inactive','active');
+        }
       }
     });
     showingA = !showingA;
@@ -3434,6 +3627,5 @@ _compInterval = setInterval(checkRotationTimer, 10000);
     </div>
   </div>
 </div>
-</div><!-- /app -->
 </body>
 </html>
