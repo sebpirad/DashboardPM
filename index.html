@@ -166,7 +166,7 @@
   .delta-neu { color: var(--dim); font-size: 11px; }
   .divider { border: none; border-top: 1px solid var(--card-border); margin: 10px 0; }
   /* ── Seller cards ── */
-  .seller-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 16px; }
+  .seller-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
   .seller-card {
     background: linear-gradient(160deg, #1B1A30 0%, #272745 100%);
     border: 1px solid var(--card-border); border-radius: 12px; padding: 16px;
@@ -192,7 +192,7 @@
   /* ════════════════════════════════════════════════════════
      DAGLIG DASHBOARD
      ═══════════════════════��════════════════════════════════ */
-  .daily-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 8px; overflow: hidden; }
+  .daily-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 8px; overflow: hidden; }
   .daily-card {
     background: linear-gradient(160deg, #1B1A30 0%, #272745 50%, #1B1A30 100%);
     border: 1px solid var(--card-border); border-radius: 16px;
@@ -888,7 +888,6 @@
   <div class="daily-team-row" id="daily-team-donuts"></div>
   <div class="bottom-panels">
     <div class="mim-log-section" id="mim-log-section"></div>
-
   </div>
 </div>
 <!-- ══ UGE VIEW ══════════════════════════════════════════════════ -->
@@ -939,7 +938,8 @@
       <option value="William">William</option>
       <option value="Jonas">Jonas</option>
       <option value="Andreas">Andreas</option>
-      <option value="Flora">Flora</option>
+      <option value="Nick">Nick</option>
+      <option value="Mathias">Mathias</option>
       <option value="Amalie">Amalie</option>
     </select>
     <label style="margin-left:14px">Uge:</label>
@@ -969,7 +969,7 @@ document.body.classList.add('tv-mode');
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfXPt5fy2E7PP8JX5mYXeYbkU-KNTn9wlffC9T7PXUbsjRdNvmlcvCxMvxpkLZKq2V/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwa9SVTez3iaWRUpQuye1t1EJcu5AIKGHDjo5bRqgU7BTiTbZNHal9Qkud1Tn8DUxIK/exec';
 const NAMES = ['William','Jonas','Andreas','Nick','Mathias','Amalie'];
 const COLORS = { William:'#63AEFA', Jonas:'#DC7243', Andreas:'#82FCE0', Nick:'#f472b6', Mathias:'#fbbf24', Amalie:'#a3e635', floor:'#A72444', maal:'#3B3B61' };
 // Seller photo configuration – GitHub-hosted + localStorage fallback
