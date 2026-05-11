@@ -2489,7 +2489,11 @@ function initializeMiMTracking() {
     let sellerMimToday = 0;
     for (let j = 1; j < rows.length; j++) {
       const r = rows[j];
-      const g = v => v instanceof Date ? fmtDate(v) : String(v || '');
+      const g = v => {
+        if(v instanceof Date) return fmtDate(v);
+        if(typeof v==='string' && v.includes('T')){ const dt=new Date(v); return isNaN(dt)?String(v||''):fmtDate(dt); }
+        return String(v||'');
+      };
       const r13 = g(r[13]), r14 = g(r[14]), r15 = g(r[15]), r21 = g(r[21]);
       if (r15.trim() && r13.trim()) {
         if (!/startede aldrig/i.test(r21) && !/opsagt samme uge/i.test(r21)) {
@@ -2545,6 +2549,8 @@ function testCelebration() {
 // ═══════════════════════════════════════════════════════════
 // FETCH
 // ═══════════════════════════════════════════════════════════
+
+
 async function loadAll(){
   document.getElementById('loading').style.display='flex';
   ['daglig','uge','maaned','person'].forEach(t=>document.getElementById('view-'+t).style.display='none');
@@ -2656,16 +2662,16 @@ async function loadAll(){
       }, { once: true });
     }
   }catch(e){
+    console.error('[loadAll] Fejl:', e.message);
+    // Show error message
     document.getElementById('loading').style.display='none';
-    // Also dismiss splash on error so user sees the error message
     const splash = document.getElementById('splash-preloader');
     if (splash) {
       splash.classList.add('fade-out');
       setTimeout(() => splash.remove(), 600);
     }
     document.getElementById('error-msg').style.display='block';
-    document.getElementById('error-msg').textContent='⚠️ Fejl: '+e.message;
-    console.error(e);
+    document.getElementById('error-msg').innerHTML='⚠️ Server svarer ikke.<br><small style="opacity:0.7">Klik Opdater for at prøve igen</small>';
   }
 }
 // ═══════════════════════════════════════════════════════════
@@ -2710,7 +2716,6 @@ async function silentRefresh() {
     // Update competition scores if visible
     if (document.getElementById('comp-overlay')?.classList.contains('active')) renderCompetition();
   } catch (e) {
-    console.warn('Silent refresh failed:', e);
   }
 }
 // ═══════════════════════════════════════════════════════════
